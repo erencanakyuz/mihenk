@@ -1,0 +1,39 @@
+# Ortam ve gizli bilgiler
+.env
+.env.local
+*.key
+*.pem
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+*.log
+
+# Editör / işletim sistemi
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Model ağırlıkları ve büyük veri
+*.gguf
+*.safetensors
+*.bin
+data/raw/
+data/interim/
+
+# Yarışma belgeleri ve iç çalışma notları — bu depoya girmez
+*.docx
+*.pdf
