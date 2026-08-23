@@ -8,12 +8,12 @@ const ratio = (a,b) => { const l1=L(hex(a)), l2=L(hex(b)); const [hi,lo]=l1>l2?[
 const mix = (a,b,p) => { const A=hex(a), B=hex(b);
   return '#'+A.map((v,i)=>Math.round(v*p + B[i]*(1-p)).toString(16).padStart(2,'0')).join(''); };
 
-const N = { bg:'#000000', bg2:'#16181c', bg3:'#202327', border:'#2f3336',
-  text:'#e7e9ea', text2:'#8b98a5', accent:'#1d9bf0', fill:'#157abd', ink:'#ffffff',
-  like:'#f91880', repost:'#00ba7c' };
-const C = { bg:'#070502', bg2:'#1c1409', bg3:'#2a1e0e', border:'#3f2f16',
-  text:'#f7f0e6', text2:'#b0a08a', accent:'#ff9d2e', fill:'#ff9d2e', ink:'#150c02' };
-const V = { verified:'#3ecf7f', official:'#5aabf5', unverified:'#ffb020', disputed:'#ff5c52' };
+const N = { bg:'#121516', bg2:'#1a1e20', bg3:'#232829', border:'#2a3032',
+  text:'#e5eaea', text2:'#8fa0a3', accent:'#2fa8a0', fill:'#228177', ink:'#ffffff',
+  like:'#e8577a', repost:'#2f9e6e' };
+const C = { bg:'#17110d', bg2:'#241a13', bg3:'#32241a', border:'#3c2c1f',
+  text:'#f3ece3', text2:'#ab998a', accent:'#d98a3a', fill:'#c07728', ink:'#1a1006' };
+const V = { verified:'#7fbf8f', official:'#7fa8cf', unverified:'#d9ab4a', disputed:'#e0604a' };
 
 let fails = 0;
 const rows = [];

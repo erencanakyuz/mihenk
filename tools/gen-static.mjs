@@ -49,7 +49,7 @@ let block = `
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
 ${crisis}
 
-    <h2>Sana Özel</h2>
+    <h2>Akış</h2>
 ${normal}
 
     <p class="meta" style="margin-top:24px">Tüm hesaplar kurgusal şablon hesaplardır. Prototip.</p>

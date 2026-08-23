@@ -95,6 +95,16 @@ ul { list-style: none; margin: 0; padding: 0; }
 .nav__item:disabled { opacity: .42; }
 .nav__item:disabled:hover { background: none; }
 .nav__item[aria-current="page"] { font-weight: 700; }
+
+/* "Kriz Durumu" nav item's live indicator — fixed amber, not the palette
+   token: it must read the same whether you're currently looking at the
+   turquoise normal palette or the amber crisis one. */
+.nav__dot {
+  width: 7px; height: 7px; border-radius: 50%; margin-left: auto;
+  background: var(--c-border); flex: 0 0 auto;
+  transition: background-color 160ms var(--ease-out);
+}
+.nav__dot[data-on="1"] { background: #d98a3a; }
 .nav__post {
   margin: 16px 4px 0;
   height: 52px; border-radius: 999px;
@@ -136,7 +146,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   align-items: center; padding: 0 var(--pad-x); gap: 20px;
   background: color-mix(in srgb, var(--c-bg) 85%, transparent);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  font-size: 20px; font-weight: 700;
+  font-size: 20px; font-weight: 700; font-family: var(--ff-display);
+  letter-spacing: .01em;
 }
 
 /* ---- tab bar ----------------------------------------------------------- */
@@ -217,7 +228,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: var(--c-bg-2);
   border-radius: 16px; margin-bottom: 16px; overflow: hidden;
 }
-.card__h { font-size: 20px; font-weight: 800; padding: 12px 16px 4px; }
+.card__h { font-size: 19px; font-weight: 700; padding: 12px 16px 4px; font-family: var(--ff-display); }
 .card__row {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 16px;
@@ -230,6 +241,19 @@ ul { list-style: none; margin: 0; padding: 0; }
 .card__t { font-size: 15px; font-weight: 700; }
 .card__more { padding: 12px 16px; color: var(--c-accent); font-size: 15px; display: block; width: 100%; text-align: left; }
 .card__more:disabled { color: var(--c-text-2); opacity: .55; }
+
+/* ---- Bölge Güven Durumu ------------------------------------------------- */
+.trust-card__body { padding: 2px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.trust-card__row { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 700; }
+.trust-card__stat {
+  font-size: 30px; font-weight: 700; line-height: 1; font-family: var(--ff-display);
+  font-variant-numeric: tabular-nums; color: var(--c-text);
+}
+.trust-card__stat small { font-size: 12px; font-weight: 400; color: var(--c-text-2); margin-left: 6px; }
+.trust-card__meter {
+  height: 6px; border-radius: 999px; background: var(--c-bg-3); overflow: hidden;
+}
+.trust-card__meter i { display: block; height: 100%; background: var(--c-accent); border-radius: 999px; }
 .btn-follow {
   background: var(--c-text); color: var(--c-bg);
   border-radius: 999px; height: 32px; padding: 0 16px; font-weight: 700; font-size: 14px;

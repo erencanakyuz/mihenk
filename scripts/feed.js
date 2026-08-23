@@ -88,7 +88,7 @@
     p.innerHTML = '';
     p.appendChild(el('<div class="pin-host" data-feed="' + id + '"></div>'));
     p.appendChild(host);
-    p.appendChild(el('<div class="feed__end">Akışın sonundasın · ' + (id === 'following' ? 'Takip' : 'Sana Özel') + '</div>'));
+    p.appendChild(el('<div class="feed__end">Akışın sonundasın · ' + (id === 'following' ? 'Takip' : 'Akış') + '</div>'));
   };
 
   /* ------------------------------------------- optimistic like / repost */

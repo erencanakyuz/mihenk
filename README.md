@@ -24,7 +24,7 @@ Geliştirme sunucusu yalnızca yerel makineye bağlanır.
 
 | Rota | İçerik |
 |---|---|
-| / | Sana Özel |
+| / | Akış |
 | /takip | Takip |
 | /kriz | Kriz modu açık olarak doğrudan kriz akışı |
 | ?demo=1 | Senaryolu prototip kontrol paneli |

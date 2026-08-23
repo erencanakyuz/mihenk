@@ -12,7 +12,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~272 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~275 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -161,7 +161,7 @@
         <div class="meta">Pazarcık · Durum Bilgisi</div>
       </article>
 
-    <h2>Sana Özel</h2>
+    <h2>Akış</h2>
       <article>
         <div class="who"><b>Mert Arslan</b> @mertarslan · 12 dk</div>
         <p>Üç saattir peşinde olduğum hata, tek bir eksik noktalı virgülmüş. Meslek hayatımın özeti.</p>
@@ -211,48 +211,58 @@
 <style>
 /* ===== styles/tokens.css ===== */
 /* ==========================================================================
-   MİHENK — design tokens
-   Two palettes: normal (X-blue) and crisis (amber).
-   Colour tokens are registered with @property so a palette swap on :root
-   cross-fades instead of snapping. Nothing else changes between modes.
+   MİHENK · design tokens
+   Two palettes: normal ("Taş & Sinyal" — stone grey + turquoise) and crisis
+   (amber-terracotta). Colour tokens are registered with @property so a
+   palette swap on :root cross-fades instead of snapping. Nothing else
+   changes between modes. Direction + full colour table: GORSEL_KIMLIK_SPEC.md
+   at the repo root (sibling of mihenk/).
    ========================================================================== */
 
-@property --c-bg        { syntax: '<color>'; inherits: true; initial-value: #000000; }
-@property --c-bg-2      { syntax: '<color>'; inherits: true; initial-value: #16181c; }
-@property --c-bg-3      { syntax: '<color>'; inherits: true; initial-value: #202327; }
-@property --c-border    { syntax: '<color>'; inherits: true; initial-value: #2f3336; }
-@property --c-text      { syntax: '<color>'; inherits: true; initial-value: #e7e9ea; }
-@property --c-text-2    { syntax: '<color>'; inherits: true; initial-value: #8b98a5; }
-@property --c-accent    { syntax: '<color>'; inherits: true; initial-value: #1d9bf0; }
-@property --c-accent-2  { syntax: '<color>'; inherits: true; initial-value: #1a8cd8; }
-@property --c-accent-fill{ syntax: '<color>'; inherits: true; initial-value: #157abd; }
+@font-face {
+  font-family: "Archivo";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("../assets/fonts/archivo-700.woff2") format("woff2");
+}
+
+@property --c-bg        { syntax: '<color>'; inherits: true; initial-value: #121516; }
+@property --c-bg-2      { syntax: '<color>'; inherits: true; initial-value: #1a1e20; }
+@property --c-bg-3      { syntax: '<color>'; inherits: true; initial-value: #232829; }
+@property --c-border    { syntax: '<color>'; inherits: true; initial-value: #2a3032; }
+@property --c-text      { syntax: '<color>'; inherits: true; initial-value: #e5eaea; }
+@property --c-text-2    { syntax: '<color>'; inherits: true; initial-value: #8fa0a3; }
+@property --c-accent    { syntax: '<color>'; inherits: true; initial-value: #2fa8a0; }
+@property --c-accent-2  { syntax: '<color>'; inherits: true; initial-value: #279088; }
+@property --c-accent-fill{ syntax: '<color>'; inherits: true; initial-value: #228177; }
 @property --c-accent-ink{ syntax: '<color>'; inherits: true; initial-value: #ffffff; }
 @property --c-scrim     { syntax: '<color>'; inherits: true; initial-value: rgba(0,0,0,.65); }
 
 :root {
-  /* ---- palette: normal ------------------------------------------------ */
-  --c-bg:         #000000;
-  --c-bg-2:       #16181c;   /* elevated surfaces, inputs, sidebar cards   */
-  --c-bg-3:       #202327;   /* pressed / secondary button                 */
-  --c-border:     #2f3336;
-  --c-text:       #e7e9ea;
-  --c-text-2:     #8b98a5;   /* meta text — AA on #000                     */
-  --c-accent:     #1d9bf0;   /* text, icons, borders — 7.00:1 on #000       */
-  --c-accent-2:   #1a8cd8;
-  --c-accent-fill:#157abd;   /* filled surfaces — 4.61:1 with white ink      */
+  /* ---- palette: normal, "Taş & Sinyal" --------------------------------- */
+  --c-bg:         #121516;   /* soğuk taş grisi, saf siyah değil            */
+  --c-bg-2:       #1a1e20;   /* elevated surfaces, inputs, sidebar cards   */
+  --c-bg-3:       #232829;   /* pressed / secondary button                 */
+  --c-border:     #2a3032;
+  --c-text:       #e5eaea;
+  --c-text-2:     #8fa0a3;   /* meta text                                   */
+  --c-accent:     #2fa8a0;   /* İznik turkuazı — text, icons, borders       */
+  --c-accent-2:   #279088;
+  --c-accent-fill:#228177;   /* filled surfaces, koyu turkuaz               */
   --c-accent-ink: #ffffff;
   --c-scrim:      rgba(0,0,0,.65);
 
   /* engagement colours (normal feed only) */
-  --c-reply:  #1d9bf0;
-  --c-repost: #00ba7c;
-  --c-like:   #f91880;
+  --c-reply:  #2fa8a0;
+  --c-repost: #2f9e6e;
+  --c-like:   #e8577a;
 
   /* verification colours (crisis feed only) */
-  --v-verified:    #3ecf7f;
-  --v-official:    #5aabf5;
-  --v-unverified:  #ffb020;
-  --v-disputed:    #ff5c52;
+  --v-verified:    #7fbf8f;
+  --v-official:    #7fa8cf;
+  --v-unverified:  #d9ab4a;
+  --v-disputed:    #e0604a;
 
   /* hover / halo tints, derived */
   --hover-row:  rgba(255,255,255,.03);
@@ -264,8 +274,10 @@
   --fs-name: 20px;
   --lh-body: 20px;
 
-  --ff: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  --ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         "Helvetica Neue", Arial, sans-serif;
+  --ff-display: "Archivo", -apple-system, "Segoe UI Semibold", "Segoe UI",
+        Roboto, Arial, sans-serif;
 
   /* ---- metrics -------------------------------------------------------- */
   --avatar: 40px;
@@ -300,18 +312,22 @@
     --c-accent-ink var(--t-palette) linear;
 }
 
-/* ---- palette: crisis --------------------------------------------------- */
+/* ---- palette: crisis ---------------------------------------------------
+   Aynı "Taş & Sinyal" ailesinde sıcak amber-terrakotaya kayar — normal
+   moddaki soğuk turkuazla asla karışmaz. Doğrulama rozetlerindeki kırmızı
+   (--v-disputed) bilerek bu amberden ayrı tutuldu: "kriz aktif" ile "bu
+   gönderi çelişkili" iki ayrı sinyal, aynı renk olursa birbirine karışır. */
 :root[data-palette="crisis"] {
-  --c-bg:         #070502;   /* still near-black, warm cast                */
-  --c-bg-2:       #1c1409;
-  --c-bg-3:       #2a1e0e;
-  --c-border:     #3f2f16;
-  --c-text:       #f7f0e6;
-  --c-text-2:     #b0a08a;   /* AA on #070502                              */
-  --c-accent:     #ff9d2e;   /* high-contrast amber — 9.80:1 on #070502    */
-  --c-accent-2:   #ffb15c;
-  --c-accent-fill:#ff9d2e;   /* dark ink on amber — 9.32:1                  */
-  --c-accent-ink: #150c02;   /* dark ink on amber fills                    */
+  --c-bg:         #17110d;   /* sıcak neredeyse-siyah                      */
+  --c-bg-2:       #241a13;
+  --c-bg-3:       #32241a;
+  --c-border:     #3c2c1f;
+  --c-text:       #f3ece3;
+  --c-text-2:     #ab998a;
+  --c-accent:     #d98a3a;   /* amber-terrakota, genel kriz vurgusu         */
+  --c-accent-2:   #e3a35c;
+  --c-accent-fill:#c07728;
+  --c-accent-ink: #1a1006;
   --c-scrim:      rgba(12,7,2,.72);
 
   --hover-row:  rgba(255, 200, 130, .045);
@@ -424,6 +440,16 @@ ul { list-style: none; margin: 0; padding: 0; }
 .nav__item:disabled { opacity: .42; }
 .nav__item:disabled:hover { background: none; }
 .nav__item[aria-current="page"] { font-weight: 700; }
+
+/* "Kriz Durumu" nav item's live indicator — fixed amber, not the palette
+   token: it must read the same whether you're currently looking at the
+   turquoise normal palette or the amber crisis one. */
+.nav__dot {
+  width: 7px; height: 7px; border-radius: 50%; margin-left: auto;
+  background: var(--c-border); flex: 0 0 auto;
+  transition: background-color 160ms var(--ease-out);
+}
+.nav__dot[data-on="1"] { background: #d98a3a; }
 .nav__post {
   margin: 16px 4px 0;
   height: 52px; border-radius: 999px;
@@ -465,7 +491,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   align-items: center; padding: 0 var(--pad-x); gap: 20px;
   background: color-mix(in srgb, var(--c-bg) 85%, transparent);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  font-size: 20px; font-weight: 700;
+  font-size: 20px; font-weight: 700; font-family: var(--ff-display);
+  letter-spacing: .01em;
 }
 
 /* ---- tab bar ----------------------------------------------------------- */
@@ -546,7 +573,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: var(--c-bg-2);
   border-radius: 16px; margin-bottom: 16px; overflow: hidden;
 }
-.card__h { font-size: 20px; font-weight: 800; padding: 12px 16px 4px; }
+.card__h { font-size: 19px; font-weight: 700; padding: 12px 16px 4px; font-family: var(--ff-display); }
 .card__row {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 16px;
@@ -559,6 +586,19 @@ ul { list-style: none; margin: 0; padding: 0; }
 .card__t { font-size: 15px; font-weight: 700; }
 .card__more { padding: 12px 16px; color: var(--c-accent); font-size: 15px; display: block; width: 100%; text-align: left; }
 .card__more:disabled { color: var(--c-text-2); opacity: .55; }
+
+/* ---- Bölge Güven Durumu ------------------------------------------------- */
+.trust-card__body { padding: 2px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.trust-card__row { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 700; }
+.trust-card__stat {
+  font-size: 30px; font-weight: 700; line-height: 1; font-family: var(--ff-display);
+  font-variant-numeric: tabular-nums; color: var(--c-text);
+}
+.trust-card__stat small { font-size: 12px; font-weight: 400; color: var(--c-text-2); margin-left: 6px; }
+.trust-card__meter {
+  height: 6px; border-radius: 999px; background: var(--c-bg-3); overflow: hidden;
+}
+.trust-card__meter i { display: block; height: 100%; background: var(--c-accent); border-radius: 999px; }
 .btn-follow {
   background: var(--c-text); color: var(--c-bg);
   border-radius: 999px; height: 32px; padding: 0 16px; font-weight: 700; font-size: 14px;
@@ -1738,7 +1778,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   M.state = state;
 
   var TABS = {
-    foryou:    { id: 'foryou',    label: 'Sana Özel', path: '/' },
+    foryou:    { id: 'foryou',    label: 'Akış',       path: '/' },
     following: { id: 'following', label: 'Takip',     path: '/takip' },
     crisis:    { id: 'crisis',    label: 'Kriz Var',  path: '/kriz' }
   };
@@ -1816,11 +1856,14 @@ ul { list-style: none; margin: 0; padding: 0; }
   }
   M.openModal = openModal; M.closeModal = closeModal;
 
-  /* ----------------------------------------------------------- shell HTML */
+  /* ----------------------------------------------------------- shell HTML
+     4 gerçek işlev, X'in 9 maddelik (çoğu prototipte işlevsiz) navının
+     yerine. Bkz. GORSEL_KIMLIK_SPEC.md §3. */
   var NAV = [
-    ['home', 'Anasayfa', 'home'], ['search', 'Keşfet', 'search'], ['bell', 'Bildirimler'],
-    ['mail', 'Mesajlar'], ['grok', 'Yapay Zekâ'], ['bookmark', 'Yer İşaretleri'],
-    ['star', 'Premium'], ['user', 'Profil'], ['dotsc', 'Daha Fazla']
+    ['home', 'Ana Akış', 'home'],
+    ['warn', 'Kriz Durumu', 'crisis'],
+    ['sos', 'İmdat', 'imdat'],
+    ['user', 'Profil']
   ];
 
   function logo() {
@@ -1832,29 +1875,16 @@ ul { list-style: none; margin: 0; padding: 0; }
   function buildShell() {
     var navHtml = NAV.map(function (n) {
       var active = n[2] === 'home';
+      var badge = n[2] === 'crisis' ? '<span class="nav__dot" data-crisis-dot aria-hidden="true"></span>' : '';
       return '<li><button class="nav__item" type="button" ' +
         (n[2] ? 'data-nav="' + n[2] + '" ' : 'disabled aria-disabled="true" title="Prototip kapsamı dışında" ') +
-        (active ? 'aria-current="page"' : '') + '>' + icon(n[0], 'ic--lg') + '<span>' + n[1] + '</span></button></li>';
+        (active ? 'aria-current="page"' : '') + '>' + icon(n[0], 'ic--lg') + '<span>' + n[1] + '</span>' + badge + '</button></li>';
     }).join('');
 
     var side =
       '<div class="side__search"><div class="side__search-box">' + icon('search') +
         '<input type="search" placeholder="Ara" aria-label="Gönderilerde ara" data-search-input></div></div>' +
-      '<section class="card" id="trends"><h2 class="card__h">Gündem</h2>' +
-        trendRow('Türkiye’de gündem', 'Yerel üretim', '42,1 B') +
-        trendRow('Teknoloji · Gündem', 'Tarayıcı oyunları', '18,7 B') +
-        trendRow('Spor · Gündem', 'Derbi haftası', '96,4 B') +
-        trendRow('Gündem', 'Hava durumu', '11,2 B') +
-        '<button class="card__more" type="button" disabled aria-disabled="true">Daha fazla göster</button></section>' +
-      '<section class="card" id="whotofollow"><h2 class="card__h">Kimi takip etmeli</h2>' +
-        [S.byId.u5, S.byId.u11, S.byId.o4].map(function (u) {
-          return '<button class="card__row" type="button" data-follow="' + u.id + '" aria-pressed="false"><span class="av">' + u.avatar + '</span>' +
-            '<span class="card__row-main"><span class="card__t">' + esc(u.name) +
-            (u.org ? icon('vbadge', 'post__verified') : '') + '</span>' +
-            '<span class="card__k">@' + esc(u.handle) + '</span></span>' +
-            '<span class="btn-follow">Takip et</span></button>';
-        }).join('') +
-        '<button class="card__more" type="button" disabled aria-disabled="true">Daha fazla göster</button></section>' +
+      trustCardHTML() +
       '<p class="card__k" style="padding:0 16px">Şablon hesaplar · Kurgusal veri · Prototip</p>';
 
     return el(
@@ -1886,12 +1916,40 @@ ul { list-style: none; margin: 0; padding: 0; }
       '</div>');
   }
 
-  function trendRow(k, t, n) {
-    return '<button class="card__row" type="button" data-search-term="' + esc(t) + '"><span class="card__row-main">' +
-      '<span class="card__k">' + esc(k) + '</span>' +
-      '<span class="card__t">' + esc(t) + '</span>' +
-      '<span class="card__k">' + esc(n) + ' gönderi</span></span>' + icon('dots') + '</button>';
+  /* "Bölge Güven Durumu" — X'in Gündem/Kimi-takip-etmeli widget'larının
+     yerine. Ürünün asıl farkını (doğrulama katmanı) kriz kapalıyken bile
+     gösterir. Sayı uydurma değil: S.crisis + state.verified'dan hesaplanır,
+     crisis.js'teki updateCounts() ile aynı mantık. Bkz. GORSEL_KIMLIK_SPEC.md §4. */
+  function trustStats() {
+    var all = S.crisis;
+    var resolved = 0, disputed = 0;
+    all.forEach(function (p) {
+      var v = state.verified[p.id] || p.v;
+      if (v === 'verified' || v === 'official') resolved++;
+      if (v === 'disputed') disputed++;
+    });
+    return { total: all.length, resolved: resolved, disputed: disputed,
+      pct: Math.round((resolved / all.length) * 100) };
   }
+
+  function trustCardHTML() {
+    var s = trustStats();
+    return '<section class="card trust-card" id="trustcard"><h2 class="card__h">Bölge Güven Durumu</h2>' +
+      '<div class="trust-card__body">' +
+        '<div class="trust-card__row"><span>Kahramanmaraş</span><span class="card__k">son 24 sa</span></div>' +
+        '<div class="trust-card__stat">%' + s.pct + '<small>doğrulanmış / resmî kaynaklı</small></div>' +
+        '<div class="trust-card__meter"><i style="width:' + s.pct + '%"></i></div>' +
+        '<div class="card__k">' + s.total + ' gönderi izleniyor · ' + s.disputed + ' çelişkili işaretlendi</div>' +
+      '</div></section>';
+  }
+
+  function refreshTrustCard() {
+    var el2 = $('#trustcard');
+    if (!el2) return;
+    var fresh = el(trustCardHTML());
+    el2.replaceWith(fresh);
+  }
+  M.refreshTrustCard = refreshTrustCard;
 
   /* ----------------------------------------------------------------- tabs */
   function renderTabs() {
@@ -2188,6 +2246,14 @@ ul { list-style: none; margin: 0; padding: 0; }
           var ta = $('#ta');
           if (ta) { ta.focus(); window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' }); }
         }
+        if (nav.dataset.nav === 'crisis') {
+          if (state.crisis) setTab('crisis');
+          else toast('Şu anda bölgenizde aktif bir kriz yok. Tespit edilirse burada görünür.', { muted: true, life: 2400 });
+        }
+        if (nav.dataset.nav === 'imdat') {
+          if (!state.crisis) M.activateCrisis({ immediate: true });
+          M.openImdat();
+        }
       }
       var trend = e.target.closest('[data-search-term]');
       if (trend) openSearch(trend.dataset.searchTerm);
@@ -2207,6 +2273,10 @@ ul { list-style: none; margin: 0; padding: 0; }
       });
     });
     M.on('tab', function () { applySearch($('#feed-search-input').value); });
+    M.on('crisis', function (on) {
+      $$('[data-crisis-dot]').forEach(function (d) { d.dataset.on = on ? '1' : ''; });
+      refreshTrustCard();
+    });
 
     $('#tabs').addEventListener('click', function (e) {
       var t = e.target.closest('.tab');
@@ -2327,7 +2397,7 @@ ul { list-style: none; margin: 0; padding: 0; }
     p.innerHTML = '';
     p.appendChild(el('<div class="pin-host" data-feed="' + id + '"></div>'));
     p.appendChild(host);
-    p.appendChild(el('<div class="feed__end">Akışın sonundasın · ' + (id === 'following' ? 'Takip' : 'Sana Özel') + '</div>'));
+    p.appendChild(el('<div class="feed__end">Akışın sonundasın · ' + (id === 'following' ? 'Takip' : 'Akış') + '</div>'));
   };
 
   /* ------------------------------------------- optimistic like / repost */
@@ -2988,7 +3058,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
   M.initCrisis = function () {
     var side = $('.side');
-    if (side) side.insertBefore(el(controlsHTML()), side.querySelector('#trends'));
+    if (side) side.insertBefore(el(controlsHTML()), side.querySelector('#trustcard'));
     var tail = el('<div class="proto-ctl-mobile">' + controlsHTML() + '</div>');
     M.panel('foryou').appendChild(tail);
 

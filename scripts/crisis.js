@@ -509,7 +509,7 @@
 
   M.initCrisis = function () {
     var side = $('.side');
-    if (side) side.insertBefore(el(controlsHTML()), side.querySelector('#trends'));
+    if (side) side.insertBefore(el(controlsHTML()), side.querySelector('#trustcard'));
     var tail = el('<div class="proto-ctl-mobile">' + controlsHTML() + '</div>');
     M.panel('foryou').appendChild(tail);
 

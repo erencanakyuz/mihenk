@@ -91,7 +91,7 @@
   M.state = state;
 
   var TABS = {
-    foryou:    { id: 'foryou',    label: 'Sana Özel', path: '/' },
+    foryou:    { id: 'foryou',    label: 'Akış',       path: '/' },
     following: { id: 'following', label: 'Takip',     path: '/takip' },
     crisis:    { id: 'crisis',    label: 'Kriz Var',  path: '/kriz' }
   };
@@ -169,11 +169,14 @@
   }
   M.openModal = openModal; M.closeModal = closeModal;
 
-  /* ----------------------------------------------------------- shell HTML */
+  /* ----------------------------------------------------------- shell HTML
+     4 gerçek işlev, X'in 9 maddelik (çoğu prototipte işlevsiz) navının
+     yerine. Bkz. GORSEL_KIMLIK_SPEC.md §3. */
   var NAV = [
-    ['home', 'Anasayfa', 'home'], ['search', 'Keşfet', 'search'], ['bell', 'Bildirimler'],
-    ['mail', 'Mesajlar'], ['grok', 'Yapay Zekâ'], ['bookmark', 'Yer İşaretleri'],
-    ['star', 'Premium'], ['user', 'Profil'], ['dotsc', 'Daha Fazla']
+    ['home', 'Ana Akış', 'home'],
+    ['warn', 'Kriz Durumu', 'crisis'],
+    ['sos', 'İmdat', 'imdat'],
+    ['user', 'Profil']
   ];
 
   function logo() {
@@ -185,29 +188,16 @@
   function buildShell() {
     var navHtml = NAV.map(function (n) {
       var active = n[2] === 'home';
+      var badge = n[2] === 'crisis' ? '<span class="nav__dot" data-crisis-dot aria-hidden="true"></span>' : '';
       return '<li><button class="nav__item" type="button" ' +
         (n[2] ? 'data-nav="' + n[2] + '" ' : 'disabled aria-disabled="true" title="Prototip kapsamı dışında" ') +
-        (active ? 'aria-current="page"' : '') + '>' + icon(n[0], 'ic--lg') + '<span>' + n[1] + '</span></button></li>';
+        (active ? 'aria-current="page"' : '') + '>' + icon(n[0], 'ic--lg') + '<span>' + n[1] + '</span>' + badge + '</button></li>';
     }).join('');
 
     var side =
       '<div class="side__search"><div class="side__search-box">' + icon('search') +
         '<input type="search" placeholder="Ara" aria-label="Gönderilerde ara" data-search-input></div></div>' +
-      '<section class="card" id="trends"><h2 class="card__h">Gündem</h2>' +
-        trendRow('Türkiye’de gündem', 'Yerel üretim', '42,1 B') +
-        trendRow('Teknoloji · Gündem', 'Tarayıcı oyunları', '18,7 B') +
-        trendRow('Spor · Gündem', 'Derbi haftası', '96,4 B') +
-        trendRow('Gündem', 'Hava durumu', '11,2 B') +
-        '<button class="card__more" type="button" disabled aria-disabled="true">Daha fazla göster</button></section>' +
-      '<section class="card" id="whotofollow"><h2 class="card__h">Kimi takip etmeli</h2>' +
-        [S.byId.u5, S.byId.u11, S.byId.o4].map(function (u) {
-          return '<button class="card__row" type="button" data-follow="' + u.id + '" aria-pressed="false"><span class="av">' + u.avatar + '</span>' +
-            '<span class="card__row-main"><span class="card__t">' + esc(u.name) +
-            (u.org ? icon('vbadge', 'post__verified') : '') + '</span>' +
-            '<span class="card__k">@' + esc(u.handle) + '</span></span>' +
-            '<span class="btn-follow">Takip et</span></button>';
-        }).join('') +
-        '<button class="card__more" type="button" disabled aria-disabled="true">Daha fazla göster</button></section>' +
+      trustCardHTML() +
       '<p class="card__k" style="padding:0 16px">Şablon hesaplar · Kurgusal veri · Prototip</p>';
 
     return el(
@@ -239,12 +229,40 @@
       '</div>');
   }
 
-  function trendRow(k, t, n) {
-    return '<button class="card__row" type="button" data-search-term="' + esc(t) + '"><span class="card__row-main">' +
-      '<span class="card__k">' + esc(k) + '</span>' +
-      '<span class="card__t">' + esc(t) + '</span>' +
-      '<span class="card__k">' + esc(n) + ' gönderi</span></span>' + icon('dots') + '</button>';
+  /* "Bölge Güven Durumu" — X'in Gündem/Kimi-takip-etmeli widget'larının
+     yerine. Ürünün asıl farkını (doğrulama katmanı) kriz kapalıyken bile
+     gösterir. Sayı uydurma değil: S.crisis + state.verified'dan hesaplanır,
+     crisis.js'teki updateCounts() ile aynı mantık. Bkz. GORSEL_KIMLIK_SPEC.md §4. */
+  function trustStats() {
+    var all = S.crisis;
+    var resolved = 0, disputed = 0;
+    all.forEach(function (p) {
+      var v = state.verified[p.id] || p.v;
+      if (v === 'verified' || v === 'official') resolved++;
+      if (v === 'disputed') disputed++;
+    });
+    return { total: all.length, resolved: resolved, disputed: disputed,
+      pct: Math.round((resolved / all.length) * 100) };
   }
+
+  function trustCardHTML() {
+    var s = trustStats();
+    return '<section class="card trust-card" id="trustcard"><h2 class="card__h">Bölge Güven Durumu</h2>' +
+      '<div class="trust-card__body">' +
+        '<div class="trust-card__row"><span>Kahramanmaraş</span><span class="card__k">son 24 sa</span></div>' +
+        '<div class="trust-card__stat">%' + s.pct + '<small>doğrulanmış / resmî kaynaklı</small></div>' +
+        '<div class="trust-card__meter"><i style="width:' + s.pct + '%"></i></div>' +
+        '<div class="card__k">' + s.total + ' gönderi izleniyor · ' + s.disputed + ' çelişkili işaretlendi</div>' +
+      '</div></section>';
+  }
+
+  function refreshTrustCard() {
+    var el2 = $('#trustcard');
+    if (!el2) return;
+    var fresh = el(trustCardHTML());
+    el2.replaceWith(fresh);
+  }
+  M.refreshTrustCard = refreshTrustCard;
 
   /* ----------------------------------------------------------------- tabs */
   function renderTabs() {
@@ -541,6 +559,14 @@
           var ta = $('#ta');
           if (ta) { ta.focus(); window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' }); }
         }
+        if (nav.dataset.nav === 'crisis') {
+          if (state.crisis) setTab('crisis');
+          else toast('Şu anda bölgenizde aktif bir kriz yok. Tespit edilirse burada görünür.', { muted: true, life: 2400 });
+        }
+        if (nav.dataset.nav === 'imdat') {
+          if (!state.crisis) M.activateCrisis({ immediate: true });
+          M.openImdat();
+        }
       }
       var trend = e.target.closest('[data-search-term]');
       if (trend) openSearch(trend.dataset.searchTerm);
@@ -560,6 +586,10 @@
       });
     });
     M.on('tab', function () { applySearch($('#feed-search-input').value); });
+    M.on('crisis', function (on) {
+      $$('[data-crisis-dot]').forEach(function (d) { d.dataset.on = on ? '1' : ''; });
+      refreshTrustCard();
+    });
 
     $('#tabs').addEventListener('click', function (e) {
       var t = e.target.closest('.tab');
