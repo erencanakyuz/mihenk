@@ -1,0 +1,151 @@
+/* ==========================================================================
+   MİHENK — düşük bant genişliği modu (low-bandwidth / plain HTML mode)
+   Deliberately austere. Everything decorative is removed; nothing is broken.
+   Also styles the <noscript> document, which must work with JS fully off.
+   ========================================================================== */
+
+:root[data-plain="1"] {
+  --pad-x: 14px;
+}
+
+/* kill every non-essential visual */
+:root[data-plain="1"] *,
+:root[data-plain="1"] *::before,
+:root[data-plain="1"] *::after {
+  animation: none !important;
+  transition: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+:root[data-plain="1"] body {
+  font-family: ui-monospace, "SFMono-Regular", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  background: #000; color: #fff;
+  font-size: 16px; line-height: 1.5;
+}
+
+/* single column: no nav, no sidebar, no media, no avatars */
+:root[data-plain="1"] .shell { display: block; max-width: 680px; margin: 0 auto; }
+:root[data-plain="1"] .nav,
+:root[data-plain="1"] .side,
+:root[data-plain="1"] .av,
+:root[data-plain="1"] .sk--av,
+:root[data-plain="1"] .post__media,
+:root[data-plain="1"] .post__quote,
+:root[data-plain="1"] .acts,
+:root[data-plain="1"] .post__more,
+:root[data-plain="1"] .fab,
+:root[data-plain="1"] .bottombar,
+:root[data-plain="1"] .composer__tool,
+:root[data-plain="1"] .map,
+:root[data-plain="1"] .cursor,
+:root[data-plain="1"] .tabs__underline { display: none !important; }
+
+:root[data-plain="1"] .main { border: 0; }
+:root[data-plain="1"] .topbar { position: static; transform: none !important; }
+:root[data-plain="1"] .topbar__row { display: flex; background: #000; font-family: inherit; }
+:root[data-plain="1"] .tabs { background: #000; border-bottom: 1px solid #666; height: auto; }
+:root[data-plain="1"] .tab { padding: 12px 8px; color: #bbb; }
+:root[data-plain="1"] .tab[aria-selected="true"] { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+
+:root[data-plain="1"] .post,
+:root[data-plain="1"] .cpost {
+  display: block; padding: 12px var(--pad-x);
+  border-bottom: 1px solid #444; border-left: 0 !important;
+}
+:root[data-plain="1"] .post:hover,
+:root[data-plain="1"] .cpost:hover { background: none; }
+:root[data-plain="1"] .post__name,
+:root[data-plain="1"] .cpost__name { font-size: 16px; max-width: none; }
+:root[data-plain="1"] .post__head,
+:root[data-plain="1"] .cpost__head { display: block; color: #bbb; font-size: 14px; }
+:root[data-plain="1"] .post__body,
+:root[data-plain="1"] .cpost__body { font-size: 16px; }
+
+/* verification stays — it is the one thing that must survive */
+:root[data-plain="1"] .vpill {
+  border: 2px solid currentColor; background: none;
+  height: auto; padding: 2px 8px; margin: 6px 0;
+  font-size: 14px;
+}
+:root[data-plain="1"] .vpill .ic { display: none; }
+:root[data-plain="1"] .vpill::before { content: "["; }
+:root[data-plain="1"] .vpill::after  { content: "]"; }
+
+:root[data-plain="1"] .cpost__meta { color: #bbb; font-size: 14px; }
+:root[data-plain="1"] .cpost__tag { border: 1px solid #666; }
+:root[data-plain="1"] .sos {
+  height: auto; padding: 12px; margin: 12px var(--pad-x);
+  border: 2px solid var(--c-accent); background: none; color: var(--c-accent);
+  width: auto;
+}
+:root[data-plain="1"] .chip { border: 1px solid #666; }
+:root[data-plain="1"] .chip[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+:root[data-plain="1"] .pin { border: 2px solid var(--c-accent); background: none; }
+:root[data-plain="1"] .btn { border: 2px solid currentColor; }
+
+/* byte-size comparison chip */
+.bytechip {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin: 10px var(--pad-x); padding: 7px 12px;
+  border: 1px solid var(--c-border); border-radius: 999px;
+  font-size: var(--fs-meta); color: var(--c-text-2);
+  font-variant-numeric: tabular-nums;
+}
+.bytechip b { color: var(--c-text); font-weight: 700; }
+.bytechip__bar {
+  width: 90px; height: 6px; border-radius: 999px; background: var(--c-bg-3);
+  overflow: hidden; position: relative;
+}
+.bytechip__fill {
+  position: absolute; inset: 0; width: 100%; background: var(--c-accent-fill);
+  transform-origin: 0 50%; transform: scaleX(1);
+  transition: transform 420ms var(--ease-out);
+}
+:root[data-plain="1"] .bytechip__fill { transform: scaleX(var(--byte-ratio, .08)); }
+
+/* the low-bandwidth toggle itself */
+.lowband {
+  display: flex; align-items: center; gap: 10px;
+  margin: 10px var(--pad-x) 0; padding: 10px 12px;
+  border: 1px solid var(--c-border); border-radius: 999px;
+  font-size: var(--fs-meta); color: var(--c-text-2); width: max-content;
+  transition: border-color 140ms, color 140ms;
+}
+.lowband:hover { color: var(--c-text); border-color: var(--c-text-2); }
+.switch {
+  width: 36px; height: 20px; border-radius: 999px; background: var(--c-bg-3);
+  position: relative; flex: none; transition: background-color 180ms var(--ease-out);
+}
+.switch::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%; background: var(--c-text-2);
+  transition: transform 180ms var(--spring), background-color 180ms;
+}
+.lowband[aria-pressed="true"] .switch { background: var(--c-accent); }
+.lowband[aria-pressed="true"] .switch::after { transform: translateX(16px); background: #fff; }
+
+/* ---- no-JS document ---------------------------------------------------- */
+.nojs { display: none; }
+.nojs__wrap { max-width: 680px; margin: 0 auto; padding: 20px 14px 60px;
+  font-family: ui-monospace, "SFMono-Regular", "DejaVu Sans Mono", Menlo, Consolas, monospace; }
+.nojs h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: .04em; }
+.nojs .nojs__note { color: #bbb; font-size: 14px; border: 1px solid #666; padding: 10px; margin: 12px 0 20px; }
+.nojs h2 { font-size: 16px; margin: 24px 0 8px; border-bottom: 1px solid #666; padding-bottom: 6px; }
+.nojs article { border-bottom: 1px solid #444; padding: 12px 0; }
+.nojs .v { display: inline-block; border: 2px solid; padding: 1px 7px; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.nojs .v.verified   { color: #3ecf7f; }
+.nojs .v.official   { color: #5aabf5; }
+.nojs .v.unverified { color: #ffb020; }
+.nojs .v.disputed   { color: #ff5c52; }
+.nojs .who { font-size: 14px; color: #bbb; }
+.nojs .who b { color: #fff; }
+.nojs .meta { font-size: 13px; color: #bbb; margin-top: 6px; }
+
+:root[data-plain="1"] .post__verified { display: inline-block; vertical-align: -2px; }
+:root[data-plain="1"] .crisis-tools { display: block; }
+:root[data-plain="1"] .bytechip { display: inline-flex; margin: 8px 0 0; }

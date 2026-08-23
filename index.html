@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="tr" data-palette="" data-plain="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="MİHENK — kriz modu akış prototipi. Tamamen yerel, kurgusal veriyle çalışan bir UI/UX prototipi.">
+<title>MİHENK</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Cpath d='M4 26V6h4.4l7.6 11.2L23.6 6H28v20h-4.6V13.8L16.6 24h-1.2L8.6 13.8V26z' fill='%23e7e9ea'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/feed.css">
+<link rel="stylesheet" href="styles/crisis.css">
+<link rel="stylesheet" href="styles/plain.css">
+</head>
+<body>
+<a class="skip-link" href="#main">İçeriğe atla</a>
+
+<noscript>
+  <style>
+    .shell, .toast-layer, .modal-layer, .fab, .bottombar, .skip-link { display: none !important; }
+    .nojs { display: block !important; }
+    body { background: #000; color: #fff; }
+  </style>
+  <div class="nojs"><div class="nojs__wrap">
+<!-- STATIC:BEGIN -->
+    <h1>MİHENK</h1>
+    <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
+    metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
+    Tam sürüm: ~158 KB · Düz mod: ~11 KB</p>
+
+    <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
+    <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
+      <article>
+        <span class="v official">Resmî Kurum</span>
+        <div class="who"><b>AFAD</b> @AFAD · 2 dk</div>
+        <p>Pazarcık merkezde iki mahallede arama kurtarma ekipleri konuşlandı. Yardım talebi olan vatandaşlar konumlarını bu sekmeden bildirebilir.</p>
+        <div class="meta">Pazarcık · Yardım Çağrısı</div>
+      </article>
+      <article>
+        <span class="v verified">Doğrulanmış</span>
+        <div class="who"><b>Ayşe Korkmaz</b> @aysekorkmaz · 4 dk</div>
+        <p>Sağlık personeliyim, Onikişubat’ta gönüllü olarak toplanma alanındayım. Tıbbi malzeme ihtiyacı olan gruplar buradan yazabilir.</p>
+        <div class="meta">Onikişubat · Yardım Çağrısı</div>
+      </article>
+      <article>
+        <span class="v unverified">Doğrulanmamış</span>
+        <div class="who"><b>Selin Aydın</b> @selinaydin · 6 dk</div>
+        <p>Bir apartmanda ısıtıcı ve battaniye ihtiyacı olduğu söyleniyor, kendim görmedim. Doğrulayabilecek biri var mı?</p>
+        <div class="meta">Dulkadiroğlu · Yardım Çağrısı</div>
+      </article>
+      <article>
+        <span class="v disputed">Çelişkili</span>
+        <div class="who"><b>Hakan Yalçın</b> @hakanyalcin · 9 dk</div>
+        <p>Aynı yardım çağrısı üç farklı konumla dolaşıyor. En az ikisi hatalı. Paylaşmadan önce konumu teyit edin.</p>
+        <div class="meta">Türkoğlu · Yardım Çağrısı</div>
+      </article>
+      <article>
+        <span class="v official">Resmî Kurum</span>
+        <div class="who"><b>Valilik</b> @Valilik · 7 dk</div>
+        <p>Elbistan’da hasar tespit ekipleri sahaya çıktı. Enkaz bildirimleri koordinasyon merkezine tek kanaldan iletiliyor.</p>
+        <div class="meta">Elbistan · Enkaz Bildirimi</div>
+      </article>
+      <article>
+        <span class="v verified">Doğrulanmış</span>
+        <div class="who"><b>Onur Çetin</b> @onurcetin · 11 dk</div>
+        <p>Sanayi sitesinde bir yapının giriş katı çökmüş durumda. Ekipler bölgede, çevre güvenliği alındı.</p>
+        <div class="meta">Elbistan · Enkaz Bildirimi</div>
+      </article>
+      <article>
+        <span class="v unverified">Doğrulanmamış</span>
+        <div class="who"><b>Mert Arslan</b> @mertarslan · 13 dk</div>
+        <p>İkinci bir yapıda hasar olduğu yönünde mesajlar geliyor, teyit edilmedi. Ekip yönlendirilmeden önce doğrulanmalı.</p>
+        <div class="meta">Göksun · Enkaz Bildirimi</div>
+      </article>
+      <article>
+        <span class="v disputed">Çelişkili</span>
+        <div class="who"><b>Deniz Ergün</b> @denizergun · 17 dk</div>
+        <p>Bu görüntünün bugüne ait olmadığı yönünde iki ayrı bildirim var. İçerik incelemede.</p>
+        <div class="meta">Afşin · Enkaz Bildirimi</div>
+      </article>
+      <article>
+        <span class="v official">Resmî Kurum</span>
+        <div class="who"><b>Valilik</b> @Valilik · 14 dk</div>
+        <p>Kayıp başvuruları için il koordinasyon merkezinde tek liste tutuluyor. Mükerrer kayıt açmayın, aynı kayda ekleme yapın.</p>
+        <div class="meta">Kahramanmaraş · Kayıp İlanı</div>
+      </article>
+      <article>
+        <span class="v verified">Doğrulanmış</span>
+        <div class="who"><b>Zeynep Kaya</b> @zeynepkaya · 19 dk</div>
+        <p>Ailesiyle irtibatı kesilen bir grup öğrenci toplanma alanında güvende. İsim listesi koordinasyon masasına iletildi.</p>
+        <div class="meta">Onikişubat · Kayıp İlanı</div>
+      </article>
+      <article>
+        <span class="v unverified">Doğrulanmamış</span>
+        <div class="who"><b>Merve Doğan</b> @mervedogan · 22 dk</div>
+        <p>Bir yakınının aranması için paylaşım yapılmış, ilan sahibine ulaşılamıyor. Teyit bekliyor.</p>
+        <div class="meta">Nurhak · Kayıp İlanı</div>
+      </article>
+      <article>
+        <span class="v disputed">Çelişkili</span>
+        <div class="who"><b>Emre Şahin</b> @emresahin · 26 dk</div>
+        <p>Aynı kayıp ilanı iki farklı isimle paylaşılıyor. Hangisinin doğru olduğu belirsiz, yaymayın.</p>
+        <div class="meta">Ekinözü · Kayıp İlanı</div>
+      </article>
+      <article>
+        <span class="v official">Resmî Kurum</span>
+        <div class="who"><b>Kızılay</b> @Kizilay · 8 dk</div>
+        <p>Kızılay barınma ve beslenme noktaları kuruldu. Kan bağışı yalnızca resmî merkezlerde alınıyor, sahada toplama yapılmıyor.</p>
+        <div class="meta">Kahramanmaraş · Yardım Noktası</div>
+      </article>
+      <article>
+        <span class="v verified">Doğrulanmış</span>
+        <div class="who"><b>Elif Yıldırım</b> @elifyildirim · 21 dk</div>
+        <p>Toplanma alanındaki dağıtım noktası aktif; sıcak içecek ve battaniye var. Kendim oradayım.</p>
+        <div class="meta">Dulkadiroğlu · Yardım Noktası</div>
+      </article>
+      <article>
+        <span class="v unverified">Doğrulanmamış</span>
+        <div class="who"><b>Can Polat</b> @canpolat · 24 dk</div>
+        <p>Bir spor salonunun yardım noktası olarak açıldığı söyleniyor. Resmî listede henüz görünmüyor.</p>
+        <div class="meta">Andırın · Yardım Noktası</div>
+      </article>
+      <article>
+        <span class="v disputed">Çelişkili</span>
+        <div class="who"><b>Burak Demir</b> @burakdemir · 29 dk</div>
+        <p>Kapandığı duyurulan bir dağıtım noktası hâlâ açık olarak paylaşılıyor. Gitmeden önce teyit edin.</p>
+        <div class="meta">Çağlayancerit · Yardım Noktası</div>
+      </article>
+      <article>
+        <span class="v official">Resmî Kurum</span>
+        <div class="who"><b>AFAD</b> @AFAD · 1 sa</div>
+        <p>Bölgede arama kurtarma çalışmaları kesintisiz sürüyor. Yollar acil durum araçlarına ayrıldı, zorunlu olmadıkça araçla giriş yapmayın.</p>
+        <div class="meta">Kahramanmaraş · Resmî Duyuru</div>
+      </article>
+      <article>
+        <span class="v disputed">Çelişkili</span>
+        <div class="who"><b>Merve Doğan</b> @mervedogan · 1 sa</div>
+        <p>“Resmî duyuru” diye dolaşan iki metin birbiriyle çelişiyor: biri toplanma alanının taşındığını, diğeri aynı yerde kaldığını söylüyor. İkisini de paylaşmayın.</p>
+        <div class="meta">Dulkadiroğlu · Resmî Duyuru</div>
+      </article>
+      <article>
+        <span class="v verified">Doğrulanmış</span>
+        <div class="who"><b>Hakan Yalçın</b> @hakanyalcin · 1 sa</div>
+        <p>Kurum duyurusunun ekran görüntüsünü paylaşıyorum, kaynağı doğruladım; resmî hesapta da yayımlandı.</p>
+        <div class="meta">Göksun · Resmî Duyuru</div>
+      </article>
+      <article>
+        <span class="v unverified">Doğrulanmamış</span>
+        <div class="who"><b>Mert Arslan</b> @mertarslan · 2 sa</div>
+        <p>“Tüm okullar iki hafta tatil” diye dolaşan mesajın kaynağı yok. Resmî bir açıklama görmedim.</p>
+        <div class="meta">Kahramanmaraş · Resmî Duyuru</div>
+      </article>
+      <article>
+        <span class="v official">Resmî Kurum</span>
+        <div class="who"><b>Meteoroloji</b> @Meteoroloji · 3 sa</div>
+        <p>Artçı sarsıntılar sürüyor, gece sıcaklığının mevsim normallerinin altına inmesi bekleniyor. Hasarlı yapılara eşya almak için dahi girilmemeli.</p>
+        <div class="meta">Kahramanmaraş · Durum Bilgisi</div>
+      </article>
+      <article>
+        <span class="v verified">Doğrulanmış</span>
+        <div class="who"><b>Onur Çetin</b> @onurcetin · 3 sa</div>
+        <p>İki mahallede elektrik geri geldi, şebeke suyu hâlâ yok. Kendi ölçümüm, saat başı güncelliyorum.</p>
+        <div class="meta">Elbistan · Durum Bilgisi</div>
+      </article>
+      <article>
+        <span class="v unverified">Doğrulanmamış</span>
+        <div class="who"><b>Ayşe Korkmaz</b> @aysekorkmaz · 4 sa</div>
+        <p>Bir hastanenin acil servisinin kapasitesinin dolduğu söyleniyor, resmî teyit bekliyorum.</p>
+        <div class="meta">Onikişubat · Durum Bilgisi</div>
+      </article>
+      <article>
+        <span class="v disputed">Çelişkili</span>
+        <div class="who"><b>Deniz Ergün</b> @denizergun · 5 sa</div>
+        <p>Yol durumu hakkında birbiriyle çelişen iki bildirim var: biri kapalı diyor, biri tek şerit açık diyor.</p>
+        <div class="meta">Pazarcık · Durum Bilgisi</div>
+      </article>
+
+    <h2>Sana Özel</h2>
+      <article>
+        <div class="who"><b>Mert Arslan</b> @mertarslan · 12 dk</div>
+        <p>Üç saattir peşinde olduğum hata, tek bir eksik noktalı virgülmüş. Meslek hayatımın özeti.</p>
+      </article>
+      <article>
+        <div class="who"><b>Merve Doğan</b> @mervedogan · 18 dk</div>
+        <p>Yeni poster serisinin ilk üçü çıktı. Renk paleti tamamen eski tramvay biletlerinden.</p>
+      </article>
+      <article>
+        <div class="who"><b>Emre Şahin</b> @emresahin · 24 dk</div>
+        <p>Stüdyoda bugün: bir davul, iki mikrofon, sıfır plan. En iyi kayıtlar böyle çıkıyor.</p>
+      </article>
+      <article>
+        <div class="who"><b>Selin Aydın</b> @selinaydin · 31 dk</div>
+        <p>Excel’de yapılabilecek her şeyi Excel’de yapmak zorunda değiliz. Bunu bir tabelaya yazdırıp asacağım.</p>
+      </article>
+      <article>
+        <div class="who"><b>Burak Demir</b> @burakdemir · 38 dk</div>
+        <p>Sabah 6’da yola çıktım, 7’de bu manzaradaydım. Erken kalkmanın tek savunulabilir sebebi.</p>
+      </article>
+      <article>
+        <div class="who"><b>Zeynep Kaya</b> @zeynepkaya · 47 dk</div>
+        <p>Öğrenci defterine “kitap bitince üzülüyorum” yazmış. Onu anlıyorum.</p>
+      </article>
+      <article>
+        <div class="who"><b>Deniz Ergün</b> @denizergun · 52 dk</div>
+        <p>Bir cümleyi kısaltmak, uzatmaktan her zaman daha çok zaman alıyor.</p>
+      </article>
+      <article>
+        <div class="who"><b>Can Polat</b> @canpolat · 1 sa</div>
+        <p>Maket bıçağını üçüncü kez kaybettim. Muhtemelen maketin içinde.</p>
+      </article>
+      <article>
+        <div class="who"><b>Elif Yıldırım</b> @elifyildirim · 1 sa</div>
+        <p>Şehirdeki her boş arsa aslında bir soru: gölge mi istiyoruz, otopark mı?</p>
+      </article>
+      <article>
+        <div class="who"><b>Onur Çetin</b> @onurcetin · 1 sa</div>
+        <p>Elektrik kesintisinde en çok özlediğim şey ışık değil, buzdolabının sesi.</p>
+      </article>
+
+    <p class="meta" style="margin-top:24px">Tüm hesaplar kurgusal şablon hesaplardır. Prototip.</p>
+<!-- STATIC:END -->
+  </div></div>
+</noscript>
+
+<script src="data/seed.js"></script>
+<script src="scripts/app.js"></script>
+<script src="scripts/feed.js"></script>
+<script src="scripts/crisis.js"></script>
+<script src="scripts/imdat.js"></script>
+<script src="scripts/demo.js"></script>
+<script src="scripts/capture.js"></script>
+</body>
+</html>

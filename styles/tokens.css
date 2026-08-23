@@ -1,0 +1,115 @@
+/* ==========================================================================
+   MİHENK — design tokens
+   Two palettes: normal (X-blue) and crisis (amber).
+   Colour tokens are registered with @property so a palette swap on :root
+   cross-fades instead of snapping. Nothing else changes between modes.
+   ========================================================================== */
+
+@property --c-bg        { syntax: '<color>'; inherits: true; initial-value: #000000; }
+@property --c-bg-2      { syntax: '<color>'; inherits: true; initial-value: #16181c; }
+@property --c-bg-3      { syntax: '<color>'; inherits: true; initial-value: #202327; }
+@property --c-border    { syntax: '<color>'; inherits: true; initial-value: #2f3336; }
+@property --c-text      { syntax: '<color>'; inherits: true; initial-value: #e7e9ea; }
+@property --c-text-2    { syntax: '<color>'; inherits: true; initial-value: #8b98a5; }
+@property --c-accent    { syntax: '<color>'; inherits: true; initial-value: #1d9bf0; }
+@property --c-accent-2  { syntax: '<color>'; inherits: true; initial-value: #1a8cd8; }
+@property --c-accent-fill{ syntax: '<color>'; inherits: true; initial-value: #157abd; }
+@property --c-accent-ink{ syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --c-scrim     { syntax: '<color>'; inherits: true; initial-value: rgba(0,0,0,.65); }
+
+:root {
+  /* ---- palette: normal ------------------------------------------------ */
+  --c-bg:         #000000;
+  --c-bg-2:       #16181c;   /* elevated surfaces, inputs, sidebar cards   */
+  --c-bg-3:       #202327;   /* pressed / secondary button                 */
+  --c-border:     #2f3336;
+  --c-text:       #e7e9ea;
+  --c-text-2:     #8b98a5;   /* meta text — AA on #000                     */
+  --c-accent:     #1d9bf0;   /* text, icons, borders — 7.00:1 on #000       */
+  --c-accent-2:   #1a8cd8;
+  --c-accent-fill:#157abd;   /* filled surfaces — 4.61:1 with white ink      */
+  --c-accent-ink: #ffffff;
+  --c-scrim:      rgba(0,0,0,.65);
+
+  /* engagement colours (normal feed only) */
+  --c-reply:  #1d9bf0;
+  --c-repost: #00ba7c;
+  --c-like:   #f91880;
+
+  /* verification colours (crisis feed only) */
+  --v-verified:    #3ecf7f;
+  --v-official:    #5aabf5;
+  --v-unverified:  #ffb020;
+  --v-disputed:    #ff5c52;
+
+  /* hover / halo tints, derived */
+  --hover-row:  rgba(255,255,255,.03);
+  --halo-alpha: .12;
+
+  /* ---- type scale ----------------------------------------------------- */
+  --fs-body: 15px;
+  --fs-meta: 13px;
+  --fs-name: 20px;
+  --lh-body: 20px;
+
+  --ff: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- metrics -------------------------------------------------------- */
+  --avatar: 40px;
+  --gutter: 12px;
+  --pad-x: 16px;
+  --icon: 18.75px;
+  --halo: 34.75px;
+  --col-nav: 275px;
+  --col-feed: 600px;
+  --col-side: 350px;
+  --tabbar-h: 53px;
+  --header-h: 53px;
+
+  /* ---- motion --------------------------------------------------------- */
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in:  cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  --t-palette: 400ms;
+
+  color-scheme: dark;
+
+  transition:
+    --c-bg var(--t-palette) linear,
+    --c-bg-2 var(--t-palette) linear,
+    --c-bg-3 var(--t-palette) linear,
+    --c-border var(--t-palette) linear,
+    --c-text var(--t-palette) linear,
+    --c-text-2 var(--t-palette) linear,
+    --c-accent var(--t-palette) linear,
+    --c-accent-2 var(--t-palette) linear,
+    --c-accent-fill var(--t-palette) linear,
+    --c-accent-ink var(--t-palette) linear;
+}
+
+/* ---- palette: crisis --------------------------------------------------- */
+:root[data-palette="crisis"] {
+  --c-bg:         #070502;   /* still near-black, warm cast                */
+  --c-bg-2:       #1c1409;
+  --c-bg-3:       #2a1e0e;
+  --c-border:     #3f2f16;
+  --c-text:       #f7f0e6;
+  --c-text-2:     #b0a08a;   /* AA on #070502                              */
+  --c-accent:     #ff9d2e;   /* high-contrast amber — 9.80:1 on #070502    */
+  --c-accent-2:   #ffb15c;
+  --c-accent-fill:#ff9d2e;   /* dark ink on amber — 9.32:1                  */
+  --c-accent-ink: #150c02;   /* dark ink on amber fills                    */
+  --c-scrim:      rgba(12,7,2,.72);
+
+  --hover-row:  rgba(255, 200, 130, .045);
+  --halo-alpha: .14;
+}
+
+/* Reduced motion: no palette cross-fade, no springs. */
+@media (prefers-reduced-motion: reduce) {
+  :root { transition: none; --t-palette: 0ms; }
+}
+
+/* Low-bandwidth mode kills the cross-fade too. */
+:root[data-plain="1"] { transition: none; }
