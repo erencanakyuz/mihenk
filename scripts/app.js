@@ -85,7 +85,7 @@
     scroll: { foryou: 0, following: 0, crisis: 0 },
     busy: false,
     instant: false,
-    likes: {}, reposts: {}, verified: {},
+    likes: {}, reposts: {}, follows: {}, verified: {},
     extraCrisis: []
   };
   M.state = state;
@@ -125,9 +125,15 @@
     var scrim = el('<div class="modal__scrim"></div>');
     layer.appendChild(scrim);
     layer.appendChild(node);
+    var heading = node.querySelector('h1, h2, h3');
+    if (heading && !heading.id) heading.id = 'modal-title-' + Date.now().toString(36);
+    if (opts.labelledBy || heading) layer.setAttribute('aria-labelledby', opts.labelledBy || heading.id);
+    else layer.setAttribute('aria-label', opts.label || 'İletişim kutusu');
     layer.hidden = false;
     layer.dataset.wide = opts.wide ? '1' : '';
     document.body.style.overflow = 'hidden';
+    var shell = $('.shell');
+    if (shell) shell.inert = true;
     var f = node.querySelector('button, [href], input, textarea, [tabindex]:not([tabindex="-1"])');
     if (f) { f.focus(); }
     else { node.tabIndex = -1; node.focus(); }
@@ -154,7 +160,10 @@
     document.removeEventListener('keydown', trap, true);
     setTimeout(function () {
       layer.hidden = true; layer.innerHTML = '';
+      layer.removeAttribute('aria-labelledby'); layer.removeAttribute('aria-label');
       document.body.style.overflow = '';
+      var shell = $('.shell');
+      if (shell) shell.inert = false;
       if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus();
     }, motionOff() ? 0 : 160);
   }
@@ -162,7 +171,7 @@
 
   /* ----------------------------------------------------------- shell HTML */
   var NAV = [
-    ['home', 'Anasayfa', true], ['search', 'Keşfet'], ['bell', 'Bildirimler'],
+    ['home', 'Anasayfa', 'home'], ['search', 'Keşfet', 'search'], ['bell', 'Bildirimler'],
     ['mail', 'Mesajlar'], ['grok', 'Yapay Zekâ'], ['bookmark', 'Yer İşaretleri'],
     ['star', 'Premium'], ['user', 'Profil'], ['dotsc', 'Daha Fazla']
   ];
@@ -175,36 +184,38 @@
 
   function buildShell() {
     var navHtml = NAV.map(function (n) {
-      return '<li><a class="nav__item" href="#" ' + (n[2] ? 'aria-current="page"' : '') + '>' +
-        icon(n[0], 'ic--lg') + '<span>' + n[1] + '</span></a></li>';
+      var active = n[2] === 'home';
+      return '<li><button class="nav__item" type="button" ' +
+        (n[2] ? 'data-nav="' + n[2] + '" ' : 'disabled aria-disabled="true" title="Prototip kapsamı dışında" ') +
+        (active ? 'aria-current="page"' : '') + '>' + icon(n[0], 'ic--lg') + '<span>' + n[1] + '</span></button></li>';
     }).join('');
 
     var side =
       '<div class="side__search"><div class="side__search-box">' + icon('search') +
-        '<input type="search" placeholder="Ara" aria-label="Ara"></div></div>' +
+        '<input type="search" placeholder="Ara" aria-label="Gönderilerde ara" data-search-input></div></div>' +
       '<section class="card" id="trends"><h2 class="card__h">Gündem</h2>' +
         trendRow('Türkiye’de gündem', 'Yerel üretim', '42,1 B') +
         trendRow('Teknoloji · Gündem', 'Tarayıcı oyunları', '18,7 B') +
         trendRow('Spor · Gündem', 'Derbi haftası', '96,4 B') +
         trendRow('Gündem', 'Hava durumu', '11,2 B') +
-        '<button class="card__more">Daha fazla göster</button></section>' +
+        '<button class="card__more" type="button" disabled aria-disabled="true">Daha fazla göster</button></section>' +
       '<section class="card" id="whotofollow"><h2 class="card__h">Kimi takip etmeli</h2>' +
         [S.byId.u5, S.byId.u11, S.byId.o4].map(function (u) {
-          return '<button class="card__row"><span class="av">' + u.avatar + '</span>' +
+          return '<button class="card__row" type="button" data-follow="' + u.id + '" aria-pressed="false"><span class="av">' + u.avatar + '</span>' +
             '<span class="card__row-main"><span class="card__t">' + esc(u.name) +
             (u.org ? icon('vbadge', 'post__verified') : '') + '</span>' +
             '<span class="card__k">@' + esc(u.handle) + '</span></span>' +
             '<span class="btn-follow">Takip et</span></button>';
         }).join('') +
-        '<button class="card__more">Daha fazla göster</button></section>' +
+        '<button class="card__more" type="button" disabled aria-disabled="true">Daha fazla göster</button></section>' +
       '<p class="card__k" style="padding:0 16px">Şablon hesaplar · Kurgusal veri · Prototip</p>';
 
     return el(
       '<div class="shell">' +
-        '<header class="nav"><a class="nav__brand" href="#" aria-label="MİHENK ana sayfa">' + logo() + '</a>' +
+        '<header class="nav"><button class="nav__brand" type="button" data-nav="home" aria-label="MİHENK ana sayfa">' + logo() + '</button>' +
           '<nav aria-label="Birincil"><ul class="nav__list">' + navHtml + '</ul></nav>' +
-          '<button class="nav__post">' + icon('quill', 'ic--lg') + '<span>Gönder</span></button>' +
-          '<button class="nav__me"><span class="av">' + S.me.avatar + '</span>' +
+          '<button class="nav__post" type="button" data-nav="compose">' + icon('quill', 'ic--lg') + '<span>Gönder</span></button>' +
+          '<button class="nav__me" type="button" disabled aria-disabled="true" title="Profil prototip kapsamı dışında"><span class="av">' + S.me.avatar + '</span>' +
             '<span class="nav__me-txt"><span class="nav__me-name">' + esc(S.me.name) + '</span><br>' +
             '<span class="nav__me-handle">@' + esc(S.me.handle) + '</span></span>' + icon('dots') + '</button>' +
         '</header>' +
@@ -215,6 +226,13 @@
               '<div class="tabs__underline" id="underline" aria-hidden="true"></div>' +
             '</div>' +
           '</div>' +
+          '<div class="feed-search" id="feed-search" hidden>' +
+            '<label class="sr-only" for="feed-search-input">Gönderilerde ara</label>' +
+            '<span class="feed-search__icon">' + icon('search') + '</span>' +
+            '<input id="feed-search-input" type="search" placeholder="Gönderilerde ara" autocomplete="off" data-search-input>' +
+            '<span class="feed-search__status" id="feed-search-status" role="status"></span>' +
+            '<button type="button" data-search-close aria-label="Aramayı kapat">' + icon('close', 'ic--sm') + '</button>' +
+          '</div>' +
           '<div class="feeds" id="feeds"></div>' +
         '</main>' +
         '<aside class="side" aria-label="İkincil">' + side + '</aside>' +
@@ -222,7 +240,7 @@
   }
 
   function trendRow(k, t, n) {
-    return '<button class="card__row"><span class="card__row-main">' +
+    return '<button class="card__row" type="button" data-search-term="' + esc(t) + '"><span class="card__row-main">' +
       '<span class="card__k">' + esc(k) + '</span>' +
       '<span class="card__t">' + esc(t) + '</span>' +
       '<span class="card__k">' + esc(n) + ' gönderi</span></span>' + icon('dots') + '</button>';
@@ -280,10 +298,19 @@
   function panel(id) { return $('#panel-' + id); }
   M.panel = panel;
 
+  function syncPanelAccessibility() {
+    $$('.feed').forEach(function (f) {
+      var on = f.dataset.active === '1';
+      f.setAttribute('aria-hidden', on ? 'false' : 'true');
+      f.inert = !on;
+    });
+  }
+  M.syncPanels = syncPanelAccessibility;
+
   function buildFeeds() {
     var f = $('#feeds');
     ['foryou', 'following'].forEach(function (id) {
-      var p = el('<section class="feed" id="panel-' + id + '" role="tabpanel" aria-labelledby="tab-' + id + '" tabindex="0"></section>');
+      var p = el('<section class="feed" id="panel-' + id + '" role="tabpanel" aria-labelledby="tab-' + id + '"></section>');
       f.appendChild(p);
     });
     var sk = el('<section class="feed feed--skel" id="panel-skel" aria-hidden="true"></section>');
@@ -292,6 +319,7 @@
     M.renderFeed('foryou');
     M.renderFeed('following');
     panel('foryou').dataset.active = '1';
+    syncPanelAccessibility();
   }
 
   /* -------------------------------------------------------- tab switching */
@@ -320,7 +348,8 @@
     document.documentElement.dataset.tab = next;
     syncTabs();
     moveUnderline(true);
-    pushURL(next, false);
+    if (!opts.fromHistory) pushURL(next, false);
+    syncPanelAccessibility();
 
     var fast = motionOff();
     var tOut = fast ? 0 : 180;
@@ -331,10 +360,12 @@
     setTimeout(function () {
       if (outEl) { outEl.dataset.anim = ''; outEl.dataset.active = '0'; }
       skel.dataset.active = '1';
+      syncPanelAccessibility();
       window.scrollTo(0, 0);
       setTimeout(function () {
         skel.dataset.active = '0';
         inEl.dataset.active = '1';
+        syncPanelAccessibility();
         inEl.dataset.anim = dir > 0 ? 'in-right' : 'in-left';
         M.stagger(inEl);
         /* flush layout so the scroll range belongs to the incoming feed,
@@ -369,6 +400,7 @@
     syncTabs();
     moveUnderline(false);
     pushURL(id, true);
+    syncPanelAccessibility();
     state.busy = false;
     M.emit('tab', { from: from, to: id });
     window.scrollTo(0, state.scroll[id] || 0);
@@ -407,7 +439,7 @@
      served from a directory root we use real paths (/takip, /kriz); when it
      is served as a single file from a deeper path we keep the same pathname
      and carry the tab in a query parameter, so reloading always works. */
-  var PATH_MODE = /(^\/$)|(\/index\.html$)/.test(location.pathname);
+  var PATH_MODE = location.protocol !== 'file:' && !/\.html?$/.test(location.pathname);
   var QKEY = { following: 'takip', crisis: 'kriz' };
 
   function urlFor(tab) {
@@ -430,12 +462,9 @@
   M.pushURL = pushURL;
 
   function routeFromLocation() {
-    if (PATH_MODE) {
-      var p = location.pathname.replace(/\/+$/, '') || '/';
-      if (p.indexOf('/kriz') === 0) return 'crisis';
-      if (p.indexOf('/takip') === 0) return 'following';
-      return 'foryou';
-    }
+    var p = location.pathname.replace(/\/+$/, '') || '/';
+    if (/(^|\/)kriz$/.test(p)) return 'crisis';
+    if (/(^|\/)takip$/.test(p)) return 'following';
     var t = new URLSearchParams(location.search).get('t');
     if (t === 'kriz') return 'crisis';
     if (t === 'takip') return 'following';
@@ -444,13 +473,44 @@
 
   window.addEventListener('popstate', function () {
     var t = routeFromLocation();
-    if (t === 'crisis' && !state.crisis) { t = 'foryou'; }
-    if (t !== state.tab) {
-      var keep = state.tab;
-      state.tab = keep;
-      setTab(t);
-    }
+    if (t === 'crisis' && !state.crisis) M.activateCrisis({ immediate: true });
+    if (t !== state.tab) setTab(t, { fromHistory: true });
   });
+
+  /* --------------------------------------------------------------- search */
+  function applySearch(value) {
+    var query = (value || '').trim().toLocaleLowerCase('tr-TR');
+    $$('[data-search-input]').forEach(function (input) {
+      if (input.value !== value) input.value = value;
+    });
+    var rows = $$('.post, .cpost', panel(state.tab));
+    var count = 0;
+    rows.forEach(function (row) {
+      var match = !query || row.innerText.toLocaleLowerCase('tr-TR').indexOf(query) >= 0;
+      row.dataset.searchHidden = match ? '' : '1';
+      if (match) count++;
+    });
+    var status = $('#feed-search-status');
+    if (status) status.textContent = query ? count + ' sonuç' : '';
+  }
+
+  function openSearch(term) {
+    var box = $('#feed-search');
+    if (!box) return;
+    box.hidden = false;
+    var input = $('#feed-search-input');
+    input.value = term || input.value || '';
+    applySearch(input.value);
+    window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' });
+    setTimeout(function () { input.focus(); }, motionOff() ? 0 : 180);
+  }
+  M.openSearch = openSearch;
+
+  function closeSearch() {
+    var box = $('#feed-search');
+    if (box) box.hidden = true;
+    applySearch('');
+  }
 
   /* ------------------------------------------------------------------ init */
   function init() {
@@ -459,15 +519,47 @@
     document.body.appendChild(el('<div class="modal-layer" id="modal" role="dialog" aria-modal="true" hidden></div>'));
     document.body.appendChild(el('<button class="fab" aria-label="Gönder">' + icon('quill', 'ic--lg') + '</button>'));
     document.body.appendChild(el('<nav class="bottombar" aria-label="Alt gezinme">' +
-      '<a href="#" aria-label="Anasayfa">' + icon('home', 'ic--lg') + '</a>' +
-      '<a href="#" aria-label="Keşfet">' + icon('search', 'ic--lg') + '</a>' +
-      '<a href="#" aria-label="Bildirimler">' + icon('bell', 'ic--lg') + '</a>' +
-      '<a href="#" aria-label="Mesajlar">' + icon('mail', 'ic--lg') + '</a></nav>'));
+      '<button type="button" data-nav="home" aria-label="Anasayfa">' + icon('home', 'ic--lg') + '</button>' +
+      '<button type="button" data-nav="search" aria-label="Keşfet">' + icon('search', 'ic--lg') + '</button>' +
+      '<button type="button" disabled aria-disabled="true" aria-label="Bildirimler (prototip kapsamı dışında)">' + icon('bell', 'ic--lg') + '</button>' +
+      '<button type="button" disabled aria-disabled="true" aria-label="Mesajlar (prototip kapsamı dışında)">' + icon('mail', 'ic--lg') + '</button></nav>'));
 
     renderTabs();
     buildFeeds();
     M.mountComposer();
     M.initCrisis();
+
+    document.addEventListener('click', function (e) {
+      var nav = e.target.closest('[data-nav]');
+      if (nav) {
+        if (nav.dataset.nav === 'home') {
+          if (state.tab !== 'foryou') setTab('foryou');
+          window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' });
+        }
+        if (nav.dataset.nav === 'search') openSearch('');
+        if (nav.dataset.nav === 'compose') {
+          var ta = $('#ta');
+          if (ta) { ta.focus(); window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' }); }
+        }
+      }
+      var trend = e.target.closest('[data-search-term]');
+      if (trend) openSearch(trend.dataset.searchTerm);
+      var follow = e.target.closest('[data-follow]');
+      if (follow) {
+        var id = follow.dataset.follow;
+        state.follows[id] = !state.follows[id];
+        follow.setAttribute('aria-pressed', state.follows[id] ? 'true' : 'false');
+        follow.querySelector('.btn-follow').textContent = state.follows[id] ? 'Takip ediliyor' : 'Takip et';
+      }
+      if (e.target.closest('[data-search-close]')) closeSearch();
+    });
+    $$('[data-search-input]').forEach(function (input) {
+      input.addEventListener('input', function () {
+        if ($('#feed-search').hidden) $('#feed-search').hidden = false;
+        applySearch(input.value);
+      });
+    });
+    M.on('tab', function () { applySearch($('#feed-search-input').value); });
 
     $('#tabs').addEventListener('click', function (e) {
       var t = e.target.closest('.tab');
@@ -486,7 +578,8 @@
 
     document.documentElement.dataset.tab = state.tab;
     var initial = routeFromLocation();
-    if (initial === 'following') { state.tab = 'foryou'; setTab('following'); }
+    if (initial === 'following') M.setTabInstant('following');
+    if (initial === 'crisis') { M.activateCrisis({ immediate: true }); M.setTabInstant('crisis'); }
 
     M.initDemo();
   }

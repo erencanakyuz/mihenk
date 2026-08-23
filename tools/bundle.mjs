@@ -4,7 +4,8 @@
      dist/mihenk.html    full standalone page (open it with a double click)
      dist/artifact.html  body-level content only, for hosts that supply the
                          <!doctype>/<head>/<body> skeleton themselves
-   No minification: the shipped file is the same code you can read in src.
+   No minification: the shipped file is the same code you can read in the
+   source folders.
    Run: node tools/bundle.mjs
    ========================================================================== */
 import fs from 'node:fs';
@@ -16,10 +17,27 @@ const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8');
 const CSS = ['styles/tokens.css', 'styles/base.css', 'styles/feed.css',
              'styles/crisis.css', 'styles/plain.css'];
 const JS = ['data/seed.js', 'scripts/app.js', 'scripts/feed.js', 'scripts/crisis.js',
-            'scripts/imdat.js', 'scripts/demo.js', 'scripts/capture.js'];
+            'scripts/imdat.js', 'scripts/demo.js'];
+
+const ASSET_MIME = {
+  '.avif': 'image/avif',
+  '.jpeg': 'image/jpeg',
+  '.jpg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webp': 'image/webp'
+};
+
+function inlineImageAssets(source) {
+  return source.replace(/assets\/img\/[A-Za-z0-9._-]+\.(?:avif|jpe?g|png|webp)/gi, ref => {
+    const file = path.join(ROOT, ...ref.split('/'));
+    if (!fs.existsSync(file)) throw new Error(`Missing image asset: ${ref}`);
+    const mime = ASSET_MIME[path.extname(file).toLowerCase()];
+    return `data:${mime};base64,${fs.readFileSync(file).toString('base64')}`;
+  });
+}
 
 const css = CSS.map(f => `/* ===== ${f} ===== */\n${read(f)}`).join('\n');
-const js  = JS.map(f => `/* ===== ${f} ===== */\n${read(f)}`).join('\n');
+const js  = inlineImageAssets(JS.map(f => `/* ===== ${f} ===== */\n${read(f)}`).join('\n'));
 
 const html = read('index.html');
 const noscript = /<noscript>[\s\S]*?<\/noscript>/.exec(html)[0];
@@ -39,7 +57,7 @@ fs.writeFileSync(path.join(ROOT, 'dist/mihenk.html'),
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="MİHENK — kriz modu akış prototipi. Tamamen yerel, kurgusal veriyle çalışan bir UI/UX prototipi.">
+<meta name="description" content="MİHENK: kriz modu akış prototipi. Tamamen yerel, kurgusal veriyle çalışan bir UI/UX prototipi.">
 <title>MİHENK</title>
 </head>
 <body>

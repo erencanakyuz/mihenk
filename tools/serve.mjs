@@ -1,24 +1,88 @@
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 const root = path.resolve(import.meta.dirname, '..');
-const MIME = { '.html':'text/html; charset=utf-8', '.css':'text/css; charset=utf-8',
-  '.js':'text/javascript; charset=utf-8', '.svg':'image/svg+xml', '.json':'application/json' };
-export function serve(port = 8321) {
-  const server = http.createServer((req, res) => {
-    let p = decodeURIComponent(req.url.split('?')[0]);
-    let f = path.join(root, p);
-    if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(root, 'index.html');
-    const ext = path.extname(f);
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream',
-      'Cache-Control': 'no-store' });
-    fs.createReadStream(f).pipe(res);
+const indexFile = path.join(root, 'index.html');
+const MIME = {
+  '.avif': 'image/avif',
+  '.css': 'text/css; charset=utf-8',
+  '.gif': 'image/gif',
+  '.html': 'text/html; charset=utf-8',
+  '.ico': 'image/x-icon',
+  '.jpeg': 'image/jpeg',
+  '.jpg': 'image/jpeg',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.mp4': 'video/mp4',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.webm': 'video/webm',
+  '.webp': 'image/webp'
+};
+
+function sendFile(req, res, file) {
+  const stat = fs.statSync(file);
+  res.writeHead(200, {
+    'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream',
+    'Content-Length': stat.size,
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff'
   });
+  if (req.method === 'HEAD') return res.end();
+  const stream = fs.createReadStream(file);
+  stream.on('error', () => {
+    if (!res.headersSent) res.writeHead(500);
+    res.end();
+  });
+  stream.pipe(res);
+}
+
+export function serve(port = 8321, host = '127.0.0.1') {
+  const server = http.createServer((req, res) => {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      res.writeHead(405, { Allow: 'GET, HEAD' });
+      return res.end('Method Not Allowed');
+    }
+
+    let pathname;
+    try {
+      pathname = decodeURIComponent((req.url || '/').split('?')[0]).replaceAll('\\', '/');
+    } catch {
+      res.writeHead(400);
+      return res.end('Bad Request');
+    }
+
+    const candidate = path.resolve(root, '.' + (pathname.startsWith('/') ? pathname : '/' + pathname));
+    const relative = path.relative(root, candidate);
+    if (relative.startsWith('..') || path.isAbsolute(relative)) {
+      res.writeHead(403);
+      return res.end('Forbidden');
+    }
+
+    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+      return sendFile(req, res, candidate);
+    }
+
+    // Only extensionless application routes receive the SPA fallback.
+    if (!path.extname(pathname)) return sendFile(req, res, indexFile);
+    res.writeHead(404);
+    res.end('Not Found');
+  });
+
   return new Promise((resolve, reject) => {
-    server.on('error', reject);
-    server.listen(port, () => { server.port = server.address().port; resolve(server); });
+    server.once('error', reject);
+    server.listen(port, host, () => {
+      const address = server.address();
+      server.port = typeof address === 'object' && address ? address.port : port;
+      resolve(server);
+    });
   });
 }
-if (process.argv[1] === new URL(import.meta.url).pathname) {
-  serve(Number(process.argv[2] || 8321)).then(() => console.log('serving on', process.argv[2] || 8321));
+
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  const port = Number(process.argv[2] || 8321);
+  serve(port).then(server => console.log(`MİHENK: http://127.0.0.1:${server.port}`));
 }

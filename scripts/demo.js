@@ -427,8 +427,6 @@
         }).join('') +
         '</div><div class="demo__hr"></div><div class="demo__grid">' +
         '<button class="demo__btn" type="button" data-demo="reset">Sıfırla</button>' +
-        '<button class="demo__btn" type="button" data-demo="rec">WebM kaydını başlat</button>' +
-        '<button class="demo__btn" type="button" data-demo="recall">Tüm klipleri kaydet</button>' +
         '</div><div class="demo__hr"></div>' +
         '<p class="demo__note">Sanal saat: rAF kare sayacı. Aynı senaryo her çalıştırmada kare kare aynıdır.</p>' +
         '</aside>');
@@ -439,8 +437,6 @@
         var d = e.target.closest('[data-demo]');
         if (!d) return;
         if (d.dataset.demo === 'reset') { stop(false); resetAll(); }
-        if (d.dataset.demo === 'rec') M.recordCurrent();
-        if (d.dataset.demo === 'recall') M.recordAll();
       });
     }
 

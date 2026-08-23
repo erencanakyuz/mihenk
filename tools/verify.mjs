@@ -2,7 +2,10 @@ import { chromium } from 'playwright';
 import { serve } from './serve.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 const ROOT = path.resolve(import.meta.dirname, '..');
+const TMP = path.join(os.tmpdir(), 'mihenk-verify');
+fs.mkdirSync(TMP, { recursive: true });
 const server = await serve(0);
 const PORT = server.port;
 const b = await chromium.launch();
@@ -131,7 +134,7 @@ const njText = await p2.locator('.nojs').innerText();
 ok('JS kapalıyken belge çalışıyor', njText.includes('KRİZ VAR') && njText.length > 2000, njText.length + ' karakter');
 const njPosts = await p2.locator('.nojs article').count();
 ok('JS kapalıyken tüm kriz gönderileri var', njPosts >= 24, njPosts + ' gönderi');
-await p2.screenshot({path:'/tmp/nojs.png', fullPage:false});
+await p2.screenshot({path:path.join(TMP, 'nojs.png'), fullPage:false});
 await ctx2.close();
 
 /* ---- 3. single-file bundle --------------------------------------------- */
@@ -149,7 +152,7 @@ await p3.waitForTimeout(1200);
 ok('tek dosya paketi çalışıyor', await p3.locator('.cpost').count() === 24, await p3.locator('.cpost').count() + ' gönderi');
 ok('tek dosya: hata yok', e3.length === 0, e3.join(' | '));
 ok('tek dosya: tek istek', r3.length === 1, r3.length + ' istek');
-await p3.screenshot({path:'/tmp/bundle-crisis.png'});
+await p3.screenshot({path:path.join(TMP, 'bundle-crisis.png')});
 await ctx3.close();
 
 await b.close(); server.close();

@@ -45,4 +45,3 @@ Keep MİHENK a zero-backend, framework-free prototype while making its repositor
 - Real-browser checks cover desktop and mobile layouts, direct routes, history navigation, crisis activation/deactivation, all enabled controls, keyboard focus, dialogs, console errors, and post-load network activity.
 - Before push, the Git tree and every commit being published are checked to confirm that `clips/` is absent.
 - Work from the concurrent image contributor is preserved and integrated only after its files are complete.
-

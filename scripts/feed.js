@@ -37,8 +37,13 @@
 
   /* --------------------------------------------------------- post render */
   function act(kind, cls, label, n, on) {
+    if (kind === 'views') {
+      return '<span class="act act--views ' + (cls || '') + '" aria-label="' + esc(label + ': ' + M.nfmt(n)) + '">' +
+        '<span class="act__halo">' + icon('views') + '</span><span class="act__n">' + M.nfmt(n) + '</span></span>';
+    }
     return '<button class="act act--' + kind + ' ' + (cls || '') + '" type="button" ' +
       'data-act="' + kind + '" ' + (on ? 'data-on="1" ' : '') +
+      ((kind === 'like' || kind === 'repost') ? 'aria-pressed="' + (on ? 'true' : 'false') + '" ' : '') +
       'aria-label="' + esc(label) + '">' +
       '<span class="act__halo">' + icon(kind === 'reply' ? 'reply' : kind === 'repost' ? 'repost' :
         kind === 'like' ? 'heart' : kind === 'views' ? 'views' : 'share') + '</span>' +
@@ -50,7 +55,7 @@
     var u = S.byId[p.uid];
     var liked = !!state.likes[p.id];
     var rep = !!state.reposts[p.id];
-    return '<article class="post" data-id="' + p.id + '" tabindex="0" role="article" ' +
+    return '<article class="post" data-id="' + p.id + '" ' +
       'aria-label="' + esc(u.name + ' gönderisi') + '">' +
       '<span class="av">' + u.avatar + '</span>' +
       '<div class="post__col">' +
@@ -60,7 +65,7 @@
           '<span class="post__handle">@' + esc(u.handle) + '</span>' +
           '<span class="post__dot">·</span>' +
           '<span class="post__time">' + esc(p.t) + '</span>' +
-          '<button class="post__more" type="button" aria-label="Daha fazla">' + icon('dots', 'ic--sm') + '</button>' +
+          '<button class="post__more" type="button" disabled aria-disabled="true" aria-label="Diğer işlemler (prototip kapsamı dışında)">' + icon('dots', 'ic--sm') + '</button>' +
         '</div>' +
         '<div class="post__body">' + esc(p.text) + '</div>' +
         (p.media ? '<div class="post__media">' + S.media(p.media) + '</div>' : '') +
@@ -93,6 +98,41 @@
     setTimeout(function () { btn.dataset.bounce = ''; }, 280);
   }
 
+  function syncAction(id, kind, base) {
+    $$('.post[data-id="' + id + '"] [data-act="' + kind + '"]').forEach(function (btn) {
+      var on = kind === 'like' ? !!state.likes[id] : !!state.reposts[id];
+      btn.dataset.on = on ? '1' : '';
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var n = btn.querySelector('.act__n');
+      if (n) n.textContent = M.nfmt(base[kind === 'like' ? 'likes' : 'reposts'] + (on ? 1 : 0));
+      bounce(btn);
+    });
+  }
+
+  function syncReplies(id, base) {
+    $$('.post[data-id="' + id + '"] [data-act="reply"] .act__n').forEach(function (n) {
+      n.textContent = M.nfmt(base.replies + state.replies[id]);
+    });
+  }
+
+  async function copyShareLink(id) {
+    var url = location.href.split('#')[0] + '#gonderi-' + encodeURIComponent(id);
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(url);
+      else {
+        var input = document.createElement('textarea');
+        input.value = url; input.setAttribute('readonly', ''); input.style.position = 'fixed'; input.style.opacity = '0';
+        document.body.appendChild(input); input.select();
+        var copied = document.execCommand('copy');
+        input.remove();
+        if (!copied) throw new Error('copy failed');
+      }
+      M.toast('Bağlantı kopyalandı', { muted: true, life: 1600 });
+    } catch (_) {
+      M.toast('Bağlantı kopyalanamadı', { muted: true, life: 2000 });
+    }
+  }
+
   document.addEventListener('click', function (e) {
     var a = e.target.closest('.act');
     if (!a) return;
@@ -101,28 +141,23 @@
     if (!art) return;
     var id = art.dataset.id;
     var kind = a.dataset.act;
-    var nEl = a.querySelector('.act__n');
     var base = (S.forYou.concat(S.following)).filter(function (p) { return p.id === id; })[0];
     if (!base) return;
 
     if (kind === 'like') {
       state.likes[id] = !state.likes[id];
-      a.dataset.on = state.likes[id] ? '1' : '';
-      nEl.textContent = M.nfmt(base.likes + (state.likes[id] ? 1 : 0));
-      bounce(a);
+      syncAction(id, kind, base);
     } else if (kind === 'repost') {
       state.reposts[id] = !state.reposts[id];
-      a.dataset.on = state.reposts[id] ? '1' : '';
-      nEl.textContent = M.nfmt(base.reposts + (state.reposts[id] ? 1 : 0));
-      bounce(a);
+      syncAction(id, kind, base);
     } else if (kind === 'reply') {
       state.replies = state.replies || {};
       state.replies[id] = (state.replies[id] || 0) + 1;
-      nEl.textContent = M.nfmt(base.replies + state.replies[id]);
+      syncReplies(id, base);
       bounce(a);
       M.toast('Yanıtın eklendi', { muted: true, life: 1600 });
     } else if (kind === 'share') {
-      M.toast('Bağlantı kopyalandı', { muted: true, life: 1600 });
+      copyShareLink(id);
     }
   });
 
@@ -143,8 +178,8 @@
             '</div>' +
           '</div>' +
           '<div class="composer__bar">' +
-            ['image', 'poll', 'emoji', 'clock', 'pin'].map(function (i) {
-              return '<button class="composer__tool" type="button" aria-label="' + i + '">' + icon(i) + '</button>';
+            [['image', 'Görsel'], ['poll', 'Anket'], ['emoji', 'Emoji'], ['clock', 'Zamanlama'], ['pin', 'Konum']].map(function (i) {
+              return '<button class="composer__tool" type="button" disabled aria-disabled="true" title="Prototip kapsamı dışında" aria-label="' + i[1] + ' (prototip kapsamı dışında)">' + icon(i[0]) + '</button>';
             }).join('') +
             '<button class="btn composer__post" id="postbtn" type="button" disabled>Gönder</button>' +
           '</div>' +
@@ -176,7 +211,16 @@
     });
 
     var fab = $('.fab');
-    if (fab) fab.addEventListener('click', function () { ta.focus(); window.scrollTo({ top: 0, behavior: (M.motionOff() || M.capture) ? 'auto' : 'smooth' }); });
+    if (fab) fab.addEventListener('click', function () {
+      if (state.tab === 'crisis' && M.openCrisisComposer) {
+        M.openCrisisComposer('');
+        setTimeout(function () { var crisisTa = $('#cta'); if (crisisTa) crisisTa.focus(); }, M.motionOff() ? 0 : 180);
+        return;
+      }
+      c.dataset.mobileOpen = '1';
+      window.scrollTo({ top: 0, behavior: (M.motionOff() || M.capture) ? 'auto' : 'smooth' });
+      setTimeout(function () { ta.focus(); }, M.motionOff() ? 0 : 180);
+    });
   };
 
   M.composerValue = function () { return $('#ta') ? $('#ta').value : ''; };
@@ -184,6 +228,8 @@
     var ta = $('#ta');
     if (!ta) return;
     ta.value = ''; ta.style.height = 'auto';
+    var composer = $('#composer');
+    if (composer) composer.dataset.mobileOpen = '';
     $('#postbtn').disabled = true;
     $('#tagsel').hidden = true;
     $$('.chip', $('#tagsel')).forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });

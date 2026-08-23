@@ -1,0 +1,18 @@
+{
+  "name": "mihenk-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-first MİHENK crisis-feed UI prototype",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "bundle": "node tools/gen-static.mjs && node tools/bundle.mjs",
+    "check:syntax": "node --check data/seed.js && node --check scripts/app.js && node --check scripts/feed.js && node --check scripts/crisis.js && node --check scripts/imdat.js && node --check scripts/demo.js && node --check tools/serve.mjs && node --check tools/bundle.mjs && node --check tools/verify.mjs",
+    "contrast": "node tools/contrast.mjs",
+    "verify": "node tools/verify.mjs",
+    "capture": "node tools/capture.mjs",
+    "check": "npm run check:syntax && npm run contrast && npm run bundle && npm run verify"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

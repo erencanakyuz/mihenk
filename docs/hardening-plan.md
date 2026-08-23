@@ -140,4 +140,3 @@
 - [ ] Inspect `git status`, staged diff, commit contents, and `git rev-list --objects origin/main..HEAD` for ignored outputs and secrets.
 - [ ] Commit the hardening changes with focused messages.
 - [ ] Push `main` to `origin` and verify the remote branch points to the expected commit.
-

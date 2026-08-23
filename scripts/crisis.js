@@ -27,8 +27,7 @@
     var u = S.byId[p.uid];
     var v = state.verified[p.id] || p.v;
     var vl = S.VER[v];
-    return '<article class="cpost" data-id="' + p.id + '" data-v="' + v + '" data-tag="' + p.tag + '" ' +
-      'tabindex="0" role="article">' +
+    return '<article class="cpost" data-id="' + p.id + '" data-v="' + v + '" data-tag="' + p.tag + '">' +
       '<span class="av">' + u.avatar + '</span>' +
       '<div class="cpost__col">' +
         '<div class="cpost__head">' +
@@ -40,6 +39,7 @@
         '<span class="vpill vpill--' + v + '">' + icon(VICON[v]) +
           '<span class="vpill__t">' + esc(vl.label) + '</span></span>' +
         '<div class="cpost__body">' + esc(p.text) + '</div>' +
+        (p.media ? '<div class="post__media">' + S.media(p.media) + '</div>' : '') +
         '<div class="cpost__meta">' +
           '<span class="cpost__loc">' + icon('pin', 'ic--sm') + esc(p.loc) + '</span>' +
           '<span class="cpost__tag">' + esc(TAGLABEL[p.tag]) + '</span>' +
@@ -65,7 +65,7 @@
   /* --------------------------------------------------------- crisis panel */
   function buildCrisisPanel() {
     if ($('#panel-crisis')) return;
-    var p = el('<section class="feed" id="panel-crisis" role="tabpanel" aria-labelledby="tab-crisis" tabindex="0"></section>');
+    var p = el('<section class="feed" id="panel-crisis" role="tabpanel" aria-labelledby="tab-crisis"></section>');
 
     var head = el(
       '<div class="crisis-head">' +
@@ -85,7 +85,7 @@
               '</div>' +
             '</div>' +
             '<div class="composer__bar">' +
-              '<button class="composer__tool" type="button" aria-label="Konum">' + icon('pin') + '</button>' +
+              '<button class="composer__tool" type="button" disabled aria-disabled="true" title="Prototip kapsamı dışında" aria-label="Konum (prototip kapsamı dışında)">' + icon('pin') + '</button>' +
               '<button class="btn composer__post" id="cpostbtn" type="button" disabled>Kriz Var’da paylaş</button>' +
             '</div>' +
           '</div>' +
@@ -113,6 +113,7 @@
     p.appendChild(list);
     p.appendChild(el('<div class="feed__end">Kriz akışının sonundasın · yalnızca doğrulama, konum ve zaman gösterilir</div>'));
     $('#feeds').appendChild(p);
+    M.syncPanels();
     renderCrisisList();
     wireCrisisPanel();
     showBytes();
@@ -416,16 +417,17 @@
       state.crisis = false;
       state.filter = 'all';
       document.documentElement.dataset.palette = '';
-      var drop = function () { var p = $('#panel-crisis'); if (p && p.parentNode) p.parentNode.removeChild(p); };
+      var drop = function () { var p = $('#panel-crisis'); if (p && p.parentNode) p.parentNode.removeChild(p); M.syncPanels(); };
       if (immediate) drop(); else setTimeout(drop, 340);
       if (!opts.silent) M.toast('Kriz modu sona erdi', { muted: true, life: opts.toastLife || 2600 });
       syncControls();
       M.emit('crisis', false);
     };
-    if (state.tab === 'crisis') {
+    var wasCrisisTab = state.tab === 'crisis';
+    if (wasCrisisTab) {
       if (immediate) M.setTabInstant('foryou'); else M.setTab('foryou');
     }
-    if (immediate) go(); else setTimeout(go, state.tab === 'crisis' ? 780 : 0);
+    if (immediate) go(); else setTimeout(go, wasCrisisTab ? 780 : 0);
   }
 
   M.activateCrisis = activate;
@@ -447,14 +449,17 @@
     var p = { id: id, uid: 'me', t: 'şimdi', text: text, likes: 0, reposts: 0, replies: 0, views: 1 };
     S.forYou.unshift(p);
     S.following.unshift(p);
-    var list = M.panel(state.tab).querySelector('.feed__list');
-    if (list) {
+    ['foryou', 'following'].forEach(function (feedId) {
+      var list = M.panel(feedId).querySelector('.feed__list');
+      if (!list) return;
       var node = el(M.postHTML(p));
-      node.style.setProperty('--i', 0);
-      node.classList.add('post--stagger');
+      if (feedId === state.tab) {
+        node.style.setProperty('--i', 0);
+        node.classList.add('post--stagger');
+        setTimeout(function () { node.classList.remove('post--stagger'); }, 420);
+      }
       list.insertBefore(node, list.firstChild);
-      setTimeout(function () { node.classList.remove('post--stagger'); }, 420);
-    }
+    });
     M.clearComposer();
     window.scrollTo({ top: 0, behavior: (M.motionOff() || M.capture) ? 'auto' : 'smooth' });
     M.toast('Gönderin paylaşıldı', { muted: true, life: 1800 });
@@ -462,7 +467,7 @@
 
   function showInterception(text) {
     var node = el(
-      '<div class="modal" role="document">' +
+      '<div class="modal">' +
         '<h2 class="modal__h" id="imh">Bu paylaşım krizle ilgili görünüyor.</h2>' +
         '<p class="modal__p">Kriz Var sekmesinde paylaşmak ister misiniz?</p>' +
         '<p class="modal__p">Orada doğrulama ve yardım eşleştirme çalışır.</p>' +
@@ -471,7 +476,7 @@
           '<button class="btn btn--ghost" id="stay-normal" type="button">Normal akışta kal</button>' +
         '</div>' +
       '</div>');
-    M.openModal(node);
+    M.openModal(node, { labelledBy: 'imh' });
     node.querySelector('#go-crisis').addEventListener('click', function () {
       M.closeModal();
       M.clearComposer();

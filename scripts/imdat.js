@@ -44,7 +44,7 @@
 
   function stepHTML(i) {
     if (i === 0) {
-      return '<h2 class="flow__q">Ne tür yardıma ihtiyacınız var?</h2>' +
+      return '<h2 class="flow__q" id="flowq">Ne tür yardıma ihtiyacınız var?</h2>' +
         '<p class="flow__hint">Birden fazla seçebilirsiniz.</p>' +
         '<div class="flow__body">' + NEEDS.map(function (n) {
           return '<button class="big-chip" type="button" data-need="' + n.id + '" aria-pressed="false">' +
@@ -52,14 +52,14 @@
         }).join('') + '</div>';
     }
     if (i === 1) {
-      return '<h2 class="flow__q">Konumunuz</h2>' +
+      return '<h2 class="flow__q" id="flowq">Konumunuz</h2>' +
         '<p class="flow__hint">Haritadaki nokta yaklaşık konumunuzdur. Gerekiyorsa adresi elle yazın.</p>' +
         '<div class="flow__body"><div class="map">' + mapSVG() + '</div>' +
         '<label class="field"><span class="field__l">Adres tarifi</span>' +
         '<input type="text" id="addr" placeholder="Mahalle, sokak, bina tarifi" autocomplete="off"></label></div>';
     }
     if (i === 2) {
-      return '<h2 class="flow__q">Kaç kişisiniz?</h2>' +
+      return '<h2 class="flow__q" id="flowq">Kaç kişisiniz?</h2>' +
         '<p class="flow__hint">Yardım gereken toplam kişi sayısı.</p>' +
         '<div class="flow__body"><div class="stepper">' +
         '<button class="stepper__b" type="button" data-step="-1" aria-label="Azalt">' + icon('minus', 'ic--lg') + '</button>' +
@@ -68,11 +68,11 @@
         '</div></div>';
     }
     if (i === 3) {
-      return '<h2 class="flow__q">Çağrınızı gözden geçirin</h2>' +
+      return '<h2 class="flow__q" id="flowq">Çağrınızı gözden geçirin</h2>' +
         '<p class="flow__hint">Gönderdikten sonra durumu bu ekrandan izleyebilirsiniz.</p>' +
         '<div class="flow__body"><div class="review" id="review"></div></div>';
     }
-    return '<h2 class="flow__q">Çağrınız iletildi</h2>' +
+    return '<h2 class="flow__q" id="flowq">Çağrınız iletildi</h2>' +
       '<p class="flow__hint">Durum zinciri gerçek zamanlı güncellenir.</p>' +
       '<div class="flow__body"><div class="chain" id="chain">' +
       CHAIN.map(function (c, k) {
@@ -146,12 +146,12 @@
     opts = opts || {};
     st = { need: opts.need || [], addr: '', people: 3, step: 0 };
     var node = el(
-      '<div class="modal" role="document" aria-labelledby="flowq">' +
+      '<div class="modal">' +
         '<div class="flow"><div class="flow__dots">' +
           [0, 1, 2, 3, 4].map(function (k) { return '<span class="flow__dot" data-on="' + (k ? '' : '1') + '"></span>'; }).join('') +
         '</div><div class="flow__viewport" id="flowvp"></div></div>' +
       '</div>');
-    M.openModal(node);
+    M.openModal(node, { labelledBy: 'flowq' });
     render(1);
 
     node.addEventListener('click', function (e) {

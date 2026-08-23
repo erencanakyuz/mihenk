@@ -2,6 +2,7 @@
 import { chromium } from 'playwright';
 import { serve } from './serve.mjs';
 import fs from 'node:fs'; import path from 'node:path';
+import os from 'node:os';
 const id = process.argv[2] || 'tab-switch';
 const server = await serve(0); const PORT = server.port;
 const b = await chromium.launch({args:['--hide-scrollbars','--run-all-compositor-stages-before-draw','--disable-new-content-rendering-timeout','--disable-threaded-animation','--disable-threaded-scrolling']});
@@ -18,15 +19,16 @@ const total = await page.evaluate(()=>window.__mihenk.total());
 const shot = async f => { await client.send('Page.captureScreenshot',{format:'png'});
   const s = await client.send('Page.captureScreenshot',{format:'png'});
   fs.writeFileSync(f, Buffer.from(s.data,'base64')); };
-fs.mkdirSync('/tmp/seam',{recursive:true});
+const out = path.join(os.tmpdir(), 'mihenk-seam');
+fs.mkdirSync(out,{recursive:true});
 for (let i=0;i<Math.ceil(total/2);i++){ for(let s=0;s<2;s++){ await adv(1000/60); await page.evaluate(()=>window.__mihenk.step()); }
-  if (i===0) { await shot('/tmp/seam/first.png'); console.log('frame0', JSON.stringify(await page.evaluate(()=>{
+  if (i===0) { await shot(path.join(out, 'first.png')); console.log('frame0', JSON.stringify(await page.evaluate(()=>{
     const c=document.querySelector('.cursor'), u=document.getElementById('underline');
     const t=document.querySelector('.tab--crisis .ic');
     return {cursor:c?getComputedStyle(c).opacity:'none', uw:u.style.width, ut:u.style.transform,
       uwc:getComputedStyle(u).width, pulse:t?getComputedStyle(t).opacity:'none', pd:getComputedStyle(document.documentElement).getPropertyValue('--pulse-dur')};
   }))); } }
-await shot('/tmp/seam/last.png');
+await shot(path.join(out, 'last.png'));
 console.log('frameN', JSON.stringify(await page.evaluate(()=>{
   const c=document.querySelector('.cursor'), u=document.getElementById('underline');
   const t=document.querySelector('.tab--crisis .ic');

@@ -34,7 +34,8 @@ const normal = S.forYou.slice(0, 10).map(p => {
 // measure the real payloads so the printed comparison is not a claim
 const files = ['index.html','styles/tokens.css','styles/base.css','styles/feed.css',
   'styles/crisis.css','styles/plain.css','data/seed.js','scripts/app.js','scripts/feed.js',
-  'scripts/crisis.js','scripts/imdat.js','scripts/demo.js','scripts/capture.js'];
+  'scripts/crisis.js','scripts/imdat.js','scripts/demo.js',
+  'assets/img/template-a.jpg','assets/img/template-b.jpg'];
 const fullKB = Math.round(files.reduce((n,f)=>n+fs.statSync(path.join(root,f)).size,0)/1024);
 
 let plainKB = 12;
