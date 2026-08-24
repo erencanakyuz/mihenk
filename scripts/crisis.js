@@ -43,6 +43,8 @@
         '<div class="cpost__meta">' +
           '<span class="cpost__loc">' + icon('pin', 'ic--sm') + esc(p.loc) + '</span>' +
           '<span class="cpost__tag">' + esc(TAGLABEL[p.tag]) + '</span>' +
+          '<button class="cpost__why" type="button" data-why="' + p.id + '">' +
+            icon('questionc', 'ic--sm') + '<span>Gerekçe</span></button>' +
           '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
             (v === 'verified' ? ' data-done="1"' : '') + '>' +
             icon('checkc', 'ic--sm') + '<span>' + (v === 'verified' ? 'Doğrulandı' : 'Doğrula') + '</span></button>' +
@@ -51,6 +53,16 @@
   }
 
   function allCrisis() { return state.extraCrisis.concat(S.crisis); }
+
+  /* Doğrulanmış Bilgi Merkezi: resmî ve doğrulanmış içerik ilk ekranda önce
+     görünür (rapor §3.3 "Bilgi arayan kullanıcı" akışı). Stabil sıralama:
+     aynı öncelikteki gönderiler kendi aralarındaki sırayı korur. */
+  var V_PRIORITY = { official: 0, verified: 1, unverified: 2, disputed: 3 };
+  function sortedCrisis() {
+    return allCrisis().slice().sort(function (a, b) {
+      return V_PRIORITY[state.verified[a.id] || a.v] - V_PRIORITY[state.verified[b.id] || b.v];
+    });
+  }
 
   function matches(p) {
     var v = state.verified[p.id] || p.v;
@@ -108,8 +120,10 @@
         '<p class="crisis-note">Doğrulama durumu her gönderide görünür. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>' +
       '</div>');
 
+    var listHead = el('<h2 class="clist__h">Doğrulanmış Bilgi Merkezi</h2>');
     var list = el('<div class="clist" id="clist"></div>');
     p.appendChild(head);
+    p.appendChild(listHead);
     p.appendChild(list);
     p.appendChild(el('<div class="feed__end">Kriz akışının sonundasın · yalnızca doğrulama, konum ve zaman gösterilir</div>'));
     $('#feeds').appendChild(p);
@@ -149,7 +163,7 @@
   function renderCrisisList() {
     var list = $('#clist');
     if (!list) return;
-    list.innerHTML = allCrisis().map(function (p) { return cpostHTML(p); }).join('');
+    list.innerHTML = sortedCrisis().map(function (p) { return cpostHTML(p); }).join('');
     applyFilter(true);
     updateCounts();
   }
@@ -221,6 +235,8 @@
       }
       var vb = e.target.closest('[data-verify]');
       if (vb) { upgrade(vb.dataset.verify); return; }
+      var why = e.target.closest('[data-why]');
+      if (why) { showRationale(why.dataset.why); return; }
       if (e.target.closest('#sos')) { M.openImdat(); return; }
       if (e.target.closest('#lowband')) {
         M.setPlain(!state.plain);
@@ -260,6 +276,33 @@
     if (!silent) M.toast('Doğrulama kaydedildi', { muted: true, life: 1600 });
   }
   M.upgradeVerification = upgrade;
+
+  /* "Kullanıcı içeriğe dokunduğunda doğrulama gerekçesi açılır" (rapor §3.3).
+     Sinyaller rapor §3.2'deki üç bileşeni (kaynak/içerik analizi, topluluk
+     oylaması, kurumsal kimlik) kısa, okunabilir bir gerekçeye çeviriyor. */
+  var RATIONALE = {
+    verified:   'İki bağımsız kaynak aynı bilgiyi doğruladı, topluluk oylaması da bu yönde.',
+    official:   'Doğrulanabilir kurumsal kimlik bilgisi taşıyan resmî bir hesaptan paylaşıldı.',
+    unverified: 'Henüz ikinci bir kaynakla doğrulanmadı. Paylaşmadan önce teyit bekleyin.',
+    disputed:   'Birbiriyle çelişen birden fazla bildirim var. Doğrulanana kadar yaymayın.'
+  };
+  function showRationale(id) {
+    var p = allCrisis().filter(function (q) { return q.id === id; })[0];
+    if (!p) return;
+    var v = state.verified[id] || p.v;
+    var vl = S.VER[v];
+    var node = el(
+      '<div class="modal" role="document">' +
+        '<h2 class="modal__h" id="rh">' + esc(vl.label) + '</h2>' +
+        '<p class="modal__p">' + esc(RATIONALE[v]) + '</p>' +
+        '<p class="modal__p" style="color:var(--c-text-2)">' + esc(p.loc) + ' · ' + esc(TAGLABEL[p.tag]) + '</p>' +
+        '<div class="modal__actions">' +
+          '<button class="btn btn--ghost" id="rationale-close" type="button">Kapat</button>' +
+        '</div>' +
+      '</div>');
+    M.openModal(node, { labelledBy: 'rh' });
+    node.querySelector('#rationale-close').addEventListener('click', function () { M.closeModal(); });
+  }
 
   /* ------------------------------------------------------- crisis publish */
   function publishCrisis() {

@@ -539,8 +539,8 @@
     document.body.appendChild(el('<nav class="bottombar" aria-label="Alt gezinme">' +
       '<button type="button" data-nav="home" aria-label="Anasayfa">' + icon('home', 'ic--lg') + '</button>' +
       '<button type="button" data-nav="search" aria-label="Keşfet">' + icon('search', 'ic--lg') + '</button>' +
-      '<button type="button" disabled aria-disabled="true" aria-label="Bildirimler (prototip kapsamı dışında)">' + icon('bell', 'ic--lg') + '</button>' +
-      '<button type="button" disabled aria-disabled="true" aria-label="Mesajlar (prototip kapsamı dışında)">' + icon('mail', 'ic--lg') + '</button></nav>'));
+      '<button type="button" data-nav="crisis" aria-label="Kriz Durumu">' + icon('warn', 'ic--lg') + '</button>' +
+      '<button type="button" data-nav="imdat" aria-label="İmdat">' + icon('sos', 'ic--lg') + '</button></nav>'));
 
     renderTabs();
     buildFeeds();

@@ -21,7 +21,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~275 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~278 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -1196,6 +1196,22 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: color-mix(in srgb, var(--v-verified) 12%, transparent); }
 .cpost__verify[data-done="1"] { color: var(--v-verified); border-color: var(--v-verified); }
 
+.cpost__why {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 12px; border-radius: 999px;
+  border: 1px solid var(--c-border); color: var(--c-text-2);
+  font-size: var(--fs-meta); font-weight: 700;
+  transition: background-color 140ms var(--ease-out), color 140ms, border-color 140ms;
+}
+.cpost__why:hover { color: var(--c-text); border-color: var(--c-text-2); }
+
+/* Doğrulanmış Bilgi Merkezi: kriz akışının kendisini adlandıran başlık,
+   rapor §3.3 "Bilgi arayan kullanıcı" akışıyla aynı terim. */
+.clist__h {
+  font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--c-text-2); padding: 14px var(--pad-x) 0;
+}
+
 /* FLIP for filter re-flow */
 .cpost[data-flip="1"] { transition: transform 380ms var(--ease-out), opacity 200ms linear; }
 .cpost[data-enter="1"] { animation: row-in 300ms var(--ease-out) both; animation-delay: calc(var(--i,0) * 26ms); }
@@ -2255,8 +2271,8 @@ ul { list-style: none; margin: 0; padding: 0; }
     document.body.appendChild(el('<nav class="bottombar" aria-label="Alt gezinme">' +
       '<button type="button" data-nav="home" aria-label="Anasayfa">' + icon('home', 'ic--lg') + '</button>' +
       '<button type="button" data-nav="search" aria-label="Keşfet">' + icon('search', 'ic--lg') + '</button>' +
-      '<button type="button" disabled aria-disabled="true" aria-label="Bildirimler (prototip kapsamı dışında)">' + icon('bell', 'ic--lg') + '</button>' +
-      '<button type="button" disabled aria-disabled="true" aria-label="Mesajlar (prototip kapsamı dışında)">' + icon('mail', 'ic--lg') + '</button></nav>'));
+      '<button type="button" data-nav="crisis" aria-label="Kriz Durumu">' + icon('warn', 'ic--lg') + '</button>' +
+      '<button type="button" data-nav="imdat" aria-label="İmdat">' + icon('sos', 'ic--lg') + '</button></nav>'));
 
     renderTabs();
     buildFeeds();
@@ -2621,6 +2637,8 @@ ul { list-style: none; margin: 0; padding: 0; }
         '<div class="cpost__meta">' +
           '<span class="cpost__loc">' + icon('pin', 'ic--sm') + esc(p.loc) + '</span>' +
           '<span class="cpost__tag">' + esc(TAGLABEL[p.tag]) + '</span>' +
+          '<button class="cpost__why" type="button" data-why="' + p.id + '">' +
+            icon('questionc', 'ic--sm') + '<span>Gerekçe</span></button>' +
           '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
             (v === 'verified' ? ' data-done="1"' : '') + '>' +
             icon('checkc', 'ic--sm') + '<span>' + (v === 'verified' ? 'Doğrulandı' : 'Doğrula') + '</span></button>' +
@@ -2629,6 +2647,16 @@ ul { list-style: none; margin: 0; padding: 0; }
   }
 
   function allCrisis() { return state.extraCrisis.concat(S.crisis); }
+
+  /* Doğrulanmış Bilgi Merkezi: resmî ve doğrulanmış içerik ilk ekranda önce
+     görünür (rapor §3.3 "Bilgi arayan kullanıcı" akışı). Stabil sıralama:
+     aynı öncelikteki gönderiler kendi aralarındaki sırayı korur. */
+  var V_PRIORITY = { official: 0, verified: 1, unverified: 2, disputed: 3 };
+  function sortedCrisis() {
+    return allCrisis().slice().sort(function (a, b) {
+      return V_PRIORITY[state.verified[a.id] || a.v] - V_PRIORITY[state.verified[b.id] || b.v];
+    });
+  }
 
   function matches(p) {
     var v = state.verified[p.id] || p.v;
@@ -2686,8 +2714,10 @@ ul { list-style: none; margin: 0; padding: 0; }
         '<p class="crisis-note">Doğrulama durumu her gönderide görünür. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>' +
       '</div>');
 
+    var listHead = el('<h2 class="clist__h">Doğrulanmış Bilgi Merkezi</h2>');
     var list = el('<div class="clist" id="clist"></div>');
     p.appendChild(head);
+    p.appendChild(listHead);
     p.appendChild(list);
     p.appendChild(el('<div class="feed__end">Kriz akışının sonundasın · yalnızca doğrulama, konum ve zaman gösterilir</div>'));
     $('#feeds').appendChild(p);
@@ -2727,7 +2757,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   function renderCrisisList() {
     var list = $('#clist');
     if (!list) return;
-    list.innerHTML = allCrisis().map(function (p) { return cpostHTML(p); }).join('');
+    list.innerHTML = sortedCrisis().map(function (p) { return cpostHTML(p); }).join('');
     applyFilter(true);
     updateCounts();
   }
@@ -2799,6 +2829,8 @@ ul { list-style: none; margin: 0; padding: 0; }
       }
       var vb = e.target.closest('[data-verify]');
       if (vb) { upgrade(vb.dataset.verify); return; }
+      var why = e.target.closest('[data-why]');
+      if (why) { showRationale(why.dataset.why); return; }
       if (e.target.closest('#sos')) { M.openImdat(); return; }
       if (e.target.closest('#lowband')) {
         M.setPlain(!state.plain);
@@ -2838,6 +2870,33 @@ ul { list-style: none; margin: 0; padding: 0; }
     if (!silent) M.toast('Doğrulama kaydedildi', { muted: true, life: 1600 });
   }
   M.upgradeVerification = upgrade;
+
+  /* "Kullanıcı içeriğe dokunduğunda doğrulama gerekçesi açılır" (rapor §3.3).
+     Sinyaller rapor §3.2'deki üç bileşeni (kaynak/içerik analizi, topluluk
+     oylaması, kurumsal kimlik) kısa, okunabilir bir gerekçeye çeviriyor. */
+  var RATIONALE = {
+    verified:   'İki bağımsız kaynak aynı bilgiyi doğruladı, topluluk oylaması da bu yönde.',
+    official:   'Doğrulanabilir kurumsal kimlik bilgisi taşıyan resmî bir hesaptan paylaşıldı.',
+    unverified: 'Henüz ikinci bir kaynakla doğrulanmadı. Paylaşmadan önce teyit bekleyin.',
+    disputed:   'Birbiriyle çelişen birden fazla bildirim var. Doğrulanana kadar yaymayın.'
+  };
+  function showRationale(id) {
+    var p = allCrisis().filter(function (q) { return q.id === id; })[0];
+    if (!p) return;
+    var v = state.verified[id] || p.v;
+    var vl = S.VER[v];
+    var node = el(
+      '<div class="modal" role="document">' +
+        '<h2 class="modal__h" id="rh">' + esc(vl.label) + '</h2>' +
+        '<p class="modal__p">' + esc(RATIONALE[v]) + '</p>' +
+        '<p class="modal__p" style="color:var(--c-text-2)">' + esc(p.loc) + ' · ' + esc(TAGLABEL[p.tag]) + '</p>' +
+        '<div class="modal__actions">' +
+          '<button class="btn btn--ghost" id="rationale-close" type="button">Kapat</button>' +
+        '</div>' +
+      '</div>');
+    M.openModal(node, { labelledBy: 'rh' });
+    node.querySelector('#rationale-close').addEventListener('click', function () { M.closeModal(); });
+  }
 
   /* ------------------------------------------------------- crisis publish */
   function publishCrisis() {

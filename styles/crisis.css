@@ -144,6 +144,22 @@
   background: color-mix(in srgb, var(--v-verified) 12%, transparent); }
 .cpost__verify[data-done="1"] { color: var(--v-verified); border-color: var(--v-verified); }
 
+.cpost__why {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 12px; border-radius: 999px;
+  border: 1px solid var(--c-border); color: var(--c-text-2);
+  font-size: var(--fs-meta); font-weight: 700;
+  transition: background-color 140ms var(--ease-out), color 140ms, border-color 140ms;
+}
+.cpost__why:hover { color: var(--c-text); border-color: var(--c-text-2); }
+
+/* Doğrulanmış Bilgi Merkezi: kriz akışının kendisini adlandıran başlık,
+   rapor §3.3 "Bilgi arayan kullanıcı" akışıyla aynı terim. */
+.clist__h {
+  font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--c-text-2); padding: 14px var(--pad-x) 0;
+}
+
 /* FLIP for filter re-flow */
 .cpost[data-flip="1"] { transition: transform 380ms var(--ease-out), opacity 200ms linear; }
 .cpost[data-enter="1"] { animation: row-in 300ms var(--ease-out) both; animation-delay: calc(var(--i,0) * 26ms); }
