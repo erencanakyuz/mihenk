@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — headless clip generation
+   MİHENK - headless clip generation
    Loads ?demo=1&scenario=<id>&capture=1, advances a *virtual* clock one
    rAF frame at a time via CDP (Emulation.setVirtualTimePolicy) and grabs a
    PNG per output frame. Same script + same scenario ⇒ identical frames.
@@ -159,15 +159,15 @@ for (const m of manifest) {
   const base = path.join(OUT, `mihenk-${m.id}-${m.size.tag}`);
   const input = ['-y', '-framerate', String(FPS), '-i', path.join(m.dir, 'f%05d.png')];
 
-  // WebM (VP9) — loops cleanly, small, alpha-free
+  // WebM (VP9) - loops cleanly, small, alpha-free
   await run('ffmpeg', [...input, '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '30',
     '-pix_fmt', 'yuv420p', '-row-mt', '1', '-an', `${base}.webm`], { maxBuffer: 1 << 28 });
 
-  // MP4 (H.264) — for slides and social
+  // MP4 (H.264) - for slides and social
   await run('ffmpeg', [...input, '-c:v', 'libx264', '-preset', 'slow', '-crf', '20',
     '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', `${base}.mp4`], { maxBuffer: 1 << 28 });
 
-  // GIF — half scale, 15 fps, per-clip palette
+  // GIF - half scale, 15 fps, per-clip palette
   const gw = Math.round(m.size.w / 2 / 2) * 2;
   const pal = path.join(m.dir, 'palette.png');
   await run('ffmpeg', ['-y', '-framerate', String(FPS), '-i', path.join(m.dir, 'f%05d.png'),

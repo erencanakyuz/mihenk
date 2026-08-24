@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — İmdat: multi-step help-request flow
+   MİHENK - İmdat: multi-step help-request flow
    One question per screen, large targets, horizontal slides.
    ========================================================================== */
 (function (M) {

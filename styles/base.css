@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — base: reset, shell layout, nav, buttons, overlays
+   MİHENK - base: reset, shell layout, nav, buttons, overlays
    ========================================================================== */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -96,7 +96,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .nav__item:disabled:hover { background: none; }
 .nav__item[aria-current="page"] { font-weight: 700; }
 
-/* "Kriz Durumu" nav item's live indicator — fixed amber, not the palette
+/* "Kriz Durumu" nav item's live indicator - fixed amber, not the palette
    token: it must read the same whether you're currently looking at the
    turquoise normal palette or the amber crisis one. */
 .nav__dot {

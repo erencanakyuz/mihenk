@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — app: icons, state, routing, shell, tab transitions
+   MİHENK - app: icons, state, routing, shell, tab transitions
    Vanilla JS. No framework, no build step. Everything hangs off window.MIHENK.
    ========================================================================== */
 (function (M) {
@@ -229,7 +229,7 @@
       '</div>');
   }
 
-  /* "Bölge Güven Durumu" — X'in Gündem/Kimi-takip-etmeli widget'larının
+  /* "Bölge Güven Durumu" - X'in Gündem/Kimi-takip-etmeli widget'larının
      yerine. Ürünün asıl farkını (doğrulama katmanı) kriz kapalıyken bile
      gösterir. Sayı uydurma değil: S.crisis + state.verified'dan hesaplanır,
      crisis.js'teki updateCounts() ile aynı mantık. Bkz. GORSEL_KIMLIK_SPEC.md §4. */
@@ -402,7 +402,7 @@
   }
   M.setTab = setTab;
 
-  /* Instant, animation-free tab switch — used by the demo runner to build a
+  /* Instant, animation-free tab switch - used by the demo runner to build a
      scenario's opening state before frame 0. */
   M.setTabInstant = function (id) {
     if (!TABS[id]) return;

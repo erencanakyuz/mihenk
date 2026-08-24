@@ -25,7 +25,7 @@
 
   /* Avatar template: one deterministic duotone-disc SVG reused for every
      account, hash-tinted per name so accounts stay visually distinct.
-     Local only — no image files, no network request. */
+     Local only - no image files, no network request. */
   function avatar(name, opts) {
     opts = opts || {};
     var h = hash(name);

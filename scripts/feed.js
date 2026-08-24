@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — feed: rendering, skeletons, FLIP, optimistic interactions
+   MİHENK - feed: rendering, skeletons, FLIP, optimistic interactions
    ========================================================================== */
 (function (M) {
   'use strict';

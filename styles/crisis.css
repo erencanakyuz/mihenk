@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — crisis: pinned card, verification, filters, İmdat flow
+   MİHENK - crisis: pinned card, verification, filters, İmdat flow
    ========================================================================== */
 
 /* ---- pinned entry card (lives at the top of the normal feeds) ---------- */
@@ -88,8 +88,8 @@
 .cpost:hover { background: var(--c-bg-3); }
 .cpost__col { flex: 1; min-width: 0; }
 
-/* verification pill — sits ABOVE the body, legible at 2 m. Dolu/solid
-   renk: saydam/tint arkaplan kullanılmıyor — bkz. GORSEL_KIMLIK_SPEC.md. */
+/* verification pill - sits ABOVE the body, legible at 2 m. Dolu/solid
+   renk: saydam/tint arkaplan kullanılmıyor - bkz. GORSEL_KIMLIK_SPEC.md. */
 .vpill {
   display: inline-flex; align-items: center; gap: 7px;
   height: 28px; padding: 0 12px 0 9px;
@@ -266,7 +266,7 @@
 }
 .crisis-tools .lowband, .crisis-tools .bytechip { margin: 0; }
 
-/* 4.3 — engagement chrome is removed on the crisis tab:
+/* 4.3 - engagement chrome is removed on the crisis tab:
    no trending panel, no who-to-follow, no like/repost counts. */
 :root[data-tab="crisis"] #trends,
 :root[data-tab="crisis"] #whotofollow { display: none; }

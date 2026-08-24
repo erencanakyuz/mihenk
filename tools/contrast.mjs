@@ -56,5 +56,5 @@ chk('düz mod · çerçeve (grafik)', '#666666', '#000000', 3);
 
 const w = rows.reduce((m,r)=>Math.max(m,r[0].length),0);
 for (const r of rows) console.log(r[0].padEnd(w), r[1].padEnd(8), 'on', r[2].padEnd(8), r[3].padStart(8), 'need', r[4].padStart(6), ' ', r[5]);
-console.log('\n' + (fails ? fails + ' FAIL(S)' : 'ALL PASS — WCAG 2.2 AA'));
+console.log('\n' + (fails ? fails + ' FAIL(S)' : 'ALL PASS - WCAG 2.2 AA'));
 process.exit(fails ? 1 : 0);

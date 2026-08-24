@@ -3,7 +3,7 @@
 **Bir sosyal akışın, kriz anında doğrulanmış bilgiye öncelik verecek şekilde
 kendi kendini yeniden şekillendirdiği bir arayüz.** TEKNOFEST 2026 NSosyal
 İnovasyon Yarışması için geliştirilen, tamamen yerel çalışan bir UI/UX
-prototipi — backend yok, gerçek kullanıcı yok, çalışma anında sıfır ağ isteği.
+prototipi - backend yok, gerçek kullanıcı yok, çalışma anında sıfır ağ isteği.
 
 <p>
   <img src="assets/demos/activation.gif" width="49%" alt="Kriz modu etkinleşiyor: normal akış, bildirim, sabit kart, yeni sekme">
@@ -18,14 +18,14 @@ prototipi — backend yok, gerçek kullanıcı yok, çalışma anında sıfır a
 
 Chuai ve arkadaşlarının (2024, *Nature Communications*) bulgusu: bir gönderi
 viral etkisinin yarısını **5,75–6,25 saatte** yaratıyor; Community Notes'un
-ortalama not ekleme gecikmesi **61,4 saat**. Yaklaşık 10 kat fark — afet
+ortalama not ekleme gecikmesi **61,4 saat**. Yaklaşık 10 kat fark - afet
 anında bu fark arama-kurtarmanın altın saatlerinin tamamını yutuyor.
 
 Piyasadaki çözümler üç kalıba giriyor: platformlar bir banner/ayrı sayfa
 açıyor ama **ana akış ve sıralama algoritması aynı kalıyor** (Meta Safety
 Check, Google SOS Alerts); bazıları sonradan **etiket/not** ekliyor (X
 Community Notes); bazıları **bağımsız bir uygulama** olarak duruyor (Ushahidi,
-afetharita.com) — ve afet anında kimse yeni bir uygulama indirmiyor.
+afetharita.com) - ve afet anında kimse yeni bir uygulama indirmiyor.
 
 MİHENK bu üçünü de yapmıyor: **platformun kendi ana bilgi akışı**, kriz
 süresince doğrulanmış kaynaklara öncelik verecek şekilde yeniden yapılanıyor.
@@ -43,7 +43,7 @@ Ayrı bir katman değil, ürünün kendisi mod değiştiriyor.
   karar verir; ana akışta krizle ilgili bir şey paylaşılırsa yönlendirme
   önerilir, asla engellenmez.
 - **İki palet, tek WCAG 2.2 AA denetimi.** `tools/contrast.mjs`, gerçek token
-  değerlerini okuyup 27 çift üzerinde ölçüyor — "iyi görünüyor" değil, sayı.
+  değerlerini okuyup 27 çift üzerinde ölçüyor - "iyi görünüyor" değil, sayı.
 - **Kare kare deterministik demo kayıtları.** `tools/capture.mjs`, sayfanın
   saatini gerçek zamandan değil sanal saatten ilerletiyor; aynı senaryo her
   çalıştırmada birebir aynı kareleri üretiyor (bkz. yukarıdaki GIF'ler).
@@ -70,7 +70,7 @@ Geliştirme sunucusu yalnızca yerel makineye bağlanır.
 | `/kriz` | Kriz modu açık olarak doğrudan kriz akışı |
 | `?demo=1` | Senaryolu prototip kontrol paneli |
 
-`dist/mihenk.html` dosyası da doğrudan çift tıkla açılabilir — CSS, JavaScript
+`dist/mihenk.html` dosyası da doğrudan çift tıkla açılabilir - CSS, JavaScript
 ve yerel görseller tek dosyaya gömülü, hiçbir isteğe ihtiyaç duymaz.
 
 ## Komutlar
@@ -114,13 +114,13 @@ dist/                   Git'e dahil tek-dosya dağıtım çıktıları
 
 Tarayıcıdaki yükleme sırası önemli: `seed.js` → `app.js` → diğer modüller.
 Modüller ortak `window.MIHENK` alanını paylaşır; framework, bundler veya build
-adımı yok — düşük bant genişliği modunun HTML'e düz metin olarak geri
+adımı yok - düşük bant genişliği modunun HTML'e düz metin olarak geri
 düşebilmesi bunu gerektiriyor.
 
 ## Tasarım yönü
 
-Görsel kimlik bilinçli bir tercih: X (Twitter) referansıyla başladı — ilk
-hedef etkileşim kalitesini kanıtlamaktı — sonra kendi kimliğine ("Taş &
+Görsel kimlik bilinçli bir tercih: X (Twitter) referansıyla başladı - ilk
+hedef etkileşim kalitesini kanıtlamaktı - sonra kendi kimliğine ("Taş &
 Sinyal": soğuk taş grisi zemin, İznik turkuazı vurgu; kriz modunda sıcak
 amber-terrakotaya kayan aynı aile) geçti. Rozetler ve durum göstergeleri her
 zaman **solid dolgu**, saydam/tint yüzey kullanılmıyor; gönderiler X'in
@@ -128,7 +128,7 @@ uçtan uca çizgiyle ayrılan listesi yerine aralıklı, sınırlı kartlar.
 
 ## İçerik ve lisanslar
 
-Tüm hesaplar kurgusal şablon hesaplardır — gerçek kişi, gerçek telefon
+Tüm hesaplar kurgusal şablon hesaplardır - gerçek kişi, gerçek telefon
 numarası veya açık adres yok. `AFAD`, `Valilik`, `Kızılay` ve `Meteoroloji`
 temsilî hesaplardır; bu kurumlarla bağlantı, onay veya gerçek zamanlı bilgi
 iddiası taşımazlar. Avatarlar kodla üretilen deterministik SVG şablonlardır;
@@ -138,6 +138,6 @@ gönderi fotoğrafları `assets/img/` altında yerel tutulan, kaynağı ve lisan
 ## Kapsam
 
 Bu depo bir ön-uç prototipidir: kimlik doğrulama, kalıcı veri, gerçek zamanlı
-kriz doğrulaması veya acil yardım iletimi içermiyor — kapsamı bilinçli olarak
+kriz doğrulaması veya acil yardım iletimi içermiyor - kapsamı bilinçli olarak
 arayüz ve etkileşim tasarımıyla sınırlı; üretim sistemi olarak kullanılmak
 üzere tasarlanmadı.

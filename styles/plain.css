@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — düşük bant genişliği modu (low-bandwidth / plain HTML mode)
+   MİHENK - düşük bant genişliği modu (low-bandwidth / plain HTML mode)
    Deliberately austere. Everything decorative is removed; nothing is broken.
    Also styles the <noscript> document, which must work with JS fully off.
    ========================================================================== */
@@ -66,7 +66,7 @@
 :root[data-plain="1"] .post__body,
 :root[data-plain="1"] .cpost__body { font-size: 16px; }
 
-/* verification stays — it is the one thing that must survive */
+/* verification stays - it is the one thing that must survive */
 :root[data-plain="1"] .vpill {
   border: 2px solid currentColor; background: none;
   height: auto; padding: 2px 8px; margin: 6px 0;

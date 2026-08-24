@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — crisis: activation, pinned card, verification, filters,
+   MİHENK - crisis: activation, pinned card, verification, filters,
    share interception, crisis composer
    ========================================================================== */
 (function (M) {
@@ -103,7 +103,7 @@
             '<span class="switch" aria-hidden="true"></span><span>Düşük bant genişliği modu</span></button>' +
           '<div class="bytechip" id="bytechip">' +
             '<span class="bytechip__bar"><span class="bytechip__fill"></span></span>' +
-            '<span id="bytetext">Tam sürüm: <b>—</b> · Düz mod: <b>—</b></span></div>' +
+            '<span id="bytetext">Tam sürüm: <b>-</b> · Düz mod: <b>-</b></span></div>' +
         '</div>' +
         '<p class="crisis-note">Doğrulama durumu her gönderide görünür. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>' +
       '</div>');

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MİHENK — demo runner
+   MİHENK - demo runner
    Scripted scenarios on a virtual clock driven by requestAnimationFrame
    frame counts (never wall-clock), so headless captures are reproducible
    frame for frame. Synthetic cursor with click ripples.
@@ -213,7 +213,7 @@
 
   var SCEN = {
 
-    /* 1 — activation: normal feed → toast → pinned card → crisis tab,
+    /* 1 - activation: normal feed → toast → pinned card → crisis tab,
        then the spec'd deactivation returns the exact opening frame.     */
     activation: { dur: 7.0, setup: function () { resetAll(); }, build: function () {
       var s = new Seq();
@@ -226,7 +226,7 @@
       return s;
     } },
 
-    /* 2 — tab switching, palette shift, skeletons, underline spring     */
+    /* 2 - tab switching, palette shift, skeletons, underline spring     */
     'tab-switch': { dur: 5.2, setup: function () { resetAll(); crisisNow(); }, build: function () {
       var s = new Seq();
       s.wait(sec(.35))
@@ -239,7 +239,7 @@
       return s;
     } },
 
-    /* 3 — verification states + filter chips re-flowing the feed        */
+    /* 3 - verification states + filter chips re-flowing the feed        */
     verification: { dur: 7.0, setup: function () {
       resetAll(); crisisNow();
       tabNow('crisis');
@@ -260,7 +260,7 @@
       return s;
     } },
 
-    /* 4 — share interception → crisis composer → tag → post → upgrade  */
+    /* 4 - share interception → crisis composer → tag → post → upgrade  */
     interception: { dur: 9.2, setup: function () { resetAll(); crisisNow(); }, build: function () {
       var s = new Seq();
       s.wait(sec(.3))
@@ -280,7 +280,7 @@
       return s;
     } },
 
-    /* 5 — full İmdat flow through to AFAD'a iletildi                     */
+    /* 5 - full İmdat flow through to AFAD'a iletildi                     */
     imdat: { dur: 10.4, setup: function () {
       resetAll(); crisisNow();
       tabNow('crisis');
@@ -310,7 +310,7 @@
       return s;
     } },
 
-    /* 6 — low-bandwidth mode strips the interface, byte chip animates   */
+    /* 6 - low-bandwidth mode strips the interface, byte chip animates   */
     'plain-mode': { dur: 5.4, setup: function () {
       resetAll(); crisisNow();
       tabNow('crisis');
@@ -362,7 +362,7 @@
     if (CAPT) {
       /* Under frame-by-frame capture the fade is driven from the clock and
          the node is removed before the last frame, so the grabbed pixels
-         always agree with the state — a CSS opacity transition can be left
+         always agree with the state - a CSS opacity transition can be left
          un-composited by a paused compositor. */
       clock.tl.push({ f: Math.max(1, clock.total - 26), fn: function () {
         var c = ensureCursor();

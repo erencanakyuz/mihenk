@@ -212,7 +212,7 @@
 /* ===== styles/tokens.css ===== */
 /* ==========================================================================
    MİHENK · design tokens
-   Two palettes: normal ("Taş & Sinyal" — stone grey + turquoise) and crisis
+   Two palettes: normal ("Taş & Sinyal" - stone grey + turquoise) and crisis
    (amber-terracotta). Colour tokens are registered with @property so a
    palette swap on :root cross-fades instead of snapping. Nothing else
    changes between modes. Direction + full colour table: GORSEL_KIMLIK_SPEC.md
@@ -247,7 +247,7 @@
   --c-border:     #2a3032;
   --c-text:       #e5eaea;
   --c-text-2:     #8fa0a3;   /* meta text                                   */
-  --c-accent:     #2fa8a0;   /* İznik turkuazı — text, icons, borders       */
+  --c-accent:     #2fa8a0;   /* İznik turkuazı - text, icons, borders       */
   --c-accent-2:   #279088;
   --c-accent-fill:#228177;   /* filled surfaces, koyu turkuaz               */
   --c-accent-ink: #ffffff;
@@ -313,7 +313,7 @@
 }
 
 /* ---- palette: crisis ---------------------------------------------------
-   Aynı "Taş & Sinyal" ailesinde sıcak amber-terrakotaya kayar — normal
+   Aynı "Taş & Sinyal" ailesinde sıcak amber-terrakotaya kayar - normal
    moddaki soğuk turkuazla asla karışmaz. Doğrulama rozetlerindeki kırmızı
    (--v-disputed) bilerek bu amberden ayrı tutuldu: "kriz aktif" ile "bu
    gönderi çelişkili" iki ayrı sinyal, aynı renk olursa birbirine karışır. */
@@ -344,7 +344,7 @@
 
 /* ===== styles/base.css ===== */
 /* ==========================================================================
-   MİHENK — base: reset, shell layout, nav, buttons, overlays
+   MİHENK - base: reset, shell layout, nav, buttons, overlays
    ========================================================================== */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -441,7 +441,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .nav__item:disabled:hover { background: none; }
 .nav__item[aria-current="page"] { font-weight: 700; }
 
-/* "Kriz Durumu" nav item's live indicator — fixed amber, not the palette
+/* "Kriz Durumu" nav item's live indicator - fixed amber, not the palette
    token: it must read the same whether you're currently looking at the
    turquoise normal palette or the amber crisis one. */
 .nav__dot {
@@ -834,7 +834,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== styles/feed.css ===== */
 /* ==========================================================================
-   MİHENK — feed: post rows, actions, composer, feed transitions
+   MİHENK - feed: post rows, actions, composer, feed transitions
    ========================================================================== */
 
 .feeds { position: relative; }
@@ -862,8 +862,8 @@ ul { list-style: none; margin: 0; padding: 0; }
 @keyframes row-in { from { opacity: 0; transform: translate3d(0,8px,0); } to { opacity: 1; transform: none; } }
 
 /* ---- post row -----------------------------------------------------------
-   Bordered, gapped card per post — not X's edge-to-edge hairline-divided
-   list. Bkz. GORSEL_KIMLIK_SPEC.md §1 (renk) — bu ek karar aynı gerekçeyle:
+   Bordered, gapped card per post - not X's edge-to-edge hairline-divided
+   list. Bkz. GORSEL_KIMLIK_SPEC.md §1 (renk) - bu ek karar aynı gerekçeyle:
    "aşırı Twitter" hissinin bir kısmı renkten değil, bu liste biçiminden
    geliyordu. */
 .feed__list, .clist { padding: 12px var(--pad-x) 0; }
@@ -1042,7 +1042,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== styles/crisis.css ===== */
 /* ==========================================================================
-   MİHENK — crisis: pinned card, verification, filters, İmdat flow
+   MİHENK - crisis: pinned card, verification, filters, İmdat flow
    ========================================================================== */
 
 /* ---- pinned entry card (lives at the top of the normal feeds) ---------- */
@@ -1131,8 +1131,8 @@ ul { list-style: none; margin: 0; padding: 0; }
 .cpost:hover { background: var(--c-bg-3); }
 .cpost__col { flex: 1; min-width: 0; }
 
-/* verification pill — sits ABOVE the body, legible at 2 m. Dolu/solid
-   renk: saydam/tint arkaplan kullanılmıyor — bkz. GORSEL_KIMLIK_SPEC.md. */
+/* verification pill - sits ABOVE the body, legible at 2 m. Dolu/solid
+   renk: saydam/tint arkaplan kullanılmıyor - bkz. GORSEL_KIMLIK_SPEC.md. */
 .vpill {
   display: inline-flex; align-items: center; gap: 7px;
   height: 28px; padding: 0 12px 0 9px;
@@ -1309,14 +1309,14 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .crisis-tools .lowband, .crisis-tools .bytechip { margin: 0; }
 
-/* 4.3 — engagement chrome is removed on the crisis tab:
+/* 4.3 - engagement chrome is removed on the crisis tab:
    no trending panel, no who-to-follow, no like/repost counts. */
 :root[data-tab="crisis"] #trends,
 :root[data-tab="crisis"] #whotofollow { display: none; }
 
 /* ===== styles/plain.css ===== */
 /* ==========================================================================
-   MİHENK — düşük bant genişliği modu (low-bandwidth / plain HTML mode)
+   MİHENK - düşük bant genişliği modu (low-bandwidth / plain HTML mode)
    Deliberately austere. Everything decorative is removed; nothing is broken.
    Also styles the <noscript> document, which must work with JS fully off.
    ========================================================================== */
@@ -1383,7 +1383,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 :root[data-plain="1"] .post__body,
 :root[data-plain="1"] .cpost__body { font-size: 16px; }
 
-/* verification stays — it is the one thing that must survive */
+/* verification stays - it is the one thing that must survive */
 :root[data-plain="1"] .vpill {
   border: 2px solid currentColor; background: none;
   height: auto; padding: 2px 8px; margin: 6px 0;
@@ -1498,7 +1498,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
   /* Avatar template: one deterministic duotone-disc SVG reused for every
      account, hash-tinted per name so accounts stay visually distinct.
-     Local only — no image files, no network request. */
+     Local only - no image files, no network request. */
   function avatar(name, opts) {
     opts = opts || {};
     var h = hash(name);
@@ -1706,7 +1706,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== scripts/app.js ===== */
 /* ==========================================================================
-   MİHENK — app: icons, state, routing, shell, tab transitions
+   MİHENK - app: icons, state, routing, shell, tab transitions
    Vanilla JS. No framework, no build step. Everything hangs off window.MIHENK.
    ========================================================================== */
 (function (M) {
@@ -1936,7 +1936,7 @@ ul { list-style: none; margin: 0; padding: 0; }
       '</div>');
   }
 
-  /* "Bölge Güven Durumu" — X'in Gündem/Kimi-takip-etmeli widget'larının
+  /* "Bölge Güven Durumu" - X'in Gündem/Kimi-takip-etmeli widget'larının
      yerine. Ürünün asıl farkını (doğrulama katmanı) kriz kapalıyken bile
      gösterir. Sayı uydurma değil: S.crisis + state.verified'dan hesaplanır,
      crisis.js'teki updateCounts() ile aynı mantık. Bkz. GORSEL_KIMLIK_SPEC.md §4. */
@@ -2109,7 +2109,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   }
   M.setTab = setTab;
 
-  /* Instant, animation-free tab switch — used by the demo runner to build a
+  /* Instant, animation-free tab switch - used by the demo runner to build a
      scenario's opening state before frame 0. */
   M.setTabInstant = function (id) {
     if (!TABS[id]) return;
@@ -2328,7 +2328,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== scripts/feed.js ===== */
 /* ==========================================================================
-   MİHENK — feed: rendering, skeletons, FLIP, optimistic interactions
+   MİHENK - feed: rendering, skeletons, FLIP, optimistic interactions
    ========================================================================== */
 (function (M) {
   'use strict';
@@ -2568,7 +2568,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== scripts/crisis.js ===== */
 /* ==========================================================================
-   MİHENK — crisis: activation, pinned card, verification, filters,
+   MİHENK - crisis: activation, pinned card, verification, filters,
    share interception, crisis composer
    ========================================================================== */
 (function (M) {
@@ -2672,7 +2672,7 @@ ul { list-style: none; margin: 0; padding: 0; }
             '<span class="switch" aria-hidden="true"></span><span>Düşük bant genişliği modu</span></button>' +
           '<div class="bytechip" id="bytechip">' +
             '<span class="bytechip__bar"><span class="bytechip__fill"></span></span>' +
-            '<span id="bytetext">Tam sürüm: <b>—</b> · Düz mod: <b>—</b></span></div>' +
+            '<span id="bytetext">Tam sürüm: <b>-</b> · Düz mod: <b>-</b></span></div>' +
         '</div>' +
         '<p class="crisis-note">Doğrulama durumu her gönderide görünür. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>' +
       '</div>');
@@ -3106,7 +3106,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== scripts/imdat.js ===== */
 /* ==========================================================================
-   MİHENK — İmdat: multi-step help-request flow
+   MİHENK - İmdat: multi-step help-request flow
    One question per screen, large targets, horizontal slides.
    ========================================================================== */
 (function (M) {
@@ -3302,7 +3302,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== scripts/demo.js ===== */
 /* ==========================================================================
-   MİHENK — demo runner
+   MİHENK - demo runner
    Scripted scenarios on a virtual clock driven by requestAnimationFrame
    frame counts (never wall-clock), so headless captures are reproducible
    frame for frame. Synthetic cursor with click ripples.
@@ -3516,7 +3516,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
   var SCEN = {
 
-    /* 1 — activation: normal feed → toast → pinned card → crisis tab,
+    /* 1 - activation: normal feed → toast → pinned card → crisis tab,
        then the spec'd deactivation returns the exact opening frame.     */
     activation: { dur: 7.0, setup: function () { resetAll(); }, build: function () {
       var s = new Seq();
@@ -3529,7 +3529,7 @@ ul { list-style: none; margin: 0; padding: 0; }
       return s;
     } },
 
-    /* 2 — tab switching, palette shift, skeletons, underline spring     */
+    /* 2 - tab switching, palette shift, skeletons, underline spring     */
     'tab-switch': { dur: 5.2, setup: function () { resetAll(); crisisNow(); }, build: function () {
       var s = new Seq();
       s.wait(sec(.35))
@@ -3542,7 +3542,7 @@ ul { list-style: none; margin: 0; padding: 0; }
       return s;
     } },
 
-    /* 3 — verification states + filter chips re-flowing the feed        */
+    /* 3 - verification states + filter chips re-flowing the feed        */
     verification: { dur: 7.0, setup: function () {
       resetAll(); crisisNow();
       tabNow('crisis');
@@ -3563,7 +3563,7 @@ ul { list-style: none; margin: 0; padding: 0; }
       return s;
     } },
 
-    /* 4 — share interception → crisis composer → tag → post → upgrade  */
+    /* 4 - share interception → crisis composer → tag → post → upgrade  */
     interception: { dur: 9.2, setup: function () { resetAll(); crisisNow(); }, build: function () {
       var s = new Seq();
       s.wait(sec(.3))
@@ -3583,7 +3583,7 @@ ul { list-style: none; margin: 0; padding: 0; }
       return s;
     } },
 
-    /* 5 — full İmdat flow through to AFAD'a iletildi                     */
+    /* 5 - full İmdat flow through to AFAD'a iletildi                     */
     imdat: { dur: 10.4, setup: function () {
       resetAll(); crisisNow();
       tabNow('crisis');
@@ -3613,7 +3613,7 @@ ul { list-style: none; margin: 0; padding: 0; }
       return s;
     } },
 
-    /* 6 — low-bandwidth mode strips the interface, byte chip animates   */
+    /* 6 - low-bandwidth mode strips the interface, byte chip animates   */
     'plain-mode': { dur: 5.4, setup: function () {
       resetAll(); crisisNow();
       tabNow('crisis');
@@ -3665,7 +3665,7 @@ ul { list-style: none; margin: 0; padding: 0; }
     if (CAPT) {
       /* Under frame-by-frame capture the fade is driven from the clock and
          the node is removed before the last frame, so the grabbed pixels
-         always agree with the state — a CSS opacity transition can be left
+         always agree with the state - a CSS opacity transition can be left
          un-composited by a paused compositor. */
       clock.tl.push({ f: Math.max(1, clock.total - 26), fn: function () {
         var c = ensureCursor();

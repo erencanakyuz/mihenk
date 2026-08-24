@@ -1,6 +1,6 @@
 /* ==========================================================================
    MİHENK · design tokens
-   Two palettes: normal ("Taş & Sinyal" — stone grey + turquoise) and crisis
+   Two palettes: normal ("Taş & Sinyal" - stone grey + turquoise) and crisis
    (amber-terracotta). Colour tokens are registered with @property so a
    palette swap on :root cross-fades instead of snapping. Nothing else
    changes between modes. Direction + full colour table: GORSEL_KIMLIK_SPEC.md
@@ -35,7 +35,7 @@
   --c-border:     #2a3032;
   --c-text:       #e5eaea;
   --c-text-2:     #8fa0a3;   /* meta text                                   */
-  --c-accent:     #2fa8a0;   /* İznik turkuazı — text, icons, borders       */
+  --c-accent:     #2fa8a0;   /* İznik turkuazı - text, icons, borders       */
   --c-accent-2:   #279088;
   --c-accent-fill:#228177;   /* filled surfaces, koyu turkuaz               */
   --c-accent-ink: #ffffff;
@@ -101,7 +101,7 @@
 }
 
 /* ---- palette: crisis ---------------------------------------------------
-   Aynı "Taş & Sinyal" ailesinde sıcak amber-terrakotaya kayar — normal
+   Aynı "Taş & Sinyal" ailesinde sıcak amber-terrakotaya kayar - normal
    moddaki soğuk turkuazla asla karışmaz. Doğrulama rozetlerindeki kırmızı
    (--v-disputed) bilerek bu amberden ayrı tutuldu: "kriz aktif" ile "bu
    gönderi çelişkili" iki ayrı sinyal, aynı renk olursa birbirine karışır. */

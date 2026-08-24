@@ -1,6 +1,6 @@
 # Demo clips
 
-Selected, final demo media — hand-picked from `clips/` (git-ignored, see
+Selected, final demo media - hand-picked from `clips/` (git-ignored, see
 `tools/capture.mjs`) and committed here so the root README renders without a
 build step. Regenerate any of them with:
 
@@ -18,4 +18,4 @@ then copy the chosen file from `clips/` here under the shorter name below.
 | `tab-switch.gif` | `tab-switch` | Switching all three tabs, palette cross-fade, underline spring |
 
 Captured deterministically (virtual clock, frame-for-frame identical on
-re-run) — see `tools/capture.mjs` header comment for how.
+re-run) - see `tools/capture.mjs` header comment for how.
