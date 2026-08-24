@@ -26,17 +26,25 @@
 }
 @keyframes row-in { from { opacity: 0; transform: translate3d(0,8px,0); } to { opacity: 1; transform: none; } }
 
-/* ---- post row ---------------------------------------------------------- */
+/* ---- post row -----------------------------------------------------------
+   Bordered, gapped card per post — not X's edge-to-edge hairline-divided
+   list. Bkz. GORSEL_KIMLIK_SPEC.md §1 (renk) — bu ek karar aynı gerekçeyle:
+   "aşırı Twitter" hissinin bir kısmı renkten değil, bu liste biçiminden
+   geliyordu. */
+.feed__list, .clist { padding: 12px var(--pad-x) 0; }
 .post {
   display: flex; gap: var(--gutter);
-  padding: 12px var(--pad-x) 4px;
-  border-bottom: 1px solid var(--c-border);
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  background: var(--c-bg-2);
   position: relative;
   cursor: pointer;
-  transition: background-color 140ms var(--ease-out);
+  transition: background-color 140ms var(--ease-out), border-color 140ms var(--ease-out);
   will-change: transform;
 }
-.post:hover { background: var(--hover-row); }
+.post:hover { background: var(--c-bg-3); border-color: var(--c-accent); }
 .post:focus-visible { outline-offset: -2px; }
 
 .post__col { flex: 1 1 auto; min-width: 0; }

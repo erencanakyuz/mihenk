@@ -356,11 +356,14 @@ ul { list-style: none; margin: 0; padding: 0; }
 .modal__actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
 
 /* ---- skeletons --------------------------------------------------------- */
-.skel-list { padding: 0; }
+.skel-list { padding: 12px var(--pad-x) 0; }
 .sk-row {
   display: flex; gap: var(--gutter);
-  padding: 12px var(--pad-x);
-  border-bottom: 1px solid var(--c-border);
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  background: var(--c-bg-2);
 }
 .sk {
   background: linear-gradient(90deg,
@@ -475,6 +478,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* skeleton panel shares feed activation */
 .feed--skel[data-active="1"] { display: block; }
+.feed--skel { padding: 12px var(--pad-x) 0; }
 
 /* hidden must win over display:flex on components */
 [hidden] { display: none !important; }

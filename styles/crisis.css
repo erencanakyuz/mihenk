@@ -15,8 +15,9 @@
 
 .pin {
   margin: 12px var(--pad-x);
-  border: 1px solid color-mix(in srgb, var(--c-accent) 55%, transparent);
-  background: color-mix(in srgb, var(--c-accent) 9%, var(--c-bg));
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--c-accent);
+  background: var(--c-bg-2);
   border-radius: 16px;
   padding: 14px 16px 16px;
 }
@@ -71,35 +72,40 @@
 .chip:active { transform: scale(.96); }
 .chip__n { opacity: .7; font-variant-numeric: tabular-nums; }
 
-/* ---- crisis post ------------------------------------------------------- */
+/* ---- crisis post -----------------------------------------------------
+   Aynı kart dili (bkz. feed.css .post): sınırlı, aralıklı kart, X'in
+   uçtan uca çizgiyle ayrılan liste biçimi değil. */
 .cpost {
   display: flex; gap: var(--gutter);
-  padding: 14px var(--pad-x);
-  border-bottom: 1px solid var(--c-border);
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  background: var(--c-bg-2);
   transition: background-color 140ms var(--ease-out);
   will-change: transform;
 }
-.cpost:hover { background: var(--hover-row); }
+.cpost:hover { background: var(--c-bg-3); }
 .cpost__col { flex: 1; min-width: 0; }
 
-/* verification pill — sits ABOVE the body, legible at 2 m */
+/* verification pill — sits ABOVE the body, legible at 2 m. Dolu/solid
+   renk: saydam/tint arkaplan kullanılmıyor — bkz. GORSEL_KIMLIK_SPEC.md. */
 .vpill {
   display: inline-flex; align-items: center; gap: 7px;
   height: 28px; padding: 0 12px 0 9px;
   border-radius: 999px;
   font-size: 13px; font-weight: 800; letter-spacing: .02em;
   margin: 8px 0 8px;
-  border: 1.5px solid currentColor;
-  background: color-mix(in srgb, currentColor 16%, var(--c-bg));
+  color: #12130f;
 }
 .vpill .ic { width: 17px; height: 17px; stroke-width: 2.4; }
-.vpill--verified   { color: var(--v-verified); }
-.vpill--official   { color: var(--v-official); }
-.vpill--unverified { color: var(--v-unverified); }
-.vpill--disputed   { color: var(--v-disputed); }
-.vpill__t { color: var(--c-text); }
+.vpill--verified   { background: var(--v-verified); }
+.vpill--official   { background: var(--v-official); }
+.vpill--unverified { background: var(--v-unverified); }
+.vpill--disputed   { background: var(--v-disputed); }
+.vpill__t { color: inherit; }
 /* the coloured left slab makes the state readable without reading text */
-.cpost { border-left: 3px solid transparent; }
+.cpost { border-left: 3px solid var(--c-border); }
 .cpost[data-v="verified"]   { border-left-color: var(--v-verified); }
 .cpost[data-v="official"]   { border-left-color: var(--v-official); }
 .cpost[data-v="unverified"] { border-left-color: var(--v-unverified); }
@@ -183,11 +189,13 @@
 }
 .big-chip:hover { background: var(--hover-row); }
 .big-chip[aria-pressed="true"] {
-  border-color: var(--c-accent);
-  background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+  border-color: var(--c-accent-fill);
+  background: var(--c-accent-fill);
+  color: var(--c-accent-ink);
 }
 .big-chip:active { transform: scale(.99); }
 .big-chip .ic { color: var(--c-accent); }
+.big-chip[aria-pressed="true"] .ic { color: var(--c-accent-ink); }
 
 .field { display: block; margin-top: 12px; }
 .field__l { display: block; font-size: var(--fs-meta); color: var(--c-text-2); margin-bottom: 6px; font-weight: 700; }

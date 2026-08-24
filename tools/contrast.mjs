@@ -5,8 +5,6 @@ const lin = c => { c/=255; return c<=0.04045 ? c/12.92 : Math.pow((c+0.055)/1.05
 const L = rgb => 0.2126*lin(rgb[0]) + 0.7152*lin(rgb[1]) + 0.0722*lin(rgb[2]);
 const ratio = (a,b) => { const l1=L(hex(a)), l2=L(hex(b)); const [hi,lo]=l1>l2?[l1,l2]:[l2,l1];
   return (hi+0.05)/(lo+0.05); };
-const mix = (a,b,p) => { const A=hex(a), B=hex(b);
-  return '#'+A.map((v,i)=>Math.round(v*p + B[i]*(1-p)).toString(16).padStart(2,'0')).join(''); };
 
 const N = { bg:'#121516', bg2:'#1a1e20', bg3:'#232829', border:'#2a3032',
   text:'#e5eaea', text2:'#8fa0a3', accent:'#2fa8a0', fill:'#228177', ink:'#ffffff',
@@ -44,11 +42,10 @@ chk('kriz · vurgu metni',                     C.accent, C.bg, 4.5);
 chk('kriz · SOS buton yazısı / dolgu',        C.ink,    C.fill, 4.5);
 chk('kriz · sekme alt çizgisi (grafik)',      C.accent, C.bg, 3);
 
-// --- verification pills: text on tinted pill, and the coloured chrome itself
+// --- verification pills: SOLID fill (no tint/translucency), shared dark ink
+const PILL_INK = '#12130f';
 for (const [k, c] of Object.entries(V)) {
-  const pill = mix(c, C.bg, 0.16);            // background: color-mix(currentColor 16%, bg)
-  chk(`kriz · ${k} · rozet yazısı`,   C.text, pill, 4.5);
-  chk(`kriz · ${k} · rozet çerçeve+ikon (grafik)`, c, pill, 3);
+  chk(`kriz · ${k} · rozet yazısı+ikon`, PILL_INK, c, 4.5);
   chk(`kriz · ${k} · sol şerit (grafik)`, c, C.bg, 3);
 }
 
