@@ -15,13 +15,13 @@ export function summarize(archive){
     const responses=own.filter(r=>r.kind==='model-response'),first=responses.filter(r=>r.attempt===0);
     const requestIds=new Set(own.filter(r=>r.kind==='model-request').map(r=>r.requestId));
     const recordedResponses=new Set(own.filter(r=>['model-response','interrupted-inference'].includes(r.kind)).map(r=>r.requestId));
-    const decisions=own.filter(r=>r.kind==='decision'),errors=own.filter(r=>r.kind==='decision-error');
+    const decisions=own.filter(r=>r.kind==='decision'),errors=own.filter(r=>r.kind==='decision-error'),comments=own.filter(r=>r.kind==='participant-comment');
     const latencies=responses.map(r=>r.durationMs).filter(Number.isFinite).sort((a,b)=>a-b);
     const total=end?.decisions.reduce((n,a)=>n+a.count,0)??null;
     return {id:start.cohortId,engine:start.engine,mode:start.mode,participants:start.settings.participants,seed:start.settings.seed,stopReason:end?.stopReason||'not_finished',
-      decisions:total,appliedOrRejected:decisions.length,decisionErrors:errors.length,waits:decisions.filter(r=>r.decision.operation==='wait').length,
+      decisions:total,appliedOrRejected:decisions.length,decisionErrors:errors.length,noActions:comments.length,waits:decisions.filter(r=>r.decision.operation==='wait').length,
       validBeforeRepair:{valid:first.filter(r=>r.decision&&!r.formatError&&!r.error).length,attempts:first.length},
-      requestRecordsComplete:[...requestIds].every(id=>recordedResponses.has(id)),decisionRecordsComplete:total!==null&&decisions.length+errors.length===total,
+      requestRecordsComplete:[...requestIds].every(id=>recordedResponses.has(id)),decisionRecordsComplete:total!==null&&decisions.length+errors.length+comments.length===total,
       latencyMs:latencies.length?{p50:latencies[Math.floor((latencies.length-1)*0.5)],p95:latencies[Math.floor((latencies.length-1)*0.95)]}:null,
       contextEntriesRemoved:own.filter(r=>r.kind==='model-request').reduce((n,r)=>n+(r.dropped||0),0),spentTokens:end?.spentTokens??null,
       providedObservations:own.filter(r=>r.kind==='observation'&&r.mode==='tool').length,visibleObservations:own.filter(r=>['observation','browser-after'].includes(r.kind)&&r.mode==='browser').length,

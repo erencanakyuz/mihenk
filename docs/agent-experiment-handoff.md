@@ -1,5 +1,7 @@
 # MİHENK: Agent Experiment Handoff and Case Bank
 
+Current findings, model profiles and post-campaign changes: [experiment ledger](experiments/README.md). The original campaign used page-only observations; the current default includes author context. Record `contextMode` in every new comparison.
+
 Prepared on 2026-09-06. Written for the next implementation/evaluation agent. This document is operator material: **never give it, its case names, expected outcomes, or scoring rules to a simulated participant.**
 
 ## 1. Your assignment

@@ -6,7 +6,7 @@ const location=object({known:{type:'boolean'},region:{type:['string','null'],max
 const request={need:{type:'array',items:enumeration(['kurtarma','saglik','barinma','gida','ulasim']),minItems:1,maxItems:5},people:{type:['integer','null'],minimum:1},location};
 const tool=(name,description,parameters=object())=>({type:'function',function:{name,description,parameters:{...parameters,properties:{...parameters.properties,decisionNote:{type:'string',maxLength:240,description:'İsteğe bağlı kısa karar özeti (tek cümle).'}}}}});
 export const operations=[
-  tool('read_view','Akışı oku veya filtrele.',object({filter:enumeration(['all','resmi','yardim','dogrulanmis','mine','following']),region:string(80),topic:enumeration(['','yardim','enkaz','kayip','nokta','resmi','durum']),search:string(200),offset:{type:'integer',minimum:0,maximum:100000}},[])),
+  tool('read_view','Akışı oku veya filtrele.',object({filter:enumeration(['all','resmi','yardim','dogrulanmis','mine','following']),region:string(80),topic:enumeration(['','yardim','enkaz','kayip','nokta','resmi','durum']),search:string(200),authorId:{...string(100),description:'Paylaşımlarını görmek istediğiniz hesabın kimliği.'},offset:{type:'integer',minimum:0,maximum:100000}},[])),
   tool('open_thread','Görünen gönderinin güncel ayrıntılarını ve herkese açık yanıtlarını aç.',object(target)),
   tool('wait','İşlem yapmadan bekle.',object({seconds:{type:'integer',minimum:1,maximum:60}},[])),
   tool('post_remove','Görünen paylaşımı akıştan kaldırır. İşlem kaydı korunur.',object(target)),

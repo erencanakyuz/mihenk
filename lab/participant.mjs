@@ -11,15 +11,17 @@ function postView(p){
   return {...visible,id:originalId||p.id,own:p.own,actions:p.actions.map(t=>t.replace('.','_'))};
 }
 export function observation(view){
-  return {title:view.title,account:view.me,query:view.query,posts:view.items.map(postView),
+  return {title:view.title,account:view.me,query:view.query,posts:view.items.map(postView),relatedPosts:(view.relatedPosts||[]).map(postView),
     thread:view.thread?{post:postView(view.thread.post),messages:view.thread.messages.map(({id,author,text,kind,createdAt,withdrawn,canWithdraw})=>({id,author,text,kind,createdAt,withdrawn,canWithdraw})),earlierCount:view.thread.earlierCount}:null,
     updates:view.updates,nextOffset:view.nextOffset,total:view.total,counts:view.counts,actions:view.actions.map(t=>t.replace('.','_'))};
 }
 export class Participant {
-  constructor({url,token,pageSize=2,actorId,runId},state={}){
+  constructor({url,token,pageSize=2,actorId,runId,contextMode='author-history'},state={}){
+    this.contextMode=state.contextMode??contextMode;
+    if(!['page','author-history'].includes(this.contextMode))throw new Error('Invalid observation context mode.');
     this.url=localURL(url);this.token=token;this.actorId=actorId;this.runId=runId;this.pageSize=pageSize;this.query=state.query||{};this.view=state.view||null;this.known=new Map(state.known||[]);this.pending=state.pending||null;
   }
-  snapshot(){return {query:this.query,view:this.view,known:[...this.known],pending:this.pending};}
+  snapshot(){return {contextMode:this.contextMode,query:this.query,view:this.view,known:[...this.known],pending:this.pending};}
   async request(route,body){
     if(!['/api/view','/api/commands','/api/activity'].includes(route.split('?')[0]))throw new Error('Participant route is not allowed.');
     const response=await fetch(this.url+route,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},redirect:'error',signal:AbortSignal.timeout(15000),...(body===undefined?{}:{body:JSON.stringify(body)})});
@@ -28,13 +30,13 @@ export class Participant {
     return result;
   }
   async read(query=this.query){
-    const view=await this.request('/api/view?'+new URLSearchParams({...query,limit:this.pageSize}));
+    const view=await this.request('/api/view?'+new URLSearchParams({...query,context:this.contextMode,limit:this.pageSize}));
     if(view.error)throw new Error(view.error.message);
     if(this.actorId&&view.me.id!==this.actorId||this.runId&&view.runId!==this.runId)throw new Error('Account binding does not match the session.');
     if(!Array.isArray(view.operations))throw new Error('The server must support explicit participant permissions.');
     if(this.view&&this.view.accessRevision!==view.accessRevision)this.known.clear();
     this.query={...query};this.view=view;
-    for(const p of [...view.items,...(view.thread?[view.thread.post]:[])]){
+    for(const p of [...view.items,...(view.relatedPosts||[]),...(view.thread?[view.thread.post]:[])]){
       this.known.set(p.id,p);if(p.originalId)this.known.set(p.originalId,{...p,id:p.originalId,originalId:null});
       this.known.set(p.authorId,{id:p.authorId,actions:['account.follow','account.ban'].filter(type=>p.actions.includes(type))});
       if(p.corrects&&!this.known.has(p.corrects))this.known.set(p.corrects,{id:p.corrects,actions:[]});

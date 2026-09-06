@@ -14,7 +14,7 @@
     if(currentView&&currentView.accessRevision!==view.accessRevision){cache.clear();M.SEED.byId={};}
     currentView=view;M.sharedView=view;M.actorId=view.me.id;M.moderationOnly=view.controlMode==='moderation';
     var S=M.SEED;S.me=account(Object.assign({},view.me,{id:'me'}));S.byId.me=S.me;
-    var posts=view.items.concat(view.thread?[view.thread.post]:[]);
+    var posts=view.items.concat(view.relatedPosts||[],view.thread?[view.thread.post]:[]);
     posts.forEach(function(p){
       S.byId[p.authorId===view.me.id?'me':p.authorId]=account(p.author);
       cache.set(p.id,p);if(p.originalId)cache.set(p.originalId,Object.assign({},p,{id:p.originalId,originalId:null}));

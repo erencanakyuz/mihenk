@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "visibility": "operator-only; never insert profiles or findings into participant prompts",
+  "models": [
+    {
+      "id": "luna-codex-2026-09-06",
+      "model": "gpt-5.6-luna",
+      "provider": "OpenAI",
+      "adapter": "sealed Codex transport",
+      "reasoningEffort": "max",
+      "tags": [
+        "thinking-model",
+        "closed-model",
+        "provider-hosted",
+        "assessment:intermediate-capability",
+        "observed:moderation-tool-use"
+      ],
+      "projectAssessment": {
+        "author": "project owner",
+        "labelTr": "Orta düzey zekâlı, düşünen yapay zekâ; küçük yerel modeller ile en güçlü frontier modeller arasında konumlandırıyoruz.",
+        "comparisonTr": "Qwen3.5-9B'den belirgin biçimde daha zeki olmasını bekliyoruz; en güçlü frontier model olarak sınıflandırmıyoruz.",
+        "status": "working assessment, not a measured capability ranking",
+        "matchedQwenComparisonCompleted": false
+      },
+      "promptVisibility": {
+        "applicationInstructions": "known; exact first request saved in model-input.json",
+        "nativeCodexInstructions": "excluded by sealed transport",
+        "providerInternalPrompts": "not independently visible or verifiable from this experiment",
+        "trainingAndPolicies": "provider-controlled, not controlled by this project",
+        "privateReasoning": "not collected; public comments, tool calls and server outcomes only"
+      },
+      "interpretationTr": "OpenAI tarafından sunulan kapalı bir modeli inceliyoruz. Bizim promptumuz boş olsa bile eğitim ve sağlayıcının iç işleyişi ortadan kalkmaz. Sağlayıcının gizli bir prompt eklediğini veya anlık olarak belirli bir karara müdahale ettiğini bu kayıtlar kanıtlamaz.",
+      "localEvidence": [
+        "../../lab/codex.mjs",
+        "../../lab/codex-profile.mjs",
+        "../../lab/sealed-transport.mjs"
+      ]
+    },
+    {
+      "id": "chrome-nano-tr-2026-09-06",
+      "model": "Chrome Gemini Nano v3Nano",
+      "adapter": "native LanguageModel session plus one-off JSON operation bridge",
+      "tags": [
+        "on-device",
+        "turkish-probe",
+        "budget-cutoff",
+        "not-comparable-to-codex-adapter"
+      ],
+      "parameterCount": null,
+      "assessmentTr": "Türkçe denemede geçerli moderasyon işlemi tamamlanmadı; bu sonuç tek başına genel zekâ sıralaması değildir. Şimdilik bu yola ek geliştirme ayırmıyoruz."
+    },
+    {
+      "id": "qwen35-9b-candidate",
+      "model": "Qwen/Qwen3.5-9B",
+      "tags": [
+        "historical-candidate",
+        "first-pilot-completed"
+      ],
+      "status": "First A100 five-account pilot completed; see qwen35-9b-a100-2026-09-06. Matched Luna comparison and 50-account capacity remain unmeasured."
+    },
+    {
+      "id": "qwen35-9b-a100-2026-09-06",
+      "model": "Qwen/Qwen3.5-9B",
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "adapter": "vLLM 0.21.0 / ModelAdapter",
+      "thinking": false,
+      "tags": [
+        "open-weights",
+        "self-hosted",
+        "turkish-pilot",
+        "five-independent-accounts",
+        "no-application-system-prompt",
+        "not-matched-to-luna"
+      ],
+      "result": "2026-09-06-qwen-a100.json",
+      "assessmentTr": "Beş hesap ve 50 karar turu tamamlandı; 9 geçerli araç çağrısı, 41 işlemsiz yanıt. Genel zekâ sıralaması yapılmadı."
+    }
+  ]
+}

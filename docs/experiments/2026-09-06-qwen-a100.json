@@ -1,0 +1,1017 @@
+{
+  "schemaVersion": 1,
+  "visibility": "operator-only",
+  "date": "2026-09-06",
+  "modelProfile": "qwen35-9b-a100-2026-09-06",
+  "runId": "2b37c502-391c-4182-ace4-ca495fbec777",
+  "localReplayRunId": "a2871b2c-fbf5-4462-9fd5-afd265031cd6",
+  "condition": "Unprompted participant accounts; tool functions described; decision notes hidden",
+  "scenario": "incomplete-information",
+  "contextMode": "author-history",
+  "applicationInstructions": null,
+  "messageRoles": {
+    "user": 50
+  },
+  "independentAccounts": 5,
+  "modelReplicas": 1,
+  "configuredConcurrency": 5,
+  "settings": {
+    "engine": "model",
+    "mode": "tool",
+    "participants": 5,
+    "inferenceConcurrency": 5,
+    "maxDecisionsPerParticipant": 10,
+    "maxInputTokensPerDecision": 8192,
+    "maxOutputTokensPerDecision": 512,
+    "maxTotalTokens": 500000,
+    "requestTimeoutSeconds": 60,
+    "maxWallMinutes": 5,
+    "seed": 17,
+    "pageSize": 2,
+    "scenario": "incomplete-information",
+    "participantInstructions": null,
+    "toolPresentation": {
+      "decisionNotes": false,
+      "descriptions": true,
+      "names": "semantic"
+    },
+    "endpoints": [
+      {
+        "url": "http://127.0.0.1:8000",
+        "model": "Qwen/Qwen3.5-9B",
+        "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+        "thinking": false,
+        "temperature": 0.7,
+        "topP": 0.8,
+        "repairInvalidCalls": false
+      }
+    ]
+  },
+  "runtime": {
+    "stage": "ready",
+    "pid": 10101,
+    "model": "Qwen/Qwen3.5-9B",
+    "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+    "node": "/content/mihenk-runtime/node-v24.18.0-linux-x64/bin/node",
+    "python": "/content/mihenk-runtime/venv/bin/python",
+    "vllm": "/content/mihenk-runtime/venv/bin/vllm",
+    "applicationPid": 10763,
+    "inferencePid": 12839,
+    "command": [
+      "/content/mihenk-runtime/venv/bin/vllm",
+      "serve",
+      "Qwen/Qwen3.5-9B",
+      "--revision",
+      "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8000",
+      "--tensor-parallel-size",
+      "1",
+      "--dtype",
+      "bfloat16",
+      "--max-model-len",
+      "16384",
+      "--max-num-seqs",
+      "5",
+      "--gpu-memory-utilization",
+      "0.85",
+      "--enable-chunked-prefill",
+      "--enable-auto-tool-choice",
+      "--tool-call-parser",
+      "qwen3_xml",
+      "--reasoning-parser",
+      "qwen3",
+      "--language-model-only"
+    ],
+    "toolPresentation": {
+      "decisionNotes": false,
+      "descriptions": true,
+      "names": "semantic"
+    },
+    "environment": {
+      "PATH_prefix": "/content/mihenk-runtime/venv/bin",
+      "HF_HOME": "/content/mihenk-runtime/huggingface",
+      "VLLM_NO_USAGE_STATS": "1",
+      "DO_NOT_TRACK": "1"
+    }
+  },
+  "hardware": {
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "gpuMemoryMiB": 40960,
+    "systemRamGiB": 83.5,
+    "driver": "580.82.07",
+    "python": "3.13.15",
+    "vllm": "0.21.0",
+    "gpuMemoryMiBAfter": 34896
+  },
+  "sourceSnapshot": {
+    "sha256": "21b0b6dcd65ae1239a0485863fcc8233d7516afed4836fe192594155e9a36f61",
+    "files": [
+      "assets/fonts/archivo-700.woff2",
+      "assets/img/template-a.jpg",
+      "assets/img/template-b.jpg",
+      "data/catalog.js",
+      "data/seed.js",
+      "dist/artifact.html",
+      "dist/mihenk.html",
+      "index.html",
+      "lab/browser.mjs",
+      "lab/codex-profile.mjs",
+      "lab/codex.mjs",
+      "lab/deterministic-checks.mjs",
+      "lab/first-wave-campaign.mjs",
+      "lab/followup-campaign.mjs",
+      "lab/gateway.mjs",
+      "lab/model.mjs",
+      "lab/moderation-cases.mjs",
+      "lab/moderation-experiment.mjs",
+      "lab/operations.mjs",
+      "lab/participant.mjs",
+      "lab/report.mjs",
+      "lab/rule-participants.mjs",
+      "lab/runner.mjs",
+      "lab/scenarios.mjs",
+      "lab/sealed-transport.mjs",
+      "lab/tool-surface.mjs",
+      "operator.html",
+      "package-lock.json",
+      "package.json",
+      "participant.html",
+      "scripts/app.js",
+      "scripts/crisis.js",
+      "scripts/demo.js",
+      "scripts/feed.js",
+      "scripts/imdat.js",
+      "scripts/operator.js",
+      "scripts/request-thread.js",
+      "scripts/shared.js",
+      "scripts/simulation.js",
+      "scripts/transport.js",
+      "server/access.mjs",
+      "server/http.mjs",
+      "server/store.mjs",
+      "server/views.mjs",
+      "server/world.mjs",
+      "styles/base.css",
+      "styles/crisis.css",
+      "styles/feed.css",
+      "styles/operator.css",
+      "styles/plain.css",
+      "styles/refine.css",
+      "styles/tokens.css",
+      "tools/bundle.mjs",
+      "tools/capture.mjs",
+      "tools/contrast.mjs",
+      "tools/gen-static.mjs",
+      "tools/measure-runtime.mjs",
+      "tools/measure-ux.mjs",
+      "tools/measure-ux2.mjs",
+      "tools/measure.mjs",
+      "tools/participant-mcp.mjs",
+      "tools/participant.mjs",
+      "tools/rehearsal.mjs",
+      "tools/seamdiff.mjs",
+      "tools/serve-rehearsal.mjs",
+      "tools/serve.mjs",
+      "tools/verify.mjs"
+    ],
+    "bytes": 686465,
+    "gitHead": "5d23a95eacd52510f7016e336e2acdf158f512e3",
+    "workingTreeIncluded": true
+  },
+  "metrics": {
+    "id": "bd4bba39-e741-46b6-87d8-4c414d487129",
+    "engine": "model",
+    "mode": "tool",
+    "participants": 5,
+    "seed": 17,
+    "stopReason": "completed",
+    "decisions": 50,
+    "appliedOrRejected": 9,
+    "decisionErrors": 0,
+    "noActions": 41,
+    "waits": 0,
+    "validBeforeRepair": {
+      "valid": 9,
+      "attempts": 50
+    },
+    "requestRecordsComplete": true,
+    "decisionRecordsComplete": true,
+    "latencyMs": {
+      "p50": 4732,
+      "p95": 7954
+    },
+    "contextEntriesRemoved": 34,
+    "spentTokens": 314998,
+    "providedObservations": 50,
+    "visibleObservations": 0,
+    "modelSettings": [
+      {
+        "url": "http://127.0.0.1:8000",
+        "model": "Qwen/Qwen3.5-9B",
+        "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+        "thinking": false,
+        "temperature": 0.7,
+        "topP": 0.8,
+        "repairInvalidCalls": false
+      }
+    ],
+    "elapsedMs": 118731,
+    "successfulToolCalls": 9,
+    "stateChangingCommands": {
+      "offer.create": 4,
+      "post.repost": 1,
+      "reply.create": 1
+    },
+    "finishReasons": {
+      "stop": 39,
+      "tool_calls": 9,
+      "length": 2
+    },
+    "inputTokens": 303080,
+    "outputTokens": 11918,
+    "maxInputTokens": 8112,
+    "maxOutputTokens": 512
+  },
+  "toolReceipts": [
+    {
+      "actorId": "89577299-6c41-4d75-be39-c4c4f9e84996",
+      "decisionNumber": 1,
+      "decision": {
+        "operation": "offer_create",
+        "arguments": {
+          "targetId": "need-water",
+          "text": "Deniz abla, su ve gıda ihtiyacınız için elimizden geleni yapmaya çalışacağız. Lütfen güncel bilgi verin, hangi bölgedesiniz?"
+        }
+      },
+      "result": {
+        "ok": true,
+        "commandId": "b0162387-67c1-43b1-a64d-0b094fec32cd",
+        "entityId": "bde29d3e-6fa9-43b8-9606-738f122eba09",
+        "entityVersion": 1
+      }
+    },
+    {
+      "actorId": "ba10c406-c570-453f-b794-501e63bf6240",
+      "decisionNumber": 2,
+      "decision": {
+        "operation": "offer_create",
+        "arguments": {
+          "targetId": "need-water",
+          "text": "Gıda ve su ihtiyacınız için destek olabilir miyim?"
+        }
+      },
+      "result": {
+        "ok": true,
+        "commandId": "f7557220-752a-4c57-96e0-4024f0989839",
+        "entityId": "e3cc35d1-d5da-40c9-8f3d-29c5165500e5",
+        "entityVersion": 1
+      }
+    },
+    {
+      "actorId": "fdaae543-ae54-40b7-94d8-eabe6b48a3ad",
+      "decisionNumber": 2,
+      "decision": {
+        "operation": "offer_create",
+        "arguments": {
+          "targetId": "need-water",
+          "text": "Gıda ve su ihtiyacınız için destek olabilir miyim? Lütfen bana ulaşın."
+        }
+      },
+      "result": {
+        "ok": true,
+        "commandId": "36c2b53e-eb6a-4786-b584-a00bc68b6749",
+        "entityId": "8ec25541-45bd-4de3-8214-d1d6d895e5d0",
+        "entityVersion": 1
+      }
+    },
+    {
+      "actorId": "ba10c406-c570-453f-b794-501e63bf6240",
+      "decisionNumber": 3,
+      "decision": {
+        "operation": "post_repost",
+        "arguments": {
+          "targetId": "road-correction"
+        }
+      },
+      "result": {
+        "ok": true,
+        "commandId": "edc34d8e-b02f-4238-b003-3c104e49057a",
+        "entityId": "9c111a29-0c4b-4aca-8f6a-13973c402ce5",
+        "entityVersion": 1
+      }
+    },
+    {
+      "actorId": "0f51f04b-268c-4de2-8b82-efcef6a2ae05",
+      "decisionNumber": 4,
+      "decision": {
+        "operation": "offer_create",
+        "arguments": {
+          "targetId": "need-water",
+          "text": "Merhaba Deniz, talebinizi görüp destek olmak istiyorum. Konumunuz Pazarcık ise, bu bilgiyi talebinize eklemeniz yardımın daha hızlı ulaşmasını sağlayabilir. Gıda ve su konusunda elimden geleni yapmaya çalışacağım."
+        }
+      },
+      "result": {
+        "ok": true,
+        "commandId": "fbfa58e3-746f-4be3-a978-2c0c83a3268f",
+        "entityId": "a097f5fd-17e8-47db-9745-2a1c0c059fe7",
+        "entityVersion": 1
+      }
+    },
+    {
+      "actorId": "fdaae543-ae54-40b7-94d8-eabe6b48a3ad",
+      "decisionNumber": 5,
+      "decision": {
+        "operation": "read_view",
+        "arguments": {
+          "filter": "all",
+          "topic": "durum",
+          "search": "Kuzey yolu"
+        }
+      },
+      "result": {
+        "ok": true,
+        "observation": {
+          "title": "Deprem bölgesinden güncellemeler",
+          "account": {
+            "id": "fdaae543-ae54-40b7-94d8-eabe6b48a3ad",
+            "name": "Üye 1",
+            "handle": "uyefdaae543",
+            "org": false
+          },
+          "query": {
+            "filter": "all",
+            "region": "",
+            "topic": "durum",
+            "search": "kuzey yolu",
+            "authorId": "",
+            "context": "author-history",
+            "offset": 0,
+            "limit": 2
+          },
+          "posts": [
+            {
+              "id": "road-correction",
+              "author": {
+                "id": "local-info",
+                "name": "Yerel Bilgi",
+                "handle": "yerelbilgi",
+                "org": true
+              },
+              "repostedBy": {
+                "id": "ba10c406-c570-453f-b794-501e63bf6240",
+                "name": "Üye 3",
+                "handle": "uyeba10c406",
+                "org": false
+              },
+              "kind": "post",
+              "text": "Kuzey yolu için önceki bilgi güncel değil. Yol kapalı; yeni bir açıklama olduğunda buradan duyurulacak.",
+              "tag": "durum",
+              "removed": false,
+              "createdAt": "2026-09-06T19:48:23.398Z",
+              "updatedAt": "2026-09-06T19:48:23.398Z",
+              "source": {
+                "kind": "firsthand",
+                "url": null
+              },
+              "verification": "official",
+              "location": {
+                "known": true,
+                "region": "Pazarcık",
+                "text": ""
+              },
+              "corrects": "road-report",
+              "likes": 0,
+              "liked": false,
+              "replies": 0,
+              "offers": 0,
+              "reposts": 1,
+              "reposted": false,
+              "observed": false,
+              "following": false,
+              "actions": [
+                "reply_create",
+                "post_react",
+                "post_repost",
+                "report_create",
+                "observation_create",
+                "account_follow"
+              ]
+            },
+            {
+              "id": "road-correction",
+              "author": {
+                "id": "local-info",
+                "name": "Yerel Bilgi",
+                "handle": "yerelbilgi",
+                "org": true
+              },
+              "repostedBy": null,
+              "kind": "post",
+              "text": "Kuzey yolu için önceki bilgi güncel değil. Yol kapalı; yeni bir açıklama olduğunda buradan duyurulacak.",
+              "tag": "durum",
+              "removed": false,
+              "createdAt": "2026-09-06T19:48:23.398Z",
+              "updatedAt": "2026-09-06T19:48:23.398Z",
+              "source": {
+                "kind": "firsthand",
+                "url": null
+              },
+              "verification": "official",
+              "location": {
+                "known": true,
+                "region": "Pazarcık",
+                "text": ""
+              },
+              "corrects": "road-report",
+              "likes": 0,
+              "liked": false,
+              "replies": 0,
+              "offers": 0,
+              "reposts": 1,
+              "reposted": false,
+              "observed": false,
+              "following": false,
+              "actions": [
+                "reply_create",
+                "post_react",
+                "post_repost",
+                "report_create",
+                "observation_create",
+                "account_follow"
+              ]
+            }
+          ],
+          "relatedPosts": [
+            {
+              "id": "road-report",
+              "author": {
+                "id": "resident-ada",
+                "name": "Ada",
+                "handle": "ada",
+                "org": false
+              },
+              "repostedBy": null,
+              "kind": "post",
+              "text": "Kuzey yolunun açıldığını duydum. Yoldan geçen var mı?",
+              "tag": "durum",
+              "removed": false,
+              "createdAt": "2026-09-06T19:48:08.324Z",
+              "updatedAt": "2026-09-06T19:48:08.324Z",
+              "source": {
+                "kind": "relayed",
+                "url": null
+              },
+              "verification": "unverified",
+              "location": {
+                "known": true,
+                "region": "Pazarcık",
+                "text": ""
+              },
+              "corrects": null,
+              "likes": 0,
+              "liked": false,
+              "replies": 0,
+              "offers": 0,
+              "reposts": 0,
+              "reposted": false,
+              "observed": false,
+              "following": false,
+              "actions": [
+                "reply_create",
+                "post_react",
+                "post_repost",
+                "report_create",
+                "observation_create",
+                "account_follow"
+              ],
+              "relation": "corrects",
+              "relatedTo": "road-correction"
+            }
+          ],
+          "thread": null,
+          "updates": [
+            {
+              "id": "a097f5fd-17e8-47db-9745-2a1c0c059fe7",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:45.330Z",
+              "text": "Merhaba Deniz, talebinizi görüp destek olmak istiyorum. Konumunuz Pazarcık ise, bu bilgiyi talebinize eklemeniz yardımın daha hızlı ulaşmasını sağlayabilir. Gıda ve su konusunda elimden geleni yapmaya çalışacağım.",
+              "author": {
+                "id": "0f51f04b-268c-4de2-8b82-efcef6a2ae05",
+                "name": "Üye 2",
+                "handle": "uye0f51f04b",
+                "org": false
+              }
+            },
+            {
+              "id": "e3cc35d1-d5da-40c9-8f3d-29c5165500e5",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:21.677Z",
+              "text": "Gıda ve su ihtiyacınız için destek olabilir miyim?",
+              "author": {
+                "id": "ba10c406-c570-453f-b794-501e63bf6240",
+                "name": "Üye 3",
+                "handle": "uyeba10c406",
+                "org": false
+              }
+            },
+            {
+              "id": "bde29d3e-6fa9-43b8-9606-738f122eba09",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:12.589Z",
+              "text": "Deniz abla, su ve gıda ihtiyacınız için elimizden geleni yapmaya çalışacağız. Lütfen güncel bilgi verin, hangi bölgedesiniz?",
+              "author": {
+                "id": "89577299-6c41-4d75-be39-c4c4f9e84996",
+                "name": "Üye 5",
+                "handle": "uye89577299",
+                "org": false
+              }
+            }
+          ],
+          "nextOffset": 2,
+          "total": 3,
+          "counts": {
+            "all": 5,
+            "yardim": 1,
+            "mine": 0,
+            "unknown": 0,
+            "resmi": 1,
+            "dogrulanmis": 0
+          },
+          "actions": [
+            "post_create",
+            "request_create"
+          ]
+        }
+      }
+    },
+    {
+      "actorId": "ba10c406-c570-453f-b794-501e63bf6240",
+      "decisionNumber": 8,
+      "decision": {
+        "operation": "read_view",
+        "arguments": {
+          "filter": "all",
+          "topic": "yardim"
+        }
+      },
+      "result": {
+        "ok": true,
+        "observation": {
+          "title": "Deprem bölgesinden güncellemeler",
+          "account": {
+            "id": "ba10c406-c570-453f-b794-501e63bf6240",
+            "name": "Üye 3",
+            "handle": "uyeba10c406",
+            "org": false
+          },
+          "query": {
+            "filter": "all",
+            "region": "",
+            "topic": "yardim",
+            "search": "",
+            "authorId": "",
+            "context": "author-history",
+            "offset": 0,
+            "limit": 2
+          },
+          "posts": [
+            {
+              "id": "need-water",
+              "author": {
+                "id": "resident-deniz",
+                "name": "Deniz",
+                "handle": "deniz",
+                "org": false
+              },
+              "repostedBy": null,
+              "kind": "request",
+              "text": "Gıda ve su ihtiyacı var. Kişi sayısı henüz bilinmiyor.",
+              "tag": "yardim",
+              "removed": false,
+              "createdAt": "2026-09-06T19:48:08.324Z",
+              "updatedAt": "2026-09-06T19:48:46.932Z",
+              "source": {
+                "kind": "firsthand",
+                "url": null
+              },
+              "verification": "unverified",
+              "location": {
+                "known": true,
+                "region": "Pazarcık",
+                "text": "Parkın kuzey girişindeyim."
+              },
+              "corrects": null,
+              "need": [
+                "gida"
+              ],
+              "people": null,
+              "status": "open",
+              "likes": 0,
+              "liked": false,
+              "replies": 0,
+              "offers": 4,
+              "reposts": 0,
+              "reposted": false,
+              "observed": false,
+              "following": false,
+              "actions": [
+                "reply_create",
+                "post_react",
+                "post_repost",
+                "report_create",
+                "observation_create",
+                "account_follow",
+                "offer_create"
+              ]
+            }
+          ],
+          "relatedPosts": [
+            {
+              "id": "community-note",
+              "author": {
+                "id": "resident-deniz",
+                "name": "Deniz",
+                "handle": "deniz",
+                "org": false
+              },
+              "repostedBy": null,
+              "kind": "post",
+              "text": "Telefonumun şarjı az. Mesajları aralıklarla kontrol edebiliyorum.",
+              "tag": "durum",
+              "removed": false,
+              "createdAt": "2026-09-06T19:48:08.324Z",
+              "updatedAt": "2026-09-06T19:48:08.324Z",
+              "source": {
+                "kind": "firsthand",
+                "url": null
+              },
+              "verification": "unverified",
+              "location": {
+                "known": true,
+                "region": "Pazarcık",
+                "text": ""
+              },
+              "corrects": null,
+              "likes": 0,
+              "liked": false,
+              "replies": 0,
+              "offers": 0,
+              "reposts": 0,
+              "reposted": false,
+              "observed": false,
+              "following": false,
+              "actions": [
+                "reply_create",
+                "post_react",
+                "post_repost",
+                "report_create",
+                "observation_create",
+                "account_follow"
+              ],
+              "relation": "same_author",
+              "relatedTo": "need-water"
+            }
+          ],
+          "thread": null,
+          "updates": [
+            {
+              "id": "a097f5fd-17e8-47db-9745-2a1c0c059fe7",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:45.330Z",
+              "text": "Merhaba Deniz, talebinizi görüp destek olmak istiyorum. Konumunuz Pazarcık ise, bu bilgiyi talebinize eklemeniz yardımın daha hızlı ulaşmasını sağlayabilir. Gıda ve su konusunda elimden geleni yapmaya çalışacağım.",
+              "author": {
+                "id": "0f51f04b-268c-4de2-8b82-efcef6a2ae05",
+                "name": "Üye 2",
+                "handle": "uye0f51f04b",
+                "org": false
+              }
+            },
+            {
+              "id": "8ec25541-45bd-4de3-8214-d1d6d895e5d0",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:21.719Z",
+              "text": "Gıda ve su ihtiyacınız için destek olabilir miyim? Lütfen bana ulaşın.",
+              "author": {
+                "id": "fdaae543-ae54-40b7-94d8-eabe6b48a3ad",
+                "name": "Üye 1",
+                "handle": "uyefdaae543",
+                "org": false
+              }
+            },
+            {
+              "id": "bde29d3e-6fa9-43b8-9606-738f122eba09",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:12.589Z",
+              "text": "Deniz abla, su ve gıda ihtiyacınız için elimizden geleni yapmaya çalışacağız. Lütfen güncel bilgi verin, hangi bölgedesiniz?",
+              "author": {
+                "id": "89577299-6c41-4d75-be39-c4c4f9e84996",
+                "name": "Üye 5",
+                "handle": "uye89577299",
+                "org": false
+              }
+            }
+          ],
+          "nextOffset": null,
+          "total": 1,
+          "counts": {
+            "all": 5,
+            "yardim": 1,
+            "mine": 0,
+            "unknown": 0,
+            "resmi": 1,
+            "dogrulanmis": 0
+          },
+          "actions": [
+            "post_create",
+            "request_create"
+          ]
+        }
+      }
+    },
+    {
+      "actorId": "ba10c406-c570-453f-b794-501e63bf6240",
+      "decisionNumber": 9,
+      "decision": {
+        "operation": "open_thread",
+        "arguments": {
+          "targetId": "road-correction"
+        }
+      },
+      "result": {
+        "ok": true,
+        "observation": {
+          "title": "Deprem bölgesinden güncellemeler",
+          "account": {
+            "id": "ba10c406-c570-453f-b794-501e63bf6240",
+            "name": "Üye 3",
+            "handle": "uyeba10c406",
+            "org": false
+          },
+          "query": {
+            "filter": "all",
+            "region": "",
+            "topic": "yardim",
+            "search": "",
+            "authorId": "",
+            "context": "author-history",
+            "offset": 0,
+            "limit": 2
+          },
+          "posts": [
+            {
+              "id": "need-water",
+              "author": {
+                "id": "resident-deniz",
+                "name": "Deniz",
+                "handle": "deniz",
+                "org": false
+              },
+              "repostedBy": null,
+              "kind": "request",
+              "text": "Gıda ve su ihtiyacı var. Kişi sayısı henüz bilinmiyor.",
+              "tag": "yardim",
+              "removed": false,
+              "createdAt": "2026-09-06T19:48:08.324Z",
+              "updatedAt": "2026-09-06T19:48:46.932Z",
+              "source": {
+                "kind": "firsthand",
+                "url": null
+              },
+              "verification": "unverified",
+              "location": {
+                "known": true,
+                "region": "Pazarcık",
+                "text": "Parkın kuzey girişindeyim."
+              },
+              "corrects": null,
+              "need": [
+                "gida"
+              ],
+              "people": null,
+              "status": "open",
+              "likes": 0,
+              "liked": false,
+              "replies": 0,
+              "offers": 4,
+              "reposts": 0,
+              "reposted": false,
+              "observed": false,
+              "following": false,
+              "actions": [
+                "reply_create",
+                "post_react",
+                "post_repost",
+                "report_create",
+                "observation_create",
+                "account_follow",
+                "offer_create"
+              ]
+            }
+          ],
+          "relatedPosts": [
+            {
+              "id": "road-report",
+              "author": {
+                "id": "resident-ada",
+                "name": "Ada",
+                "handle": "ada",
+                "org": false
+              },
+              "repostedBy": null,
+              "kind": "post",
+              "text": "Kuzey yolunun açıldığını duydum. Yoldan geçen var mı?",
+              "tag": "durum",
+              "removed": false,
+              "createdAt": "2026-09-06T19:48:08.324Z",
+              "updatedAt": "2026-09-06T19:48:08.324Z",
+              "source": {
+                "kind": "relayed",
+                "url": null
+              },
+              "verification": "unverified",
+              "location": {
+                "known": true,
+                "region": "Pazarcık",
+                "text": ""
+              },
+              "corrects": null,
+              "likes": 0,
+              "liked": false,
+              "replies": 0,
+              "offers": 0,
+              "reposts": 0,
+              "reposted": false,
+              "observed": false,
+              "following": false,
+              "actions": [
+                "reply_create",
+                "post_react",
+                "post_repost",
+                "report_create",
+                "observation_create",
+                "account_follow"
+              ],
+              "relation": "corrects",
+              "relatedTo": "road-correction"
+            }
+          ],
+          "thread": {
+            "post": {
+              "id": "road-correction",
+              "author": {
+                "id": "local-info",
+                "name": "Yerel Bilgi",
+                "handle": "yerelbilgi",
+                "org": true
+              },
+              "repostedBy": null,
+              "kind": "post",
+              "text": "Kuzey yolu için önceki bilgi güncel değil. Yol kapalı; yeni bir açıklama olduğunda buradan duyurulacak.",
+              "tag": "durum",
+              "removed": false,
+              "createdAt": "2026-09-06T19:48:23.398Z",
+              "updatedAt": "2026-09-06T19:48:23.398Z",
+              "source": {
+                "kind": "firsthand",
+                "url": null
+              },
+              "verification": "official",
+              "location": {
+                "known": true,
+                "region": "Pazarcık",
+                "text": ""
+              },
+              "corrects": "road-report",
+              "likes": 0,
+              "liked": false,
+              "replies": 0,
+              "offers": 0,
+              "reposts": 1,
+              "reposted": true,
+              "observed": false,
+              "following": false,
+              "actions": [
+                "reply_create",
+                "post_react",
+                "post_repost",
+                "report_create",
+                "observation_create",
+                "account_follow"
+              ]
+            },
+            "messages": [],
+            "earlierCount": 0
+          },
+          "updates": [
+            {
+              "id": "a097f5fd-17e8-47db-9745-2a1c0c059fe7",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:45.330Z",
+              "text": "Merhaba Deniz, talebinizi görüp destek olmak istiyorum. Konumunuz Pazarcık ise, bu bilgiyi talebinize eklemeniz yardımın daha hızlı ulaşmasını sağlayabilir. Gıda ve su konusunda elimden geleni yapmaya çalışacağım.",
+              "author": {
+                "id": "0f51f04b-268c-4de2-8b82-efcef6a2ae05",
+                "name": "Üye 2",
+                "handle": "uye0f51f04b",
+                "org": false
+              }
+            },
+            {
+              "id": "8ec25541-45bd-4de3-8214-d1d6d895e5d0",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:21.719Z",
+              "text": "Gıda ve su ihtiyacınız için destek olabilir miyim? Lütfen bana ulaşın.",
+              "author": {
+                "id": "fdaae543-ae54-40b7-94d8-eabe6b48a3ad",
+                "name": "Üye 1",
+                "handle": "uyefdaae543",
+                "org": false
+              }
+            },
+            {
+              "id": "bde29d3e-6fa9-43b8-9606-738f122eba09",
+              "targetId": "need-water",
+              "kind": "offer",
+              "at": "2026-09-06T19:48:12.589Z",
+              "text": "Deniz abla, su ve gıda ihtiyacınız için elimizden geleni yapmaya çalışacağız. Lütfen güncel bilgi verin, hangi bölgedesiniz?",
+              "author": {
+                "id": "89577299-6c41-4d75-be39-c4c4f9e84996",
+                "name": "Üye 5",
+                "handle": "uye89577299",
+                "org": false
+              }
+            }
+          ],
+          "nextOffset": null,
+          "total": 1,
+          "counts": {
+            "all": 5,
+            "yardim": 1,
+            "mine": 0,
+            "unknown": 0,
+            "resmi": 1,
+            "dogrulanmis": 0
+          },
+          "actions": [
+            "post_create",
+            "request_create"
+          ]
+        }
+      }
+    },
+    {
+      "actorId": "0f51f04b-268c-4de2-8b82-efcef6a2ae05",
+      "decisionNumber": 10,
+      "decision": {
+        "operation": "reply_create",
+        "arguments": {
+          "targetId": "need-water",
+          "text": "Merhaba Deniz, gıda ve su ihtiyacınız için elimizden geleni yapmaya çalışacağız. Ancak yardımın daha hızlı ulaşabilmesi için lütfen bulunduğunuz bölgeyi (il/ilçe) belirtirseniz çok seviniriz. Konum bilgisi olmadan yardım ulaştırmak zor oluyor. Teşekkürler."
+        }
+      },
+      "result": {
+        "ok": true,
+        "commandId": "e6d64e5e-7d2c-4aca-98a6-1dc94d00ce79",
+        "entityId": "9dbf64ee-e1a6-49a8-9af9-fbe0f4f06cde",
+        "entityVersion": 1
+      }
+    }
+  ],
+  "replayMatches": true,
+  "viability": {
+    "readyFor50": false,
+    "pilotMeetsOutputGate": false,
+    "safetyChecksRecorded": false,
+    "unresolvedImportant": 0
+  },
+  "observationsTr": [
+    "Dört hesap destek önerisi gönderdi; bir hesap hiçbir araç çağırmadı. Toplam dokuz araç çağrısı başarılı oldu.",
+    "41 yanıtta araç çağrısı yoktu; bunların ikisi 512 çıktı token sınırında kesildi. Çoğu yorum, talimat bekleyen asistan üslubundaydı.",
+    "Bir hesap konumu ve kişi sayısı bilinmeyen talebin işlenemediğini öne sürdü. Uygulama bu alanları zorunlu tutmuyor; bu bir model yorumudur.",
+    "Düz metin yorumlar akışa otomatik gönderilmedi; yalnız araçla gönderilen içerikler paylaşıldı.",
+    "8K tam girdi bütçesinde 34 eski geçmiş girdisi çıkarıldı. 16K sunucu sınırı ile uygulama girdi sınırı farklıdır."
+  ],
+  "limitsTr": [
+    "Bu işlev/kapasite pilotu, Luna moderasyon senaryolarıyla eşleştirilmiş bir zekâ karşılaştırması değildir.",
+    "Düşünme kapalıydı. 50/100 hesap kapasitesi veya kesintisiz uzun koşu kanıtlanmadı.",
+    "Özel rol/görev promptu verilmedi; modelin eğitim etkileri ve kendi sohbet/araç şablonu devam eder.",
+    "9/50 araç seçimi oranı, 41 bozuk araç çağrısı anlamına gelmez. Araç çağrılarının 9/9 tanesi geçerliydi.",
+    "readyFor50 kapısı açılmadı; 90% araç seçimi eşiği geçilmedi ve bu koşuda sınır kontrol kayıtları üretilmedi."
+  ],
+  "fixesTr": [
+    "Ayrı Python ortamının bin dizini PATH içine alındı; ilk açılıştaki ninja bulunamadı hatası giderildi.",
+    "Rapor, kayıtlı participant-comment sonuçlarını eksik karar kaydı sanıyordu. noActions sayacı eklendi ve tamlık hesabına dahil edildi; ham kayıtlar değişmedi."
+  ],
+  "evidenceDirectory": ".rehearsal/runs/2b37c502-391c-4182-ace4-ca495fbec777",
+  "originalExportSha256": "bcb9bbccbbca5a8cc96db71ecf6b065df7fca5a811c7b72dfaed4de6b0b8e56b"
+}
