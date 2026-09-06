@@ -1,7 +1,7 @@
 /* ==========================================================================
    MİHENK · design tokens
-   Two palettes: normal ("Taş & Sinyal" - stone grey + turquoise) and crisis
-   (amber-terracotta). Colour tokens are registered with @property so a
+   Shared cool surfaces across two modes: normal ("Taş & Sinyal" - stone grey + turquoise) and crisis
+   (the same calm slate surfaces). Colour tokens are registered with @property so a
    palette swap on :root cross-fades instead of snapping. Nothing else
    changes between modes. Direction + full colour table: GORSEL_KIMLIK_SPEC.md
    at the repo root (sibling of mihenk/).
@@ -15,34 +15,34 @@
   src: url("../assets/fonts/archivo-700.woff2") format("woff2");
 }
 
-@property --c-bg        { syntax: '<color>'; inherits: true; initial-value: #121516; }
-@property --c-bg-2      { syntax: '<color>'; inherits: true; initial-value: #1a1e20; }
-@property --c-bg-3      { syntax: '<color>'; inherits: true; initial-value: #232829; }
-@property --c-border    { syntax: '<color>'; inherits: true; initial-value: #2a3032; }
-@property --c-text      { syntax: '<color>'; inherits: true; initial-value: #e5eaea; }
-@property --c-text-2    { syntax: '<color>'; inherits: true; initial-value: #8fa0a3; }
-@property --c-accent    { syntax: '<color>'; inherits: true; initial-value: #2fa8a0; }
-@property --c-accent-2  { syntax: '<color>'; inherits: true; initial-value: #279088; }
-@property --c-accent-fill{ syntax: '<color>'; inherits: true; initial-value: #228177; }
+@property --c-bg        { syntax: '<color>'; inherits: true; initial-value: #1b1e27; }
+@property --c-bg-2      { syntax: '<color>'; inherits: true; initial-value: #212530; }
+@property --c-bg-3      { syntax: '<color>'; inherits: true; initial-value: #2a303d; }
+@property --c-border    { syntax: '<color>'; inherits: true; initial-value: #343b49; }
+@property --c-text      { syntax: '<color>'; inherits: true; initial-value: #edf1f7; }
+@property --c-text-2    { syntax: '<color>'; inherits: true; initial-value: #a6afc0; }
+@property --c-accent    { syntax: '<color>'; inherits: true; initial-value: #6bb9ff; }
+@property --c-accent-2  { syntax: '<color>'; inherits: true; initial-value: #91cbff; }
+@property --c-accent-fill{ syntax: '<color>'; inherits: true; initial-value: #2176bc; }
 @property --c-accent-ink{ syntax: '<color>'; inherits: true; initial-value: #ffffff; }
 @property --c-scrim     { syntax: '<color>'; inherits: true; initial-value: rgba(0,0,0,.65); }
 
 :root {
   /* ---- palette: normal, "Taş & Sinyal" --------------------------------- */
-  --c-bg:         #121516;   /* soğuk taş grisi, saf siyah değil            */
-  --c-bg-2:       #1a1e20;   /* elevated surfaces, inputs, sidebar cards   */
-  --c-bg-3:       #232829;   /* pressed / secondary button                 */
-  --c-border:     #2a3032;
-  --c-text:       #e5eaea;
-  --c-text-2:     #8fa0a3;   /* meta text                                   */
-  --c-accent:     #2fa8a0;   /* İznik turkuazı - text, icons, borders       */
-  --c-accent-2:   #279088;
-  --c-accent-fill:#228177;   /* filled surfaces, koyu turkuaz               */
+  --c-bg:         #1b1e27;   /* soğuk taş grisi, saf siyah değil            */
+  --c-bg-2:       #212530;   /* elevated surfaces, inputs, sidebar cards   */
+  --c-bg-3:       #2a303d;   /* pressed / secondary button                 */
+  --c-border:     #343b49;
+  --c-text:       #edf1f7;
+  --c-text-2:     #a6afc0;   /* meta text                                   */
+  --c-accent:     #6bb9ff;   /* İznik turkuazı - text, icons, borders       */
+  --c-accent-2:   #91cbff;
+  --c-accent-fill:#2176bc;   /* filled surfaces, koyu turkuaz               */
   --c-accent-ink: #ffffff;
   --c-scrim:      rgba(0,0,0,.65);
 
   /* engagement colours (normal feed only) */
-  --c-reply:  #2fa8a0;
+  --c-reply:  #6bb9ff;
   --c-repost: #2f9e6e;
   --c-like:   #e8577a;
 
@@ -59,8 +59,8 @@
   /* ---- type scale ----------------------------------------------------- */
   --fs-body: 15px;
   --fs-meta: 13px;
-  --fs-name: 20px;
-  --lh-body: 20px;
+  --fs-name: 15px;
+  --lh-body: 23px;
 
   --ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         "Helvetica Neue", Arial, sans-serif;
@@ -100,25 +100,21 @@
     --c-accent-ink var(--t-palette) linear;
 }
 
-/* ---- palette: crisis ---------------------------------------------------
-   Aynı "Taş & Sinyal" ailesinde sıcak amber-terrakotaya kayar - normal
-   moddaki soğuk turkuazla asla karışmaz. Doğrulama rozetlerindeki kırmızı
-   (--v-disputed) bilerek bu amberden ayrı tutuldu: "kriz aktif" ile "bu
-   gönderi çelişkili" iki ayrı sinyal, aynı renk olursa birbirine karışır. */
+/* Crisis keeps the same readable slate palette. Urgency belongs to the help action. */
 :root[data-palette="crisis"] {
-  --c-bg:         #17110d;   /* sıcak neredeyse-siyah                      */
-  --c-bg-2:       #241a13;
-  --c-bg-3:       #32241a;
-  --c-border:     #3c2c1f;
-  --c-text:       #f3ece3;
-  --c-text-2:     #ab998a;
-  --c-accent:     #d98a3a;   /* amber-terrakota, genel kriz vurgusu         */
-  --c-accent-2:   #e3a35c;
-  --c-accent-fill:#c07728;
-  --c-accent-ink: #1a1006;
-  --c-scrim:      rgba(12,7,2,.72);
+  --c-bg:         #1b1e27;   /* shared slate surface */
+  --c-bg-2:       #212530;
+  --c-bg-3:       #2a303d;
+  --c-border:     #343b49;
+  --c-text:       #edf1f7;
+  --c-text-2:     #a6afc0;
+  --c-accent:     #6bb9ff;   /* shared blue navigation accent */
+  --c-accent-2:   #91cbff;
+  --c-accent-fill:#2176bc;
+  --c-accent-ink: #ffffff;
+  --c-scrim:      rgba(0,0,0,.65);
 
-  --hover-row:  rgba(255, 200, 130, .045);
+  --hover-row:  rgba(255,255,255,.03);
   --halo-alpha: .14;
 }
 

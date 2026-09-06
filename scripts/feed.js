@@ -55,7 +55,7 @@
     var u = S.byId[p.uid];
     var liked = !!state.likes[p.id];
     var rep = !!state.reposts[p.id];
-    return '<article class="post" data-id="' + p.id + '" ' +
+    return '<article class="post" data-id="' + p.id + '" data-version="'+(p.version||1)+'" ' +
       'aria-label="' + esc(u.name + ' gönderisi') + '">' +
       '<span class="av">' + u.avatar + '</span>' +
       '<div class="post__col">' +
@@ -65,15 +65,15 @@
           '<span class="post__handle">@' + esc(u.handle) + '</span>' +
           '<span class="post__dot">·</span>' +
           '<span class="post__time">' + esc(p.t) + '</span>' +
-          '<button class="post__more" type="button" disabled aria-disabled="true" aria-label="Diğer işlemler (prototip kapsamı dışında)">' + icon('dots', 'ic--sm') + '</button>' +
+          '<button class="post__more" type="button" data-report="' + esc(p.originalId||p.id) + '" aria-label="Gönderiyi bildir">' + icon('dots', 'ic--sm') + '</button>' +
         '</div>' +
         '<div class="post__body">' + esc(p.text) + '</div>' +
         (p.media ? '<div class="post__media">' + S.media(p.media) + '</div>' : '') +
         '<div class="acts">' +
           act('reply', '', 'Yanıtla', p.replies + (state.replies && state.replies[p.id] || 0)) +
-          act('repost', '', 'Yeniden gönder', p.reposts + (rep ? 1 : 0), rep) +
-          act('like', '', 'Beğen', p.likes + (liked ? 1 : 0), liked) +
-          act('views', '', 'Görüntülenme', p.views) +
+          act('repost', '', 'Yeniden gönder', p.reposts + (!M.shared && rep ? 1 : 0), rep) +
+          act('like', '', 'Beğen', p.likes + (!M.shared && liked ? 1 : 0), liked) +
+          (M.shared ? '' : act('views', '', 'Görüntülenme', p.views)) +
           act('share', '', 'Paylaş', null) +
         '</div>' +
       '</div></article>';
@@ -116,7 +116,7 @@
   }
 
   async function copyShareLink(id) {
-    var url = location.href.split('#')[0] + '#gonderi-' + encodeURIComponent(id);
+    var url = location.href.split('#')[0] + (M.shared ? '#post=' : '#gonderi-') + encodeURIComponent(id);
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(url);
       else {
@@ -144,6 +144,12 @@
     var base = (S.forYou.concat(S.following)).filter(function (p) { return p.id === id; })[0];
     if (!base) return;
 
+    if (M.shared) {
+      if(kind==='reply'){M.openThread(base.originalId||id);return;}
+      if(kind==='share'){copyShareLink(id);return;}
+      a.disabled=true;var raw=M.rawPost(base.originalId||id);
+      M.transport.send({type:kind==='like'?'post.react':'post.repost',targetId:raw.originalId||raw.id,payload:kind==='like'?{active:!raw.liked}:{}}).then(function(r){if(!r.ok){a.disabled=false;M.toast(r.error.message);}else M.refreshShared(true);});return;
+    }
     if (kind === 'like') {
       state.likes[id] = !state.likes[id];
       syncAction(id, kind, base);
@@ -178,7 +184,7 @@
             '</div>' +
           '</div>' +
           '<div class="composer__bar">' +
-            [['image', 'Görsel'], ['poll', 'Anket'], ['emoji', 'Emoji'], ['clock', 'Zamanlama'], ['pin', 'Konum']].map(function (i) {
+            [['image', 'Görsel'], ['poll', 'Anket'], ['emoji', 'Emoji'], ['clock', 'Zamanlama'], ['pin', 'Konum']].filter(function(){return !M.shared;}).map(function (i) {
               return '<button class="composer__tool" type="button" disabled aria-disabled="true" title="Prototip kapsamı dışında" aria-label="' + i[1] + ' (prototip kapsamı dışında)">' + icon(i[0]) + '</button>';
             }).join('') +
             '<button class="btn composer__post" id="postbtn" type="button" disabled>Gönder</button>' +

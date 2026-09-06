@@ -8,6 +8,7 @@ secrets/
 
 # Dependencies and local tooling
 node_modules/
+.rehearsal/
 *.log
 .frames/
 

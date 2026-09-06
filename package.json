@@ -6,11 +6,17 @@
   "scripts": {
     "start": "node tools/serve.mjs",
     "bundle": "node tools/gen-static.mjs && node tools/bundle.mjs",
-    "check:syntax": "node --check data/seed.js && node --check scripts/app.js && node --check scripts/feed.js && node --check scripts/crisis.js && node --check scripts/imdat.js && node --check scripts/demo.js && node --check tools/serve.mjs && node --check tools/bundle.mjs && node --check tools/verify.mjs",
+    "check:syntax": "node --check data/seed.js && node --check scripts/app.js && node --check scripts/feed.js && node --check scripts/crisis.js && node --check scripts/imdat.js && node --check scripts/demo.js && node --check tools/serve.mjs && node --check tools/bundle.mjs && node --check tools/verify.mjs && node --check data/catalog.js && node --check scripts/transport.js && node --check scripts/shared.js && node --check scripts/request-thread.js && node --check scripts/simulation.js && node --check server/store.mjs && node --check server/world.mjs && node --check server/views.mjs && node --check server/http.mjs && node --check lab/scenarios.mjs && node --check tools/rehearsal.mjs && node --check tools/serve-rehearsal.mjs && node --check lab/operations.mjs && node --check lab/participant.mjs && node --check lab/model.mjs && node --check lab/rule-participants.mjs && node --check lab/runner.mjs && node --check lab/browser.mjs && node --check lab/report.mjs && node --check tools/participant.mjs && node --check scripts/operator.js",
     "contrast": "node tools/contrast.mjs",
     "verify": "node tools/verify.mjs",
     "capture": "node tools/capture.mjs",
-    "check": "npm run check:syntax && npm run contrast && npm run bundle && npm run verify"
+    "check": "npm run check:syntax && npm run contrast && npm run bundle && npm run verify",
+    "measure": "node tools/measure.mjs && node tools/measure-runtime.mjs && node tools/measure-ux.mjs && node tools/measure-ux2.mjs",
+    "rehearsal": "node tools/serve-rehearsal.mjs",
+    "rehearsal:control": "node tools/rehearsal.mjs",
+    "rehearsal:run": "node lab/runner.mjs",
+    "rehearsal:report": "node lab/report.mjs",
+    "participant": "node tools/participant.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

@@ -7,6 +7,7 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 const seedSrc = fs.readFileSync(path.join(root, 'data/seed.js'), 'utf8');
 const window = {};
+new Function('window', fs.readFileSync(path.join(root, 'data/catalog.js'), 'utf8'))(window);
 new Function('window', seedSrc)(window);
 const S = window.MIHENK.SEED;
 

@@ -75,6 +75,10 @@
 :root[data-plain="1"] .vpill .ic { display: none; }
 :root[data-plain="1"] .vpill::before { content: "["; }
 :root[data-plain="1"] .vpill::after  { content: "]"; }
+:root[data-plain="1"] .vpill--verified { color: var(--v-verified); }
+:root[data-plain="1"] .vpill--official { color: var(--v-official); }
+:root[data-plain="1"] .vpill--unverified { color: var(--v-unverified); }
+:root[data-plain="1"] .vpill--disputed { color: var(--v-disputed); }
 
 :root[data-plain="1"] .cpost__meta { color: #bbb; font-size: 14px; }
 :root[data-plain="1"] .cpost__tag { border: 1px solid #666; }
@@ -83,6 +87,9 @@
   border: 2px solid var(--c-accent); background: none; color: var(--c-accent);
   width: auto;
 }
+:root[data-plain="1"] .crisis-actions { grid-template-columns: 1fr; }
+:root[data-plain="1"] .crisis-actions .sos,
+:root[data-plain="1"] .crisis-actions .btn { margin: 0; width: 100%; min-height: 44px; font-size: 15px; }
 :root[data-plain="1"] .chip { border: 1px solid #666; }
 :root[data-plain="1"] .chip[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
 :root[data-plain="1"] .pin { border: 2px solid var(--c-accent); background: none; }

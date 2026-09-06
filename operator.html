@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MİHENK · Katılımcıları izle</title><link rel="stylesheet" href="/operator.css"><script src="/operator.js" defer></script></head>
+<body>
+  <header class="top"><a class="brand" href="/">MİHENK <span>Gözlem odası</span></a><span class="connection" id="connection" role="status">Bağlanıyor</span></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">ORTAK DÜNYA</p><h1>Katılımcıları izle</h1><p>Ne gördü, ne seçti, ne oldu? Her hesabın kendi akışı burada.</p></div><div class="run-tools"><label for="runs">Oturum<select id="runs"><option>Yükleniyor…</option></select></label><button id="toggle-run" type="button" disabled>Duraklat</button></div></section>
+    <form class="access" id="access" hidden><label for="access-key">Gözlem anahtarı<input id="access-key" type="password" autocomplete="off"></label><button type="submit">Bağlan</button></form>
+    <div class="stats" aria-label="Oturum bilgileri"><div><span>Katılımcı</span><strong id="participant-count">—</strong></div><div><span>Açık talep</span><strong id="request-count">—</strong></div><div><span>Seçilen hesabın işlemleri</span><strong id="action-count">—</strong></div><div><span>Oturum</span><strong id="run-status">—</strong></div></div>
+    <div class="workspace"><aside><div class="section-head"><h2>Hesaplar</h2><span id="account-hint"></span></div><div id="accounts" class="accounts"></div></aside><section class="activity"><div class="section-head"><div><h2 id="selected-name">Bir hesap seç</h2><p id="selected-detail">Hesapların geçmişleri birbirinden ayrıdır.</p></div><label class="follow"><input id="follow-latest" type="checkbox" checked> Son işlemleri göster</label></div><div id="timeline" class="timeline" aria-live="off"><div class="empty">Katılımcı bağlandığında gördüğü içerikler ve işlemleri burada görünür.</div></div></section></div>
+    <p class="footnote">Karar notu, katılımcının isteğe bağlı tek cümlelik açıklamasıdır. İşlem sonucu, uygulamanın kayıtlarından gösterilir.</p>
+  </main>
+</body></html>

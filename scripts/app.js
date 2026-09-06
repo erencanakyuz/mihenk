@@ -86,7 +86,7 @@
     busy: false,
     instant: false,
     likes: {}, reposts: {}, follows: {}, verified: {},
-    extraCrisis: []
+    extraCrisis: [], corroborations: {}
   };
   M.state = state;
 
@@ -116,11 +116,16 @@
   M.toast = toast;
 
   /* ---------------------------------------------------------------- modal */
-  var lastFocus = null;
+  var lastFocus = null, lastFocusSelector = null, modalCloseTimer = null;
   function openModal(node, opts) {
     opts = opts || {};
+    clearTimeout(modalCloseTimer);
     var layer = $('#modal');
-    lastFocus = document.activeElement;
+    if(layer.hidden || !layer.contains(document.activeElement)){
+      lastFocus = document.activeElement;lastFocusSelector=null;
+      var originAttribute=['data-thread','data-offer','data-report','data-why','data-edit-request','data-resolve'].find(function(attr){return lastFocus.hasAttribute(attr);});
+      if(originAttribute)lastFocusSelector='['+originAttribute+'="'+CSS.escape(lastFocus.getAttribute(originAttribute))+'"]';
+    }
     layer.innerHTML = '';
     var scrim = el('<div class="modal__scrim"></div>');
     layer.appendChild(scrim);
@@ -134,6 +139,7 @@
     document.body.style.overflow = 'hidden';
     var shell = $('.shell');
     if (shell) shell.inert = true;
+    $$('.bottombar, .fab').forEach(function (n) { n.inert = true; });
     var f = node.querySelector('button, [href], input, textarea, [tabindex]:not([tabindex="-1"])');
     if (f) { f.focus(); }
     else { node.tabIndex = -1; node.focus(); }
@@ -146,7 +152,7 @@
     if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
     if (e.key !== 'Tab') return;
     var f = $$('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])', $('#modal'))
-      .filter(function (n) { return n.offsetParent !== null; });
+      .filter(function (n) { return n.offsetParent !== null && !n.disabled && !n.closest('[inert]'); });
     if (!f.length) return;
     var first = f[0], last = f[f.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -158,13 +164,16 @@
     var m = layer.querySelector('.modal');
     if (m) m.dataset.leaving = '1';
     document.removeEventListener('keydown', trap, true);
-    setTimeout(function () {
+    clearTimeout(modalCloseTimer);
+    modalCloseTimer = setTimeout(function () {
       layer.hidden = true; layer.innerHTML = '';
       layer.removeAttribute('aria-labelledby'); layer.removeAttribute('aria-label');
       document.body.style.overflow = '';
       var shell = $('.shell');
       if (shell) shell.inert = false;
-      if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus();
+      $$('.bottombar, .fab').forEach(function (n) { n.inert = false; });
+      var restore=lastFocus&&document.contains(lastFocus)?lastFocus:lastFocusSelector?$$(lastFocusSelector).find(function(n){return n.offsetParent!==null;}):null;
+      restore=restore||$('.tab[aria-selected="true"]');if(restore)restore.focus({preventScroll:true});
     }, motionOff() ? 0 : 160);
   }
   M.openModal = openModal; M.closeModal = closeModal;
@@ -186,7 +195,7 @@
   }
 
   function buildShell() {
-    var navHtml = NAV.map(function (n) {
+    var navHtml = NAV.filter(function(n){return !M.shared || n[2];}).map(function (n) {
       var active = n[2] === 'home';
       var badge = n[2] === 'crisis' ? '<span class="nav__dot" data-crisis-dot aria-hidden="true"></span>' : '';
       return '<li><button class="nav__item" type="button" ' +
@@ -198,20 +207,20 @@
       '<div class="side__search"><div class="side__search-box">' + icon('search') +
         '<input type="search" placeholder="Ara" aria-label="Gönderilerde ara" data-search-input></div></div>' +
       trustCardHTML() +
-      '<p class="card__k" style="padding:0 16px">Şablon hesaplar · Kurgusal veri · Prototip</p>';
+      (M.shared ? '' : '<p class="card__k" style="padding:0 16px">Şablon hesaplar · Kurgusal veri · Prototip</p>');
 
     return el(
       '<div class="shell">' +
-        '<header class="nav"><button class="nav__brand" type="button" data-nav="home" aria-label="MİHENK ana sayfa">' + logo() + '</button>' +
+        '<header class="nav"><button class="nav__brand" type="button" data-nav="home" aria-label="MİHENK ana sayfa">' + logo() + '<span class="brand-word">MİHENK</span></button>' +
           '<nav aria-label="Birincil"><ul class="nav__list">' + navHtml + '</ul></nav>' +
           '<button class="nav__post" type="button" data-nav="compose">' + icon('quill', 'ic--lg') + '<span>Gönder</span></button>' +
-          '<button class="nav__me" type="button" disabled aria-disabled="true" title="Profil prototip kapsamı dışında"><span class="av">' + S.me.avatar + '</span>' +
+          '<button class="nav__me" type="button" disabled aria-disabled="true" title="Hesabınız"><span class="av">' + S.me.avatar + '</span>' +
             '<span class="nav__me-txt"><span class="nav__me-name">' + esc(S.me.name) + '</span><br>' +
             '<span class="nav__me-handle">@' + esc(S.me.handle) + '</span></span>' + icon('dots') + '</button>' +
         '</header>' +
         '<main class="main" id="main">' +
           '<div class="topbar" id="topbar">' +
-            '<div class="topbar__row">' + logo().replace('viewBox', 'style="width:26px;height:26px" viewBox') + '<span>MİHENK</span></div>' +
+            '<div class="topbar__row">' + logo().replace('viewBox', 'style="width:26px;height:26px" viewBox') + '<span>MİHENK</span>' + (M.shared ? '' : '<button class="header-lab" type="button" data-open-lab>Tatbikat</button>') + '</div>' +
             '<div class="tabs" role="tablist" aria-label="Akışlar" id="tabs">' +
               '<div class="tabs__underline" id="underline" aria-hidden="true"></div>' +
             '</div>' +
@@ -229,12 +238,12 @@
       '</div>');
   }
 
-  /* "Bölge Güven Durumu" - X'in Gündem/Kimi-takip-etmeli widget'larının
+  /* "Bilginin durumu" - X'in Gündem/Kimi-takip-etmeli widget'larının
      yerine. Ürünün asıl farkını (doğrulama katmanı) kriz kapalıyken bile
      gösterir. Sayı uydurma değil: S.crisis + state.verified'dan hesaplanır,
      crisis.js'teki updateCounts() ile aynı mantık. Bkz. GORSEL_KIMLIK_SPEC.md §4. */
   function trustStats() {
-    var all = S.crisis;
+    var all = state.extraCrisis.concat(S.crisis);
     var resolved = 0, disputed = 0;
     all.forEach(function (p) {
       var v = state.verified[p.id] || p.v;
@@ -242,17 +251,17 @@
       if (v === 'disputed') disputed++;
     });
     return { total: all.length, resolved: resolved, disputed: disputed,
-      pct: Math.round((resolved / all.length) * 100) };
+      pct: all.length ? Math.round((resolved / all.length) * 100) : 0 };
   }
 
   function trustCardHTML() {
     var s = trustStats();
-    return '<section class="card trust-card" id="trustcard"><h2 class="card__h">Bölge Güven Durumu</h2>' +
+    return '<section class="card trust-card" id="trustcard"><h2 class="card__h">Bilginin durumu</h2>' +
       '<div class="trust-card__body">' +
-        '<div class="trust-card__row"><span>Kahramanmaraş</span><span class="card__k">son 24 sa</span></div>' +
+        '<div class="trust-card__row"><span>Kahramanmaraş</span><span class="card__k">' + (M.shared ? 'bu görünüm' : 'örnek veri') + '</span></div>' +
         '<div class="trust-card__stat">%' + s.pct + '<small>doğrulanmış / resmî kaynaklı</small></div>' +
         '<div class="trust-card__meter"><i style="width:' + s.pct + '%"></i></div>' +
-        '<div class="card__k">' + s.total + ' gönderi izleniyor · ' + s.disputed + ' çelişkili işaretlendi</div>' +
+        '<div class="card__k">' + s.total + ' gönderi · ' + s.disputed + ' çelişkili işaretlendi</div>' +
       '</div></section>';
   }
 
@@ -282,6 +291,11 @@
   }
 
   function syncTabs() {
+    $$('[data-nav="home"], [data-nav="crisis"]').forEach(function (n) {
+      if (n.classList.contains('nav__brand')) return;
+      var selected = n.dataset.nav === (state.tab === 'crisis' ? 'crisis' : 'home');
+      if (selected) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');
+    });
     $$('.tab').forEach(function (t) {
       var on = t.dataset.tab === state.tab;
       t.setAttribute('aria-selected', on ? 'true' : 'false');
@@ -341,15 +355,16 @@
   }
 
   /* -------------------------------------------------------- tab switching */
+  var tabTransition = 0;
   function setTab(next, opts) {
     opts = opts || {};
-    if (state.busy) return;
     if (!TABS[next]) return;
     if (next === state.tab) return;
     var ids = order();
     if (ids.indexOf(next) < 0) return;
 
     state.busy = true;
+    var transition = ++tabTransition;
     state.scroll[state.tab] = window.scrollY;
 
     var dir = ids.indexOf(next) > ids.indexOf(state.tab) ? 1 : -1;
@@ -370,17 +385,20 @@
     syncPanelAccessibility();
 
     var fast = motionOff();
-    var tOut = fast ? 0 : 180;
-    var tSkel = fast ? 0 : (opts.skelMs || 340);
+    var tOut = fast ? 0 : 80;
+    var tSkel = fast ? 0 : (opts.skelMs || 0);
 
     if (outEl) outEl.dataset.anim = dir > 0 ? 'out-left' : 'out-right';
 
     setTimeout(function () {
+      if (transition !== tabTransition) return;
+      $$('.feed').forEach(function (f) { f.dataset.active = ''; f.dataset.anim = ''; });
       if (outEl) { outEl.dataset.anim = ''; outEl.dataset.active = '0'; }
       skel.dataset.active = '1';
       syncPanelAccessibility();
       window.scrollTo(0, 0);
       setTimeout(function () {
+        if (transition !== tabTransition) return;
         skel.dataset.active = '0';
         inEl.dataset.active = '1';
         syncPanelAccessibility();
@@ -392,11 +410,12 @@
         var want = state.scroll[next] || 0;
         window.scrollTo(0, want);
         setTimeout(function () {
+          if (transition !== tabTransition) return;
           inEl.dataset.anim = '';
           if (Math.abs(window.scrollY - want) > 2) window.scrollTo(0, want);
           state.busy = false;
           M.emit('tab', { from: prev, to: next });
-        }, fast ? 0 : 230);
+        }, fast ? 0 : 140);
       }, tSkel);
     }, tOut);
   }
@@ -408,6 +427,7 @@
     if (!TABS[id]) return;
     var p = panel(id);
     if (!p) return;
+    tabTransition++;
     state.scroll[state.tab] = window.scrollY;
     $$('.feed').forEach(function (f) { f.dataset.active = ''; f.dataset.anim = ''; });
     p.dataset.active = '1';
@@ -506,11 +526,21 @@
     rows.forEach(function (row) {
       var match = !query || row.innerText.toLocaleLowerCase('tr-TR').indexOf(query) >= 0;
       row.dataset.searchHidden = match ? '' : '1';
-      if (match) count++;
+      if (match && row.style.display !== 'none') count++;
     });
     var status = $('#feed-search-status');
     if (status) status.textContent = query ? count + ' sonuç' : '';
+    var activePanel = panel(state.tab);
+    var empty = activePanel.querySelector('.empty-results');
+    if (!count && !empty) {
+      empty = el('<div class="empty-results" role="status"><b>Bu seçimde gönderi yok.</b><p>Başka bir bölge seçebilir veya filtreleri temizleyebilirsin.</p><button class="btn btn--ghost" data-clear-filters>Filtreleri temizle</button></div>');
+      activePanel.insertBefore(empty, activePanel.querySelector('.feed__end'));
+    }
+    if (empty) empty.hidden = count > 0;
+    var end = activePanel.querySelector('.feed__end');
+    if (end) end.hidden = count === 0;
   }
+  M.applySearch = applySearch;
 
   function openSearch(term) {
     var box = $('#feed-search');
@@ -548,6 +578,13 @@
     M.initCrisis();
 
     document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-clear-filters]')) {
+        applySearch('');
+        if (state.tab === 'crisis') {
+          $('#crisis-region').value = ''; $('#crisis-topic').value = '';
+          $('.chip[data-filter="all"]').click();
+        }
+      }
       var nav = e.target.closest('[data-nav]');
       if (nav) {
         if (nav.dataset.nav === 'home') {
@@ -556,6 +593,7 @@
         }
         if (nav.dataset.nav === 'search') openSearch('');
         if (nav.dataset.nav === 'compose') {
+          if (state.tab === 'crisis') { M.openCrisisComposer(); $('#cta').focus(); return; }
           var ta = $('#ta');
           if (ta) { ta.focus(); window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' }); }
         }
@@ -609,12 +647,15 @@
     document.documentElement.dataset.tab = state.tab;
     var initial = routeFromLocation();
     if (initial === 'following') M.setTabInstant('following');
-    if (initial === 'crisis') { M.activateCrisis({ immediate: true }); M.setTabInstant('crisis'); }
+    if (M.shared || initial === 'crisis') { M.activateCrisis({ immediate: true }); M.setTabInstant(initial); }
 
-    M.initDemo();
+    if (!M.shared && M.initDemo) M.initDemo();
+    if (!M.shared && M.initSimulation) M.initSimulation();
+    if (M.shared && M.initShared) M.initShared();
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  function boot() { if (M.shared) M.transport.ready().then(init).catch(function(error){ console.error('Application startup failed',error); var screen=document.getElementById('connection-screen'); if(screen)screen.textContent='Akış açılamadı. Sayfayı yenileyerek tekrar deneyin.'; }); else init(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 
 })(window.MIHENK = window.MIHENK || {});

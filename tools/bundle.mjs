@@ -15,9 +15,9 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8');
 
 const CSS = ['styles/tokens.css', 'styles/base.css', 'styles/feed.css',
-             'styles/crisis.css', 'styles/plain.css'];
-const JS = ['data/seed.js', 'scripts/app.js', 'scripts/feed.js', 'scripts/crisis.js',
-            'scripts/imdat.js', 'scripts/demo.js'];
+             'styles/crisis.css', 'styles/refine.css', 'styles/plain.css'];
+const JS = ['data/catalog.js', 'data/seed.js', 'scripts/transport.js', 'scripts/app.js', 'scripts/feed.js', 'scripts/crisis.js',
+            'scripts/imdat.js', 'scripts/request-thread.js', 'scripts/demo.js', 'scripts/simulation.js'];
 
 const ASSET_MIME = {
   '.avif': 'image/avif',
@@ -36,7 +36,7 @@ function inlineImageAssets(source) {
   });
 }
 
-const css = CSS.map(f => `/* ===== ${f} ===== */\n${read(f)}`).join('\n');
+const css = CSS.map(f => `/* ===== ${f} ===== */\n${read(f)}`).join('\n').replace('../assets/fonts/archivo-700.woff2', 'data:font/woff2;base64,' + fs.readFileSync(path.join(ROOT, 'assets/fonts/archivo-700.woff2')).toString('base64'));
 const js  = inlineImageAssets(JS.map(f => `/* ===== ${f} ===== */\n${read(f)}`).join('\n'));
 
 const html = read('index.html');
