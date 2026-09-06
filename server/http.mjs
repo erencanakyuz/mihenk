@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { openStore, secret, hash } from './store.mjs';
 import { AppError, createWorldService, applyDelta, reject } from './world.mjs';
 import { projectView } from './views.mjs';
+import { normalizeAccess, permits, roles, accessFor } from './access.mjs';
 import { makeScenario, advance } from '../lab/scenarios.mjs';
 
 const ROOT=path.resolve(import.meta.dirname,'..');
@@ -63,11 +64,13 @@ export async function serveRehearsal({port=8322,operatorPort=8323,host='127.0.0.
         if(url.pathname==='/api/activity'&&req.method==='POST'){
           limit(session.token);const p=await body(req,4096);
           if(Object.keys(p).some(k=>!['eventId','operation','note','targetId'].includes(k))||typeof p.eventId!=='string'||p.eventId.length>100||typeof p.operation!=='string'||!/^[a-z_]{1,40}$/.test(p.operation)||typeof p.note!=='string'||p.note.length>240)reject('validation','Karar notu geçersiz.');
+          if(!permits(store.read(session.run_id)?.actors[session.actor_id],p.operation))reject('unauthorized','Bu işlem için yetkiniz yok.');
           if(p.targetId&&!JSON.parse(session.seen).includes(p.targetId))reject('unauthorized','Önce ilgili kaydı açın.');
           store.record(session.run_id,'participant-note',{actorId:session.actor_id,eventId:p.eventId,operation:p.operation,targetId:p.targetId||null,note:p.note});
           return json(res,200,{ok:true});
         }
         if(url.pathname==='/api/events'&&req.method==='GET') {
+          if(!permits(store.read(session.run_id)?.actors[session.actor_id],'read_view'))reject('unauthorized','Bu görünüm için yetkiniz yok.');
           const same=[...streams].filter(s=>s.session.token===session.token);
           if(same.length>=3)reject('rate_limited','Çok sayıda açık bağlantı var.');
           res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-store','Connection':'keep-alive'});
@@ -101,18 +104,38 @@ export async function serveRehearsal({port=8322,operatorPort=8323,host='127.0.0.
       if(url.pathname==='/monitor'&&req.method==='GET'){
         const run=store.read(url.searchParams.get('runId'));if(!run)reject('not_found','Run not found.');
         const after=key=>Math.max(0,Number.parseInt(url.searchParams.get(key),10)||0);
-        return json(res,200,{run:{id:run.id,title:run.title,status:run.status,tick:run.tick,openRequests:Object.values(run.posts).filter(p=>p.kind==='request'&&p.status==='open').length},actors:Object.values(run.actors).map(a=>({id:a.id,name:a.name,handle:a.handle})),...store.monitor(run.id,after('afterRecord'),after('afterEvent'),url.searchParams.get('actorId')||null)});
+        return json(res,200,{run:{id:run.id,title:run.title,status:run.status,tick:run.tick,openRequests:Object.values(run.posts).filter(p=>p.kind==='request'&&p.status==='open'&&!p.removed).length},actors:Object.values(run.actors).map(a=>({id:a.id,name:a.name,handle:a.handle,access:accessFor(a)})),...store.monitor(run.id,after('afterRecord'),after('afterEvent'),url.searchParams.get('actorId')||null)});
       }
       if(url.pathname==='/runs'&&req.method==='GET')return json(res,200,store.list());
       if(url.pathname==='/runs'&&req.method==='POST'){const p=await body(req);const state=makeScenario(p.scenario);store.create(state);return json(res,201,{runId:state.id});}
       if(url.pathname==='/sessions'&&req.method==='POST') {
         const p=await body(req), state=store.read(p.runId);if(!state)reject('not_found','Run not found.');
+        if(Object.keys(p).some(k=>!['runId','actorId','name','access','policy'].includes(k))||p.access!==undefined&&p.policy!==undefined)reject('validation','Invalid session configuration.');
         let actorId=p.actorId;
         if(actorId&&!Object.hasOwn(state.actors,actorId))reject('not_found','Account not found.');
+        if(actorId&&(p.access!==undefined||p.policy!==undefined))reject('validation','Use the access endpoint to change an existing account.');
+        let policy;try{policy=normalizeAccess(p.policy??(p.access==='moderation'?'moderator':p.access??'participant'));}catch(error){reject('validation',error.message);}
         if(!actorId) {actorId=randomUUID();const name=typeof p.name==='string'?p.name.trim().slice(0,60):'Üye '+(Object.keys(state.actors).length+1);
-          service.mutate(state.id,s=>{s.actors[actorId]={id:actorId,name:name||'Üye',handle:'uye'+actorId.slice(0,8)};},{kind:'account-created'});}
+          service.mutate(state.id,s=>{s.actors[actorId]={id:actorId,name:name||'Üye',handle:'uye'+actorId.slice(0,8),policy,accessRevision:1};},{kind:'account-created'});}
         const session=store.createSession(state.id,actorId);
         return json(res,201,{...session,url:'http://127.0.0.1:'+participant.address().port+'/kriz#join='+session.joinCode});
+      }
+      if(url.pathname==='/roles'&&req.method==='GET')return json(res,200,roles);
+      if(url.pathname==='/access'&&req.method==='POST'){
+        const p=await body(req);
+        if(!Object.hasOwn(p,'policy')||Object.keys(p).some(k=>!['runId','actorId','policy'].includes(k)))reject('validation','Invalid access update.');
+        let policy;try{policy=normalizeAccess(p.policy);}catch(error){reject('validation',error.message);}
+        if(!Object.hasOwn(store.read(p.runId)?.actors||{},p.actorId))reject('not_found','Account not found.');
+        service.mutate(p.runId,s=>{const actor=s.actors[p.actorId];actor.policy=policy;actor.accessRevision=(actor.accessRevision||0)+1;},{kind:'access-changed',actorId:p.actorId});
+        return json(res,200,{ok:true,policy});
+      }
+      if(url.pathname==='/sessions/revoke'&&req.method==='POST'){
+        const p=await body(req);
+        if(Object.keys(p).some(k=>!['runId','actorId'].includes(k))||!Object.hasOwn(store.read(p.runId)?.actors||{},p.actorId))reject('validation','Invalid account.');
+        const revoked=store.revokeSessions(p.runId,p.actorId);
+        for(const stream of streams)if(stream.session.run_id===p.runId&&stream.session.actor_id===p.actorId)stream.res.end();
+        store.record(p.runId,'sessions-revoked',{actorId:p.actorId,revoked});
+        return json(res,200,{ok:true,revoked});
       }
       if(url.pathname==='/control'&&req.method==='POST') {
         const p=await body(req),state=store.read(p.runId);if(!state)reject('not_found','Run not found.');
@@ -140,7 +163,10 @@ export async function serveRehearsal({port=8322,operatorPort=8323,host='127.0.0.
   service.listeners.add((runId,delta)=>{
     const publicChange=Object.keys(delta).some(k=>!['reports'].includes(k));
     if(!publicChange)return;
-    for(const stream of streams)if(stream.session.run_id===runId)stream.res.write('event: changed\ndata: {}\n\n');
+    for(const stream of streams)if(stream.session.run_id===runId){
+      if(!permits(store.read(runId)?.actors[stream.session.actor_id],'read_view'))stream.res.end();
+      else stream.res.write('event: changed\ndata: {}\n\n');
+    }
   });
   const listen=(server,p)=>new Promise((resolve,reject)=>{server.once('error',reject);server.listen(p,host,resolve);});
   try {await listen(participant,port);await listen(operator,operatorPort);}

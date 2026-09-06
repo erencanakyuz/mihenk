@@ -16,11 +16,12 @@ export function observation(view){
     updates:view.updates,nextOffset:view.nextOffset,total:view.total,counts:view.counts,actions:view.actions.map(t=>t.replace('.','_'))};
 }
 export class Participant {
-  constructor({url,token,pageSize=2},state={}){
-    this.url=localURL(url);this.token=token;this.pageSize=pageSize;this.query=state.query||{};this.view=state.view||null;this.known=new Map(state.known||[]);this.pending=state.pending||null;
+  constructor({url,token,pageSize=2,actorId,runId},state={}){
+    this.url=localURL(url);this.token=token;this.actorId=actorId;this.runId=runId;this.pageSize=pageSize;this.query=state.query||{};this.view=state.view||null;this.known=new Map(state.known||[]);this.pending=state.pending||null;
   }
   snapshot(){return {query:this.query,view:this.view,known:[...this.known],pending:this.pending};}
   async request(route,body){
+    if(!['/api/view','/api/commands','/api/activity'].includes(route.split('?')[0]))throw new Error('Participant route is not allowed.');
     const response=await fetch(this.url+route,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},redirect:'error',signal:AbortSignal.timeout(15000),...(body===undefined?{}:{body:JSON.stringify(body)})});
     const result=await response.json();
     if(!response.ok&&!result.error)throw new Error('Connection failed.');
@@ -29,10 +30,13 @@ export class Participant {
   async read(query=this.query){
     const view=await this.request('/api/view?'+new URLSearchParams({...query,limit:this.pageSize}));
     if(view.error)throw new Error(view.error.message);
+    if(this.actorId&&view.me.id!==this.actorId||this.runId&&view.runId!==this.runId)throw new Error('Account binding does not match the session.');
+    if(!Array.isArray(view.operations))throw new Error('The server must support explicit participant permissions.');
+    if(this.view&&this.view.accessRevision!==view.accessRevision)this.known.clear();
     this.query={...query};this.view=view;
     for(const p of [...view.items,...(view.thread?[view.thread.post]:[])]){
       this.known.set(p.id,p);if(p.originalId)this.known.set(p.originalId,{...p,id:p.originalId,originalId:null});
-      this.known.set(p.authorId,{id:p.authorId,actions:p.actions.includes('account.follow')?['account.follow']:[]});
+      this.known.set(p.authorId,{id:p.authorId,actions:['account.follow','account.ban'].filter(type=>p.actions.includes(type))});
       if(p.corrects&&!this.known.has(p.corrects))this.known.set(p.corrects,{id:p.corrects,actions:[]});
     }
     for(const u of view.updates)if(!this.known.has(u.targetId))this.known.set(u.targetId,{id:u.targetId,actions:[]});
@@ -42,8 +46,9 @@ export class Participant {
   }
   available(){
     const types=new Set([...this.view?.actions||[],...[...this.known.values()].flatMap(p=>p.actions||[])]);
-    return operations.filter(t=>['read_view','open_thread','wait'].includes(t.function.name)||types.has(commandType(t.function.name)));
+    return operations.filter(t=>this.view?.operations?.includes(t.function.name)&&(['read_view','open_thread','wait'].includes(t.function.name)||types.has(commandType(t.function.name))));
   }
+  capabilities(){return operations.filter(t=>this.view?.operations?.includes(t.function.name));}
   prepare(decision){
     const invalid=validateOperation(decision,this.available());if(invalid)return {error:{code:'schema',message:invalid}};
     const {operation,arguments:args}=decision;
@@ -64,6 +69,12 @@ export class Participant {
     this.pending=prepared;await save();
     try{
       const result=await this.request('/api/commands',prepared.command);
+      if(result.ok&&prepared.command.type==='post.remove'){
+        const post=this.known.get(prepared.command.targetId);if(post){post.actions=[];post.removed=true;}
+      }
+      if(result.ok&&prepared.command.type==='account.ban'){
+        for(const record of this.known.values())if(record.id===prepared.command.targetId||record.authorId===prepared.command.targetId)record.actions=(record.actions||[]).filter(type=>type!=='account.ban');
+      }
       // An HTTP response is authoritative even when the product rejects the command.
       this.pending=null;await save();return result;
     }catch{return {ok:false,error:{code:'transport',message:'Gönderim doğrulanamadı. Aynı işlem yeniden denenebilir.'}};}

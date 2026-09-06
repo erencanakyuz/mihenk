@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { hash } from './store.mjs';
+import { permits, canSeePost, canTarget } from './access.mjs';
 export const NEEDS = {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'};
 export const TAGS = ['yardim','enkaz','kayip','nokta','resmi','durum'];
 const collections = ['actors','posts','replies','offers','reports','reactions','follows','observations'];
@@ -77,11 +78,26 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
   if(typeof cmd.commandId!=='string'||!/^[-a-zA-Z0-9]{8,100}$/.test(cmd.commandId)) reject('validation','İşlem kimliği geçersiz.');
   if(typeof cmd.type!=='string') reject('validation','İşlem türü gerekli.');
   if(!Object.hasOwn(state.actors,actorId)) reject('unauthorized','Oturum bulunamadı.');
+  const actor=state.actors[actorId];
+  if(actor.banned)reject('unauthorized','Bu hesap yeni işlem yapamıyor.');
+  if(!permits(actor,cmd.type))reject('unauthorized','Bu işlem için yetkiniz yok.');
+  if(cmd.targetId&&!canTarget(state,actorId,cmd.targetId))reject('unauthorized','Bu kayıt erişiminizin dışında.');
   if(state.status==='stopped'||state.status==='replay') reject('unavailable','Bu oturum yeni işlemlere kapalı.');
   const p=cmd.payload??{}, target=Object.hasOwn(state.posts,cmd.targetId)?state.posts[cmd.targetId]:null;
   const stamp={authorId:actorId,version:1,createdAt:now,updatedAt:now};
   let entity;
-  if(cmd.type==='request.create') {
+  if(['post.remove','account.ban'].includes(cmd.type)){
+    fields(p,[]);
+    if(cmd.type==='post.remove'){
+      if(!target||target.removed)reject('not_found','Gönderi artık görünmüyor.');
+      version(target,cmd);target.removed=true;target.removedBy=actorId;target.version++;target.updatedAt=now;entity=target;
+    }else{
+      const account=Object.hasOwn(state.actors,cmd.targetId)?state.actors[cmd.targetId]:null;
+      if(!account||account.id===actorId)reject('validation','Hesabı kontrol edin.');
+      if(permits(account,'account.ban')||permits(account,'post.remove'))reject('unauthorized','Bu hesap bu işlemle engellenemez.');
+      account.banned=true;account.bannedBy=actorId;account.updatedAt=now;account.version=(account.version||1)+1;entity=account;
+    }
+  } else if(cmd.type==='request.create') {
     const props=requestFields(p);
     entity={...stamp,id:randomUUID(),kind:'request',tag:'yardim',...props,status:'open',verification:'unverified',source:{kind:'firsthand',url:null}};
     entity.text=needsText(entity); state.posts[entity.id]=entity;
@@ -101,7 +117,7 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
     if(!entity) reject('not_found','Destek önerisi bulunamadı.');
     own(entity,actorId); version(entity,cmd); entity.withdrawn=true; entity.version++; entity.updatedAt=now;
   } else {
-    if(!target) reject('not_found','Gönderi bulunamadı.');
+    if(!target||target.removed) reject('not_found','Gönderi bulunamadı.');
     if(cmd.type.startsWith('request.')) {
       if(target.kind!=='request') reject('validation','Bu kayıt bir yardım talebi değil.');
       own(target,actorId); version(target,cmd);
@@ -139,6 +155,7 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
       state.reports[entity.id]=entity;
     } else reject('validation','İşlem tanınmıyor.');
   }
+  if(entity.kind&&['post','request','repost'].includes(entity.kind)&&!canSeePost(state,actorId,entity))reject('unauthorized','Paylaşım erişim bölgenizin dışında.');
   return {ok:true,commandId:cmd.commandId,entityId:entity.id,entityVersion:entity.version};
 }
 export function createWorldService(store) {

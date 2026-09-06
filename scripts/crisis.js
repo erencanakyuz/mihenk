@@ -62,7 +62,7 @@
           (p.uid === 'me' && p.need ? '<button class="cpost__why" type="button" data-edit-request="' + p.id + '">Talebi güncelle</button>' : '') +
           '<button class="cpost__why" type="button" data-why="' + p.id + '">' +
             icon('questionc', 'ic--sm') + '<span>Gerekçe</span></button>' +
-          (p.uid !== 'me' ? '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
+          (p.uid !== 'me' && (!M.shared||p.actions.includes('observation.create')) ? '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
             (state.corroborations[p.id] ? ' data-done="1"' : '') + '>' +
             icon('checkc', 'ic--sm') + '<span>' + (state.corroborations[p.id] ? 'Beyanın alındı' : 'Ben de gördüm') + '</span></button>' : '') +
         '</div>' +

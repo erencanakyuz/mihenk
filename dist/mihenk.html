@@ -1962,7 +1962,8 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   }
   function time(at){var date=new Date(at);return date.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
   function hydrate(view){
-    currentView=view;M.sharedView=view;M.actorId=view.me.id;
+    if(currentView&&currentView.accessRevision!==view.accessRevision){cache.clear();M.SEED.byId={};}
+    currentView=view;M.sharedView=view;M.actorId=view.me.id;M.moderationOnly=view.controlMode==='moderation';
     var S=M.SEED;S.me=account(Object.assign({},view.me,{id:'me'}));S.byId.me=S.me;
     var posts=view.items.concat(view.thread?[view.thread.post]:[]);
     posts.forEach(function(p){
@@ -2181,7 +2182,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var layer = $('#modal');
     if(layer.hidden || !layer.contains(document.activeElement)){
       lastFocus = document.activeElement;lastFocusSelector=null;
-      var originAttribute=['data-thread','data-offer','data-report','data-why','data-edit-request','data-resolve'].find(function(attr){return lastFocus.hasAttribute(attr);});
+      var originAttribute=['data-thread','data-offer','data-report','data-why','data-edit-request','data-resolve','data-remove-post','data-ban-account'].find(function(attr){return lastFocus.hasAttribute(attr);});
       if(originAttribute)lastFocusSelector='['+originAttribute+'="'+CSS.escape(lastFocus.getAttribute(originAttribute))+'"]';
     }
     layer.innerHTML = '';
@@ -2786,17 +2787,17 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
           '<span class="post__handle">@' + esc(u.handle) + '</span>' +
           '<span class="post__dot">·</span>' +
           '<span class="post__time">' + esc(p.t) + '</span>' +
-          '<button class="post__more" type="button" data-report="' + esc(p.originalId||p.id) + '" aria-label="Gönderiyi bildir">' + icon('dots', 'ic--sm') + '</button>' +
+          (!M.shared||p.actions.includes('report.create')?'<button class="post__more" type="button" data-report="' + esc(p.originalId||p.id) + '" aria-label="Gönderiyi bildir">' + icon('dots', 'ic--sm') + '</button>':'') +
         '</div>' +
         '<div class="post__body">' + esc(p.text) + '</div>' +
         (p.media ? '<div class="post__media">' + S.media(p.media) + '</div>' : '') +
-        '<div class="acts">' +
+        (M.shared?M.cardActions(p):'<div class="acts">' +
           act('reply', '', 'Yanıtla', p.replies + (state.replies && state.replies[p.id] || 0)) +
           act('repost', '', 'Yeniden gönder', p.reposts + (!M.shared && rep ? 1 : 0), rep) +
           act('like', '', 'Beğen', p.likes + (!M.shared && liked ? 1 : 0), liked) +
           (M.shared ? '' : act('views', '', 'Görüntülenme', p.views)) +
           act('share', '', 'Paylaş', null) +
-        '</div>' +
+        '</div>') +
       '</div></article>';
   }
   M.postHTML = postHTML;
@@ -3029,7 +3030,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
           (p.uid === 'me' && p.need ? '<button class="cpost__why" type="button" data-edit-request="' + p.id + '">Talebi güncelle</button>' : '') +
           '<button class="cpost__why" type="button" data-why="' + p.id + '">' +
             icon('questionc', 'ic--sm') + '<span>Gerekçe</span></button>' +
-          (p.uid !== 'me' ? '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
+          (p.uid !== 'me' && (!M.shared||p.actions.includes('observation.create')) ? '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
             (state.corroborations[p.id] ? ' data-done="1"' : '') + '>' +
             icon('checkc', 'ic--sm') + '<span>' + (state.corroborations[p.id] ? 'Beyanın alındı' : 'Ben de gördüm') + '</span></button>' : '') +
         '</div>' +
@@ -3907,6 +3908,13 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   function save(id,value){try{localStorage.setItem(key(id),JSON.stringify(value));}catch(_){}}
   M.cardActions=function(p){
     var id=p.originalId||p.id;
+    if(M.shared)return '<div class="request-actions">'+(M.sharedView.operations.includes('open_thread')?'<button type="button" data-thread="'+esc(id)+'">'+M.icon('reply','ic--sm')+'Yanıtları aç</button>':'')+
+      (p.actions.includes('post.remove')?'<button type="button" data-remove-post="'+esc(id)+'" data-version="'+p.version+'">'+M.icon('close','ic--sm')+'Kaldır</button>':'')+
+      (p.actions.includes('account.ban')?'<button type="button" data-ban-account="'+esc(p.authorId)+'">Hesabı engelle</button>':'')+
+      (p.actions.includes('offer.create')?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':'')+
+      (p.actions.includes('post.react')?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button>':'')+
+      (p.actions.includes('post.repost')?'<button type="button" data-repost="'+esc(id)+'" aria-label="Yeniden paylaş" '+(p.reposted?'disabled':'')+'>'+M.icon('repost','ic--sm')+'</button>':'')+
+      (p.actions.includes('report.create')?'<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button>':'')+'</div>';
     return '<div class="request-actions"><button type="button" data-thread="'+esc(id)+'">'+M.icon('reply','ic--sm')+'<span>Yanıtlar'+(p.replies?' · '+p.replies:'')+'</span></button>'+
       (p.need&&p.uid!=='me'&&!p.resolved?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':'')+
       (M.shared?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button><button type="button" data-repost="'+esc(id)+'" aria-label="Yeniden paylaş" '+(p.reposted?'disabled':'')+'>'+M.icon('repost','ic--sm')+'</button>':'')+
@@ -3917,26 +3925,28 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       var view=await M.transport.getView({thread:id}), thread=view.thread;
       if(!thread)return;
       var p=thread.post, draft=read(id), mine=p.authorId===(M.actorId||'me');
+      var canReply=!M.shared||p.actions.includes('reply.create'),canOffer=p.kind==='request'&&!mine&&p.status==='open'&&(!M.shared||p.actions.includes('offer.create'));
       if(offer&&!draft.pending)draft.kind='offer';
       if(p.status==='closed')draft.kind='reply';
       var node=M.el('<div class="modal thread-dialog"><div class="thread-top"><h2 class="modal__h" id="thread-title">'+(p.kind==='request'?'Talebin yanıtları':'Gönderinin yanıtları')+'</h2><button type="button" data-thread-close aria-label="Yanıtları kapat">'+M.icon('close')+'</button></div>'+
         '<div class="thread-original"><b>'+esc(p.author.name)+'</b><p>'+esc(p.text)+'</p><p class="thread-location">'+M.icon('pin','ic--sm')+esc(p.location.text||p.location.region||'Konum henüz belirtilmedi')+'</p>'+
-        (p.kind==='request'?'<strong class="thread-status" data-closed="'+(p.status==='closed')+'">'+(p.status==='closed'?'Talep kapalı · Sahibi ihtiyacın karşılandığını belirtti':'Talep açık')+'</strong>':'')+
+        (p.removed?'<strong class="thread-status">Gönderi kaldırıldı</strong>':p.kind==='request'?'<strong class="thread-status" data-closed="'+(p.status==='closed')+'">'+(p.status==='closed'?'Talep kapalı · Sahibi ihtiyacın karşılandığını belirtti':'Talep açık')+'</strong>':'')+
         '<p class="thread-time">Son güncelleme: '+esc(new Date(p.updatedAt).toLocaleString('tr-TR'))+'</p>'+
-        (M.shared&&!mine?'<button class="btn btn--ghost" data-follow-account="'+esc(p.authorId)+'">'+(p.following?'Takibi bırak':'Takip et')+'</button>':'')+'</div>'+
+        (M.shared&&!mine&&p.actions?.includes('account.follow')?'<button class="btn btn--ghost" data-follow-account="'+esc(p.authorId)+'">'+(p.following?'Takibi bırak':'Takip et')+'</button>':'')+'</div>'+
         '<button type="button" class="new-updates" id="thread-refresh" hidden>Yeni durum veya yanıt var · Güncelle</button>'+
         '<div class="thread-messages" aria-label="Yanıtlar">'+(thread.earlierCount?'<p class="thread-time">Son 100 yanıt gösteriliyor.</p>':'')+
         (thread.messages.length?thread.messages.map(function(m){return '<article class="thread-message" data-message-id="'+esc(m.id)+'"><div><b>'+esc(m.author.name)+'</b><span>'+esc(new Date(m.createdAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}))+'</span></div>'+
           (m.kind==='offer'?'<strong class="offer-label">'+(m.withdrawn?'Geri çekilmiş destek önerisi':'Destek önerisi')+'</strong>':'')+'<p>'+esc(m.text)+'</p>'+
-          (m.canWithdraw?'<button type="button" class="text-action" data-withdraw="'+esc(m.id)+'" data-version="'+m.version+'">Önerimi geri çek</button>':'')+'</article>';}).join(''):'<p class="thread-empty">Henüz yanıt yok. Bildiklerinizi paylaşabilir veya bir ayrıntıyı sorabilirsiniz.</p>')+'</div>'+
-        '<form class="thread-form"><label for="thread-kind">İşlem<select id="thread-kind"><option value="reply">Yanıt yaz</option>'+
-        (p.kind==='request'&&!mine&&p.status==='open'?'<option value="offer">Destek öner</option>':'')+'</select></label>'+
+          (m.canWithdraw?'<button type="button" class="text-action" data-withdraw="'+esc(m.id)+'" data-version="'+m.version+'">Önerimi geri çek</button>':'')+'</article>';}).join(''):'<p class="thread-empty">Henüz yanıt yok.'+(canReply?' Bildiklerinizi paylaşabilir veya bir ayrıntıyı sorabilirsiniz.':canOffer?' Sunabileceğiniz desteği belirtebilirsiniz.':'')+'</p>')+'</div>'+
+        '<form class="thread-form"><label for="thread-kind">İşlem<select id="thread-kind">'+(canReply?'<option value="reply">Yanıt yaz</option>':'')+
+        (canOffer?'<option value="offer">Destek öner</option>':'')+'</select></label>'+
         '<label for="thread-text">Mesajınız<textarea id="thread-text" rows="3" maxlength="1000" placeholder="Kısa ve açık bir mesaj yazın."></textarea></label>'+
         '<p class="field-hint">Yanıtınız bu gönderiyi gören herkese görünür. Telefon veya özel adres paylaşmayın.</p>'+
         '<p id="thread-error" class="compose-error" role="alert" hidden></p><button class="btn" id="thread-send" type="submit">Yanıtı gönder</button></form></div>');
       M.openModal(node,{labelledBy:'thread-title'});activeThread={id:id,version:p.version,node:node};
       var input=node.querySelector('#thread-text'),kind=node.querySelector('#thread-kind'),button=node.querySelector('#thread-send');
-      input.value=draft.text;kind.value=draft.kind;if(!kind.value)kind.value='reply';
+      node.querySelector('form').hidden=!canReply&&!canOffer;
+      input.value=draft.text;kind.value=draft.kind;if(!kind.value)kind.value=canReply?'reply':'offer';
       function persist(){draft.text=input.value;draft.kind=kind.value;save(id,draft);}
       function label(){button.textContent=draft.pending?'Gönderimi yeniden dene':kind.value==='offer'?'Destek önerisini gönder':'Yanıtı gönder';}
       function lock(on){input.readOnly=on;kind.disabled=on;}
@@ -3995,6 +4005,13 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     };
   };
   document.addEventListener('click',async function(e){
+    var remove=e.target.closest('[data-remove-post]'),ban=e.target.closest('[data-ban-account]');
+    if(remove||ban){
+      var control=remove||ban,targetId=remove?remove.dataset.removePost:ban.dataset.banAccount;
+      var confirm=M.el('<div class="modal report-dialog"><h2 class="modal__h" id="action-title">'+(remove?'Paylaşım kaldırılsın mı?':'Hesap engellensin mi?')+'</h2><p class="modal__p">'+(remove?'Paylaşım akışta görünmeyecek. İşlem kaydı korunur.':'Bu hesap yeni paylaşım ve yanıt yazamayacak. Önceki paylaşımlar otomatik kaldırılmaz.')+'</p><p class="compose-error" role="alert" hidden></p><div class="modal__actions"><button class="btn btn--ghost" type="button" data-cancel>Vazgeç</button><button class="btn" type="button" data-confirm>'+(remove?'Paylaşımı kaldır':'Hesabı engelle')+'</button></div></div>');
+      M.openModal(confirm,{labelledBy:'action-title'});confirm.querySelector('[data-cancel]').onclick=M.closeModal;
+      confirm.querySelector('[data-confirm]').onclick=async function(){this.disabled=true;var result=await M.transport.send({type:remove?'post.remove':'account.ban',targetId:targetId,...(remove?{expectedVersion:Number(remove.dataset.version)}:{}),payload:{}});if(result.ok){M.closeModal();M.refreshShared(true);M.toast(remove?'Paylaşım kaldırıldı.':'Hesabın yeni paylaşım yapması engellendi.');}else{this.disabled=false;var error=confirm.querySelector('[role="alert"]');error.hidden=false;error.textContent=result.error.message;}};return;
+    }
     var thread=e.target.closest('[data-thread]'),offer=e.target.closest('[data-offer]'),report=e.target.closest('[data-report]'),react=e.target.closest('[data-react]'),repost=e.target.closest('[data-repost]');
     if(thread){M.openThread(thread.dataset.thread);return;}if(offer){M.openThread(offer.dataset.offer,true);return;}if(report){M.openReport(report.dataset.report,Number(report.closest('[data-version]')?.dataset.version)||undefined);return;}
     var control=react||repost;if(!control)return;

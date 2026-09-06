@@ -123,7 +123,7 @@
     var layer = $('#modal');
     if(layer.hidden || !layer.contains(document.activeElement)){
       lastFocus = document.activeElement;lastFocusSelector=null;
-      var originAttribute=['data-thread','data-offer','data-report','data-why','data-edit-request','data-resolve'].find(function(attr){return lastFocus.hasAttribute(attr);});
+      var originAttribute=['data-thread','data-offer','data-report','data-why','data-edit-request','data-resolve','data-remove-post','data-ban-account'].find(function(attr){return lastFocus.hasAttribute(attr);});
       if(originAttribute)lastFocusSelector='['+originAttribute+'="'+CSS.escape(lastFocus.getAttribute(originAttribute))+'"]';
     }
     layer.innerHTML = '';

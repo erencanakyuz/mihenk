@@ -65,17 +65,17 @@
           '<span class="post__handle">@' + esc(u.handle) + '</span>' +
           '<span class="post__dot">·</span>' +
           '<span class="post__time">' + esc(p.t) + '</span>' +
-          '<button class="post__more" type="button" data-report="' + esc(p.originalId||p.id) + '" aria-label="Gönderiyi bildir">' + icon('dots', 'ic--sm') + '</button>' +
+          (!M.shared||p.actions.includes('report.create')?'<button class="post__more" type="button" data-report="' + esc(p.originalId||p.id) + '" aria-label="Gönderiyi bildir">' + icon('dots', 'ic--sm') + '</button>':'') +
         '</div>' +
         '<div class="post__body">' + esc(p.text) + '</div>' +
         (p.media ? '<div class="post__media">' + S.media(p.media) + '</div>' : '') +
-        '<div class="acts">' +
+        (M.shared?M.cardActions(p):'<div class="acts">' +
           act('reply', '', 'Yanıtla', p.replies + (state.replies && state.replies[p.id] || 0)) +
           act('repost', '', 'Yeniden gönder', p.reposts + (!M.shared && rep ? 1 : 0), rep) +
           act('like', '', 'Beğen', p.likes + (!M.shared && liked ? 1 : 0), liked) +
           (M.shared ? '' : act('views', '', 'Görüntülenme', p.views)) +
           act('share', '', 'Paylaş', null) +
-        '</div>' +
+        '</div>') +
       '</div></article>';
   }
   M.postHTML = postHTML;

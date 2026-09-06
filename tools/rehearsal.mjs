@@ -8,9 +8,12 @@ export async function operatorCall(route,payload,config=operatorConfig()) {
   const result=await response.json();if(!response.ok)throw new Error(result.error?.message||'Operator request failed.');return result;
 }
 export async function main(args=process.argv.slice(2)){
-  const [action='list',runId,value]=args;
+  const [action='list',runId,value,role='participant']=args;
   if(action==='create')console.log(JSON.stringify(await operatorCall('/runs',{scenario:runId||'incomplete-information'})));
-  else if(action==='join')console.log(JSON.stringify(await operatorCall('/sessions',{runId,name:value})));
+  else if(action==='join')console.log(JSON.stringify(await operatorCall('/sessions',{runId,name:value,policy:role})));
+  else if(action==='roles')console.log(JSON.stringify(await operatorCall('/roles'),null,2));
+  else if(action==='access'){const {actorId,policy}=JSON.parse(readFileSync(value,'utf8'));console.log(JSON.stringify(await operatorCall('/access',{runId,actorId,policy}),null,2));}
+  else if(action==='revoke')console.log(JSON.stringify(await operatorCall('/sessions/revoke',{runId,actorId:value})));
   else if(action==='prepare'){
     const count=Number(value||5);if(!Number.isInteger(count)||count<1||count>100)throw new Error('Participant count must be 1–100.');
     const config=operatorConfig(),directory=path.join(root,'.rehearsal/runs',runId,'accounts');mkdirSync(directory,{recursive:true});
@@ -38,6 +41,6 @@ export async function main(args=process.argv.slice(2)){
     console.log(JSON.stringify(await operatorCall('/records',{runId,kind:'finding',record:{...note,mode:'directed-review',at:new Date().toISOString()}})));
   } else if(action==='replay'){const data=JSON.parse(readFileSync(runId,'utf8'));console.log(JSON.stringify(await operatorCall('/replay',data)));}
   else if(action==='list')console.log(JSON.stringify(await operatorCall('/runs'),null,2));
-  else throw new Error('Use create, join, prepare, list, start, pause, resume, stop, tick, export or replay.');
+  else throw new Error('Use create, join, prepare, list, roles, access, revoke, start, pause, resume, stop, tick, export or replay.');
 }
 if(process.argv[1]&&pathToFileURL(path.resolve(process.argv[1])).href===import.meta.url)main().catch(e=>{console.error(e.message);process.exitCode=1;});

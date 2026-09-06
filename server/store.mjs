@@ -53,6 +53,7 @@ export function openStore(filename) {
       db.prepare('INSERT INTO sessions(token,join_code,run_id,actor_id,expires) VALUES(?,?,?,?,?)').run(hash(token),hash(joinCode),runId,actorId,Date.now()+86400000);
       return { token, joinCode, actorId, runId };
     },
+    revokeSessions(runId,actorId) { return db.prepare('UPDATE sessions SET expires=0,join_code=NULL WHERE run_id=? AND actor_id=?').run(runId,actorId).changes; },
     redeem(joinCode) {
       return store.transaction(() => {
         const row = db.prepare('SELECT * FROM sessions WHERE join_code=? AND expires>?').get(hash(joinCode), Date.now());

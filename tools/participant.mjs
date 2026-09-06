@@ -5,7 +5,9 @@ import { Participant,observation } from '../lab/participant.mjs';
 
 export async function main([filename,action='view',input]=process.argv.slice(2)){
   if(!filename)throw new Error('Use participant.mjs ACCOUNT_FILE view|operations|act|retry. act reads {operation,arguments} from stdin or a JSON file.');
-  const file=path.resolve(filename),lock=file+'.lock';
+  const alias=filename.startsWith('@')?filename.slice(1):null;
+  if(alias&&!/^[a-f0-9-]{36}$/.test(alias))throw new Error('Invalid account handle.');
+  const file=alias?JSON.parse(readFileSync(path.resolve(import.meta.dirname,'../.rehearsal/interfaces',alias+'.json'),'utf8')).file:path.resolve(filename),lock=file+'.lock';
   let fd;
   try{fd=openSync(lock,'wx');}catch{
     const pid=Number(readFileSync(lock,'utf8'));

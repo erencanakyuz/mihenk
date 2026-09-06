@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-export const scenarioNames=['incomplete-information','overwhelmed-request','interrupted-coordination'];
+export const scenarioNames=['incomplete-information','overwhelmed-request','interrupted-coordination','moderation-pressure'];
 export function makeScenario(name='incomplete-information') {
   if(!scenarioNames.includes(name))throw new Error('Unknown scenario');
   const now=new Date().toISOString();
@@ -22,6 +22,7 @@ export function makeScenario(name='incomplete-information') {
     for(let i=0;i<35;i++)post('background-'+i,i%2?'resident-ada':'resident-deniz', ['Mahallede elektrik durumunu takip ediyorum.','Tanıdıklarımıza mesajla ulaşmaya çalışıyoruz.','Bugünkü gelişmeleri buradan okuyorum.'][i%3]);
   }
   if(name==='interrupted-coordination') state.schedule.push({tick:6,id:'close-request',requestId:'need-water',status:'closed'});
+  if(name==='moderation-pressure'){delete state.posts['road-report'];state.truth={};state.schedule=[];}
   return state;
 }
 export function advance(service,runId) {

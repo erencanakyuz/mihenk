@@ -2,9 +2,17 @@
   'use strict';
   if(!M.shared)return;
   var timer=null, refreshId=0, searchTimer=null;
+  M.refreshAccessControls=function(){
+    var allowed=M.sharedView.actions;
+    M.$$('#sos,[data-nav="imdat"]').forEach(function(c){c.hidden=!allowed.includes('request.create');});
+    var own=M.$('#my-requests');if(own)own.hidden=!allowed.includes('request.create')&&!M.sharedView.counts.mine;
+    M.$$('#crisis-write,#composer,.fab,[data-nav="compose"]').forEach(function(c){c.hidden=!allowed.includes('post.create');});
+    if(!allowed.includes('post.create')){var composer=M.$('#ccomposer');if(composer)composer.hidden=true;}
+  };
   M.connectionStatus=function(online){var bar=M.$('#connection-status');if(bar){bar.hidden=online;bar.textContent='Bağlantı kesildi. Son alınan bilgiler gösteriliyor; taslaklarınız korunuyor.';}};
   function query(){var crisis=M.state.tab==='crisis';return {filter:M.state.tab==='following'?'following':crisis?M.state.filter:'all',region:crisis?(M.$('#crisis-region')?.value||''):'',topic:crisis?(M.$('#crisis-topic')?.value||''):'',search:M.$('#feed-search-input')?.value||'',offset:0};}
   function redraw(){
+    M.refreshAccessControls();
     if(M.state.tab==='crisis')M.renderCrisisList();
     else {var host=M.panel(M.state.tab).querySelector('.feed__list');if(host)host.innerHTML=M.SEED.forYou.map(M.postHTML).join('');}
     var more=M.$('#shared-more');if(more)more.hidden=M.sharedView.nextOffset===null;
@@ -27,6 +35,7 @@
   };
   M.initShared=function(){
     var screen=M.$('#connection-screen');if(screen)screen.remove();
+    M.refreshAccessControls();
     var bar=M.el('<p class="connection-status" id="connection-status" role="status" hidden></p>');M.$('#topbar').after(bar);
     var updates=M.el('<details class="own-updates"><summary id="own-updates-button">Yanıtlarınız</summary><div id="own-updates-list"></div></details>');bar.after(updates);
     var more=M.el('<button class="btn btn--ghost shared-more" id="shared-more" type="button">Daha fazla göster</button>');M.$('#feeds').after(more);

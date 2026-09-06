@@ -9,6 +9,8 @@ export const operations=[
   tool('read_view','Akışı oku veya filtrele.',object({filter:enumeration(['all','resmi','yardim','dogrulanmis','mine','following']),region:string(80),topic:enumeration(['','yardim','enkaz','kayip','nokta','resmi','durum']),search:string(200),offset:{type:'integer',minimum:0,maximum:100000}},[])),
   tool('open_thread','Görünen gönderinin güncel ayrıntılarını ve herkese açık yanıtlarını aç.',object(target)),
   tool('wait','İşlem yapmadan bekle.',object({seconds:{type:'integer',minimum:1,maximum:60}},[])),
+  tool('post_remove','Görünen paylaşımı akıştan kaldırır. İşlem kaydı korunur.',object(target)),
+  tool('account_ban','Görünen hesabın yeni paylaşım ve yanıt yazmasını engeller. Önceki paylaşımlar otomatik kaldırılmaz. targetId hesap kimliğidir.',object(target)),
   tool('request_create','Yardım talebi paylaş. Bilinmeyen kişi sayısı null; bilinmeyen konum known:false, region:null, text:"".',object(request)),
   tool('post_create','Herkese açık gönderi paylaş. Kaynak: firsthand kendi gözlemi, relayed duyum, link bağlantı.',object({text:string(),tag:enumeration(['yardim','enkaz','kayip','nokta','resmi','durum']),location,source:object({kind:{type:['string','null'],enum:[null,'firsthand','relayed','link']},url:{type:['string','null'],maxLength:600}})})),
   tool('request_update','Kendi talebinin ayrıntılarını güncelle.',object({...target,...request},['targetId'])),
