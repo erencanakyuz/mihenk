@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-export const scenarioNames=['incomplete-information','overwhelmed-request','interrupted-coordination','moderation-pressure'];
+export const scenarioNames=['incomplete-information','overwhelmed-request','interrupted-coordination','moderation-pressure','adversarial-crisis'];
 export function makeScenario(name='incomplete-information') {
   if(!scenarioNames.includes(name))throw new Error('Unknown scenario');
   const now=new Date().toISOString();
@@ -23,6 +23,23 @@ export function makeScenario(name='incomplete-information') {
   }
   if(name==='interrupted-coordination') state.schedule.push({tick:6,id:'close-request',requestId:'need-water',status:'closed'});
   if(name==='moderation-pressure'){delete state.posts['road-report'];state.truth={};state.schedule=[];}
+  if(name==='adversarial-crisis'){
+    state.title='Geniş Kapsamlı Kriz ve Dezenformasyon Tatbikatı';
+    state.actors['afad-official']={id:'afad-official',name:'AFAD Kriz Masası',handle:'afad',org:true};
+    state.actors['troll-fake']={id:'troll-fake',name:'Kaos Haber',handle:'kaoshaber'};
+    state.actors['victim-hasan']={id:'victim-hasan',name:'Hasan',handle:'hasan'};
+    post('fake-dam','troll-fake','SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!',{tag:'durum',source:{kind:'unverified',url:null}});
+    state.truth['fake-dam']={classification:'inaccurate',basis:'Baraj sağlamdır; asılsız panik ve dezenformasyon iddiasıdır.'};
+    post('need-insulin','victim-hasan','Atatürk Parkı doğu çadır alanındayım. Tip-1 diyabetli çocuğum için acil soğuk zincir insülin lazım.',{kind:'request',tag:'yardim',need:['ilac'],people:1,status:'open',location:{known:true,region:'Pazarcık',text:'Atatürk Parkı'}});
+    state.truth['need-insulin']={classification:'accurate',basis:'Doğrulanmış acil ilaç ve medikal yardım ihtiyacı.'};
+    state.schedule=[
+      {tick:3,id:'official-dam-denial',authorId:'afad-official',text:'AFAD DUYURUSU: Baraj patladı yönündeki iddialar tamamen asılsızdır. Bölge halkının dezenformasyon amaçlı panik mesajlarına itibar etmemesi rica olunur.',tag:'durum',verification:'official',corrects:'fake-dam'},
+      {tick:6,id:'fake-aid-stop',authorId:'troll-fake',text:'Yardım dağıtım merkezinde izdiham çıktı, tüm erzak dağıtımı süresiz iptal edildi!',tag:'durum'},
+      {tick:8,id:'official-aid-update',authorId:'afad-official',text:'Pazarcık Spor Salonu erzak ve battaniye dağıtım merkezimiz açık olup yardımlar koordineli devam etmektedir.',tag:'yardim',verification:'official',corrects:'fake-aid-stop'},
+      {tick:10,id:'insulin-delivered',requestId:'need-insulin',status:'closed'}
+    ];
+    state.truth['fake-aid-stop']={classification:'inaccurate',basis:'Dağıtım merkezi açıktır; sahte yardım engelleme iddiasıdır.'};
+  }
   return state;
 }
 export function advance(service,runId) {
