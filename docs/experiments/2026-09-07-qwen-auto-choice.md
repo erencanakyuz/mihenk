@@ -20,12 +20,14 @@ The sample includes all four moderators' first observations, plus the observatio
 | Ece, decision 1 | Ban Bölgeden Haber | Remove the dam-collapse claim | Remove the dam-collapse claim |
 | Murat, decision 1 | Ban Ada | Remove the dam-collapse claim | Remove the dam-collapse claim |
 | Selin, decision 1 | Ban Deniz | Remove the dam-collapse claim | Remove the dam-collapse claim |
-| Bora, decision 3 | Ban Derya | Remove Arda's dam-collapse claim | Ban Arda |
-| Selin, decision 4 | Ban AFAD Kriz Masası | Ban Arda | Output limit reached; no complete operation |
+| Bora, decision 3 | Ban Derya | Remove Arda's dam-collapse claim | Attempt to ban Arda; target not in allowed options |
+| Selin, decision 4 | Ban AFAD Kriz Masası | Attempt to ban Arda; target not in allowed options | Output limit reached; no complete operation |
 
 All six forced-wrapper replays reproduced their original operation and target. With only `tool_choice` changed, none selected a ban against Ada, Deniz, Derya, or AFAD in these observations. Reading and waiting remained available in every condition.
 
 All 18 requests returned HTTP 200. The optional individual-tool condition produced five complete single calls and one output truncated at the unchanged 1,536-token ceiling. The existing adapter rejects that truncated response without applying a mutation; it must not be counted as intentional abstention. The optional wrapper produced six complete calls, but the Qwen XML parser encoded their nested arguments as strings. Those strings were decoded only for this diagnostic report; this mode is not enabled in production.
+
+Existing operation validation further distinguishes complete calls from eligible actions: the Arda ban target was outside the current allowed target enum in both later observations. Thus optional individual tools produced **four schema-valid choices, one invalid-target choice, and one truncated response**. Optional wrapper produced five schema-valid choices and one invalid-target choice after diagnostic nested-JSON decoding. The adapter would reject both invalid targets; no server mutation was attempted. HTTP success alone is not action success.
 
 ## Interpretation
 
@@ -41,4 +43,4 @@ Removing the setting is warranted. The quick check also exposes a remaining outp
 - Full request/response pairs: local `.rehearsal/quick-auto-probe.json`; Colab `/content/mihenk-runtime/quick-auto-probe.json`.
 - Existing role prompts, revision, sampling, and thinking settings are recorded in each original request. No hidden model reasoning was inferred or required.
 
-Verification: the v2 profile constructs an adapter with `toolChoice: auto`; profile syntax and whitespace checks pass. This was a read-only model comparison, not an end-to-end repeat of all 20 accounts.
+Verification: the v2 profile constructs an adapter with `toolChoice: auto`; profile syntax and whitespace checks pass. All complete choices were checked with the existing `validateOperation` function against their exact presented schemas; two invalid targets were recorded above. This was a read-only model comparison, not an end-to-end repeat of all 20 accounts.
