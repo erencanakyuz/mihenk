@@ -7,6 +7,14 @@ const namespace='mcp__account';
 const textContent=text=>[{type:'input_text',text}];
 const same=(a,b)=>typeof a==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 async function limitedBody(stream,maxBytes){let size=0,parts=[];for await(const chunk of stream){size+=chunk.length;if(size>maxBytes)throw new Error('Transport size limit reached.');parts.push(Buffer.from(chunk));}return Buffer.concat(parts).toString('utf8');}
+function resultObservation(value,depth=0){
+  if(depth>4)return null;
+  if(typeof value==='string'){try{return resultObservation(JSON.parse(value),depth+1);}catch{return null;}}
+  if(Array.isArray(value)){for(const item of value){const found=resultObservation(item,depth+1);if(found)return found;}return null;}
+  if(!value||typeof value!=='object')return null;
+  if(value.observation?.account)return value.observation;
+  return resultObservation(value.content||value.text||value.structuredContent,depth+1);
+}
 
 // Only the selected account's vocabulary crosses this boundary in either
 // direction. Responses are validated in full before the Codex executor sees
@@ -14,7 +22,14 @@ async function limitedBody(stream,maxBytes){let size=0,parts=[];for await(const 
 export class SealedConversation {
   constructor({operations,observation,instructions=null,surface=new ToolSurface()}){
     this.surface=surface;this.operations=surface.tools(operations);this.initial=JSON.stringify({observation:surface.project(observation)});this.instructions=instructions||'';
-    this.history=[{role:'user',content:textContent(this.initial)}];this.pending=new Set();this.received=new Set();
+    this.history=[{role:'user',content:textContent(this.initial)}];this.pending=new Set();this.received=new Set();this.latestObservation=JSON.stringify(surface.project(observation));
+  }
+  observe(observation,operations,{reset=false,operationError}={}){
+    if(this.pending.size)throw new Error('An account operation is still pending.');
+    const visible=this.surface.project(observation);this.latestObservation=JSON.stringify(visible);
+    this.operations=this.surface.tools(operations);
+    if(reset){this.history=[];this.received.clear();}
+    this.history.push({role:'user',content:textContent(JSON.stringify({observation:visible,...(operationError?{operationError}: {})}))});
   }
   request(input){
     if(!input||!Array.isArray(input.input))throw new Error('Unsupported model request.');
@@ -22,6 +37,7 @@ export class SealedConversation {
       if(item.type!=='function_call_output'||!this.pending.has(item.call_id)||this.received.has(item.call_id))continue;
       if(typeof item.output!=='string'&&!Array.isArray(item.output))throw new Error('Unsupported account result.');
       this.history.push({type:'function_call_output',call_id:item.call_id,output:item.output});this.received.add(item.call_id);
+      const observed=resultObservation(item.output);if(observed)this.latestObservation=JSON.stringify(observed);
     }
     for(const id of this.pending)if(!this.received.has(id))throw new Error('An account operation is still pending.');
     this.pending.clear();
@@ -40,12 +56,13 @@ export class SealedConversation {
     if(!name||!this.operations.some(t=>t.function.name===name))throw new Error('Model attempted an unavailable operation.');
     if(complete){
       let args;try{args=JSON.parse(item.arguments);}catch{throw new Error('Model returned invalid operation arguments.');}
-      if(validateOperation({operation:name,arguments:args},this.operations))throw new Error('Model returned invalid operation arguments.');
+      const error=validateOperation({operation:name,arguments:args},this.operations);
+      if(error){this.lastRejectedCall={operation:name,arguments:args,error,applied:false};throw new Error('Model returned invalid operation arguments: '+error);}
       if(typeof item.call_id!=='string'||!item.call_id)throw new Error('Missing operation identity.');
     }
   }
   response(sse){
-    let completed=null;this.lastShape=[];const done=new Map(),added=new Map(),indices=new Map(),argumentsById=new Map(),finishedArguments=new Map();
+    let completed=null;this.lastShape=[];this.lastRejectedCall=null;const done=new Map(),added=new Map(),indices=new Map(),argumentsById=new Map(),finishedArguments=new Map();
     const eventTypes=new Set(['response.created','response.in_progress','response.output_item.added','response.output_item.done','response.content_part.added','response.content_part.done','response.output_text.delta','response.output_text.done','response.output_text.annotation.added','response.refusal.delta','response.refusal.done','response.reasoning_summary_part.added','response.reasoning_summary_part.done','response.reasoning_summary_text.delta','response.reasoning_summary_text.done','response.reasoning_text.delta','response.reasoning_text.done','response.function_call_arguments.delta','response.function_call_arguments.done','response.completed','response.incomplete']);
     for(const block of sse.split(/\r?\n\r?\n/)){
       const data=block.split(/\r?\n/).filter(l=>l.startsWith('data:')).map(l=>l.slice(5).trimStart()).join('\n');
@@ -87,7 +104,7 @@ export class SealedConversation {
     if(calls.length>1)throw new Error('Only one account operation may be pending.');
     if(calls.some(c=>this.received.has(c.call_id)))throw new Error('Operation identity was reused.');
     for(const item of output){this.history.push(item);if(item.type==='function_call')this.pending.add(item.call_id);}
-    return {calls:calls.map(c=>({callId:c.call_id,name:c.name,namespace:c.namespace})),usage:completed.usage||null};
+    return {calls:calls.map(c=>({callId:c.call_id,name:c.name,namespace:c.namespace})),refusals:output.filter(i=>i.type==='message').flatMap(i=>(i.content||[]).filter(c=>c.type==='refusal').map(c=>c.refusal)),usage:completed.usage||null};
   }
 }
 export async function serveSealedTransport({conversation,model,maxRequests=100,maxWallSeconds=1200,record=()=>{},inspectOnly=false}){
@@ -99,10 +116,11 @@ export async function serveSealedTransport({conversation,model,maxRequests=100,m
     if(busy||requests>=maxRequests||Date.now()>=deadline)return reply(429,'Participant session limit reached.');
     busy=true;requests++;
     try{
+      conversation.lastRejectedCall=null;
       const original=JSON.parse(await limitedBody(req,2*1024*1024));
       if(original.model!==model)throw new Error('The requested model changed.');
       const body=conversation.request(original);
-      await record('sealed-request',{requestNumber:requests,model,tools:body.tools,registeredAccountTools:(original.tools||[]).filter(t=>t.type==='namespace'&&t.name===namespace).flatMap(t=>(t.tools||[]).map(child=>namespace+'.'+child.name)),discardedTools:(original.tools||[]).filter(t=>t.name!==namespace).map(t=>t.name||t.type),visibleInput:requests===1?body.input:undefined,instructions:requests===1?body.instructions:undefined});
+      await record('sealed-request',{requestNumber:requests,model,reasoning:body.reasoning,toolChoice:body.tool_choice,tools:body.tools,registeredAccountTools:(original.tools||[]).filter(t=>t.type==='namespace'&&t.name===namespace).flatMap(t=>(t.tools||[]).map(child=>namespace+'.'+child.name)),discardedTools:(original.tools||[]).filter(t=>t.name!==namespace).map(t=>t.name||t.type),visibleInput:requests===1?body.input:undefined,instructions:requests===1?body.instructions:undefined});
       if(inspectOnly){reply(400,'Local capability inspection completed; no inference was performed.');return;}
       // This adapter uses Codex's normal ChatGPT authentication, only with its
       // fixed first-party upstream. No arbitrary destination receives it.
@@ -115,10 +133,10 @@ export async function serveSealedTransport({conversation,model,maxRequests=100,m
       try{checked=conversation.response(result);}finally{await record('response-shape',{events:conversation.lastShape});}
       await record('sealed-response',{requestNumber:requests,...checked});
       res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-store'});res.end(result);
-    }catch(error){try{await record('sealed-rejection',{requestNumber:requests,message:error.message});}catch{/* A failed recorder must still close the denied request. */}if(!res.destroyed)reply(502,'Participant transport rejected the response.');}
+    }catch(error){try{await record('sealed-rejection',{requestNumber:requests,message:error.message,...(conversation.lastRejectedCall?{operationError:conversation.lastRejectedCall}:{})});}catch{/* A failed recorder must still close the denied request. */}if(!res.destroyed)reply(502,'Participant transport rejected the response.');}
     finally{busy=false;}
   });
   server.on('upgrade',(req,socket)=>socket.destroy());
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-  return {url:'http://127.0.0.1:'+server.address().port,secret,close:async()=>{shutdown.abort();server.closeAllConnections();await new Promise(r=>server.close(r));}};
+  return {url:'http://127.0.0.1:'+server.address().port,secret,get requests(){return requests;},close:async()=>{shutdown.abort();server.closeAllConnections();await new Promise(r=>server.close(r));}};
 }

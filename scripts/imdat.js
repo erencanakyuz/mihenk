@@ -49,7 +49,7 @@
         '<div class="flow__body">' + regionsHTML() +
         '<label class="field"><span class="field__l">Adres tarifi</span>' +
         '<input type="text" id="addr" placeholder="Mahalle, sokak, bina tarifi" maxlength="240" autocomplete="off"></label><p class="field-hint">Bu bilgi talebinizle birlikte herkese görünür. Bir mahalle veya yakınınızdaki belirgin bir yer yeterli.</p>' +
-        '<button class="location-skip" type="button" data-flow="unknown-location">Konumu bilmiyorum, devam et</button></div>';
+        '<button class="location-skip" type="button" data-flow="unknown-location">Konumdan emin değilim, devam et</button><p class="field-hint">Yazdığınız ilçe ve yer tarifi korunur.</p></div>';
     }
     if (i === 2) {
       return '<h2 class="flow__q" id="flowq">Kaç kişisiniz?</h2>' +
@@ -124,7 +124,7 @@
       }).filter(Boolean);
       $('#review').innerHTML =
         row('İhtiyaç', names.length ? names.join(', ') : 'Belirtilmedi') +
-        row('Konum', (st.region ? st.region + ' · ' : '') + (st.addr || 'Konum belirtilmedi')) +
+        row('Konum', (st.region ? st.region + ' · ' : '') + (st.addr || (st.region ? '' : 'Konum belirtilmedi')) + (!st.locationKnown && (st.addr || st.region) ? ' · Konum kesin değil' : '')) +
         row('Kişi sayısı', st.people === null ? 'Henüz bilinmiyor' : st.people + ' kişi') +
         row('Görünürlük', 'Kriz Var akışı · Doğrulanmamış olarak başlar');
     }
@@ -192,7 +192,7 @@
       var f = e.target.closest('[data-flow]');
       if (!f) return;
       if (f.dataset.flow === 'close') { M.closeModal(); return; }
-      if (f.dataset.flow === 'unknown-location') { st.addr = ''; st.region = ''; st.locationKnown = false; st.step = 2; render(1); return; }
+      if (f.dataset.flow === 'unknown-location') { st.locationKnown = false; st.step = 2; render(1); return; }
       if (f.dataset.flow === 'unknown-people') { st.people = null; st.step = 3; render(1); return; }
       if (f.dataset.flow === 'requests') {
         M.closeModal(); M.setTabInstant('crisis');
@@ -202,7 +202,7 @@
       if (f.dataset.flow === 'prev') { st.step = Math.max(0, st.step - 1); render(-1); return; }
       if (f.dataset.flow === 'next') {
         var error = st.step === 0 && !st.need.length ? 'Devam etmek için bir ihtiyaç seçin.' :
-          st.step === 1 && !st.addr.trim() && !st.region ? 'Bir yer tarifi yazın veya Konumu bilmiyorum ile devam edin.' :
+          st.step === 1 && !st.addr.trim() && !st.region ? 'Bir yer tarifi yazın veya Konumdan emin değilim ile devam edin.' :
           st.step === 2 && st.people !== null && (!/^\d+$/.test(String(st.people)) || !Number.isSafeInteger(Number(st.people)) || Number(st.people) < 1) ? 'Pozitif bir tam sayı yazın veya Kişi sayısını bilmiyorum ile devam edin.' : '';
         if (error) {
           var note = $('#flow-error');
@@ -213,7 +213,7 @@
         if (st.step === 3) {
           var submitting=st;
           if(M.shared || M.transport) {
-            st.pending=st.pending || {commandId:crypto.randomUUID(),type:st.editId?'request.update':'request.create',payload:{need:st.need.slice(),people:st.people===null?null:Number(st.people),location:{text:st.addr.trim(),region:st.region||null,known:!!(st.addr.trim()||st.region)}}};
+            st.pending=st.pending || {commandId:crypto.randomUUID(),type:st.editId?'request.update':'request.create',payload:{need:st.need.slice(),people:st.people===null?null:Number(st.people),location:{text:st.addr.trim(),region:st.region||null,known:st.locationKnown}}};
             if(st.editId){st.pending.targetId=st.editId;st.pending.expectedVersion=st.version;}
             st.sending=true;persist();f.disabled=true;f.textContent='Gönderiliyor…';
             var result=await M.transport.send(st.pending);submitting.sending=false;
@@ -244,7 +244,7 @@
           if (!post) { post = { id: 'help-' + Date.now().toString(36), uid: 'me', tag: 'yardim', v: 'unverified' }; M.state.extraCrisis.unshift(post); }
           post.text = names.join(', ') + ' ihtiyacı var.' + (st.people === null ? ' Kişi sayısı henüz bilinmiyor.' : ' ' + st.people + ' kişi.');
           post.need = st.need.slice(); post.people = st.people === null ? null : Number(st.people); post.loc = st.addr.trim() || st.region || 'Konum henüz belirtilmedi'; post.region = st.region;
-          post.location = { text: st.addr.trim(), region: st.region || null, known: !!(st.addr.trim() || st.region) };
+          post.location = { text: st.addr.trim(), region: st.region || null, known: st.locationKnown };
           post.t = st.editId ? 'güncellendi' : 'şimdi';
           post.v = 'unverified'; delete M.state.verified[post.id];
           if (M.renderCrisisList) M.renderCrisisList();

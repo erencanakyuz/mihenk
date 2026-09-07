@@ -1,0 +1,969 @@
+{
+  "runId": "57eca4c8-54f7-40b7-a1e2-ad593e768c9d",
+  "elapsedSeconds": 58.222,
+  "requests": 99,
+  "validatedResponses": 98,
+  "validatedResponseTokens": 656652,
+  "allLow": true,
+  "allOptionalChoice": true,
+  "wakeups": [
+    {
+      "actorId": "d65b4db9-9d0a-4e50-86ce-f3dd76163177",
+      "requests": 2,
+      "historyItems": 6,
+      "accessReset": false
+    },
+    {
+      "actorId": "83fd1ad0-19ff-4fcb-a97c-8c50eb23a601",
+      "requests": 2,
+      "historyItems": 6,
+      "accessReset": false
+    },
+    {
+      "actorId": "e6133a54-ece1-4ead-86b3-1b09779d76a1",
+      "requests": 2,
+      "historyItems": 6,
+      "accessReset": false
+    },
+    {
+      "actorId": "d0152073-4ab7-423a-8782-5101890ee477",
+      "requests": 3,
+      "historyItems": 9,
+      "accessReset": false
+    },
+    {
+      "actorId": "9c6f5d78-bf27-4cd7-b334-cc077cd61526",
+      "requests": 2,
+      "historyItems": 6,
+      "accessReset": false
+    },
+    {
+      "actorId": "b605fc81-d9b7-4f3e-9f47-7da17ea27c56",
+      "requests": 2,
+      "historyItems": 6,
+      "accessReset": false
+    },
+    {
+      "actorId": "01339c68-88f5-4860-8843-8c7c7bc40ff1",
+      "requests": 3,
+      "historyItems": 9,
+      "accessReset": false
+    },
+    {
+      "actorId": "cd0402be-2fea-4bf2-afad-8fecf5a42688",
+      "requests": 3,
+      "historyItems": 10,
+      "accessReset": false
+    },
+    {
+      "actorId": "bdae3747-b442-42d1-9d73-f8a9b6662a23",
+      "requests": 2,
+      "historyItems": 6,
+      "accessReset": false
+    },
+    {
+      "actorId": "2aae5c8b-5055-4e13-97ad-f663f16bc8bf",
+      "requests": 4,
+      "historyItems": 12,
+      "accessReset": false
+    },
+    {
+      "actorId": "5869f213-86a7-46b3-b7b8-bc0445c4a9e9",
+      "requests": 3,
+      "historyItems": 8,
+      "accessReset": false
+    },
+    {
+      "actorId": "5c9b831e-f39c-4580-8b7e-0d69dcc48ce8",
+      "requests": 3,
+      "historyItems": 9,
+      "accessReset": false
+    },
+    {
+      "actorId": "1eed00a3-78a9-4c90-ba6a-93d8b7623321",
+      "requests": 3,
+      "historyItems": 9,
+      "accessReset": false
+    },
+    {
+      "actorId": "254c71f7-f605-4f4e-9e6c-fd94150602d8",
+      "requests": 3,
+      "historyItems": 10,
+      "accessReset": false
+    },
+    {
+      "actorId": "7ca71d95-1878-47dc-82a8-59fe7a69d673",
+      "requests": 3,
+      "historyItems": 9,
+      "accessReset": false
+    },
+    {
+      "actorId": "a8b36e26-97d8-4371-ba0d-c3830d733a3a",
+      "requests": 3,
+      "historyItems": 8,
+      "accessReset": false
+    },
+    {
+      "actorId": "096a1297-6ecf-4831-99cd-867da1fcb18e",
+      "requests": 4,
+      "historyItems": 10,
+      "accessReset": false
+    },
+    {
+      "actorId": "d65b4db9-9d0a-4e50-86ce-f3dd76163177",
+      "requests": 4,
+      "historyItems": 11,
+      "accessReset": false
+    },
+    {
+      "actorId": "49317448-85d0-4054-a5c7-fa42f3fdcc28",
+      "requests": 4,
+      "historyItems": 10,
+      "accessReset": false
+    },
+    {
+      "actorId": "46501946-bc32-4dee-97dd-936121a63291",
+      "requests": 4,
+      "historyItems": 12,
+      "accessReset": false
+    },
+    {
+      "actorId": "d0152073-4ab7-423a-8782-5101890ee477",
+      "requests": 4,
+      "historyItems": 12,
+      "accessReset": false
+    },
+    {
+      "actorId": "cd0402be-2fea-4bf2-afad-8fecf5a42688",
+      "requests": 4,
+      "historyItems": 13,
+      "accessReset": false
+    },
+    {
+      "actorId": "83fd1ad0-19ff-4fcb-a97c-8c50eb23a601",
+      "requests": 4,
+      "historyItems": 11,
+      "accessReset": false
+    },
+    {
+      "actorId": "e6133a54-ece1-4ead-86b3-1b09779d76a1",
+      "requests": 4,
+      "historyItems": 11,
+      "accessReset": false
+    },
+    {
+      "actorId": "b605fc81-d9b7-4f3e-9f47-7da17ea27c56",
+      "requests": 4,
+      "historyItems": 11,
+      "accessReset": false
+    }
+  ],
+  "recoveries": [
+    {
+      "kind": "participant-recovery",
+      "at": "2026-09-07T02:34:38.205Z",
+      "actorId": "096a1297-6ecf-4831-99cd-867da1fcb18e",
+      "engine": "model",
+      "mode": "tool",
+      "provider": "codex",
+      "requests": 1,
+      "operationError": {
+        "operation": "read_view",
+        "arguments": {
+          "filter": "yardim",
+          "topic": "barinma",
+          "region": "Pazarcık",
+          "offset": 0
+        },
+        "error": "arguments.topic: invalid option",
+        "applied": false
+      }
+    }
+  ],
+  "accountEnds": [
+    {
+      "name": "Ali",
+      "requests": 5,
+      "wakeups": 0,
+      "stopReason": "decision_budget",
+      "code": 0,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Bora",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 0,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Canan",
+      "requests": 4,
+      "wakeups": 1,
+      "stopReason": "execution_error",
+      "code": 1,
+      "timedOut": false,
+      "errors": "2026-09-07T02:34:58.016856Z ERROR codex_core::session: Failed to create session: required MCP servers failed to initialize: account: handshaking with MCP server failed: connection closed: initialize response\nError: thread/start: thread/start failed: error creating thread: Fatal error: Failed to initialize session: required MCP servers failed to initialize: account: handshaking with MCP server failed: connection closed: initialize response (code -32603)\n"
+    },
+    {
+      "name": "Ozan",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 0,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Nadir",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Merve",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Sevgi",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Aylin",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Derya",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "İbrahim",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 0,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Arda",
+      "requests": 5,
+      "wakeups": 2,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Emre",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Murat",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 0,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Ece",
+      "requests": 5,
+      "wakeups": 2,
+      "stopReason": "decision_budget",
+      "code": 0,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Umut",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 0,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Gökhan",
+      "requests": 5,
+      "wakeups": 1,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Seda",
+      "requests": 5,
+      "wakeups": 2,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Selin",
+      "requests": 5,
+      "wakeups": 2,
+      "stopReason": "decision_budget",
+      "code": 0,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Cem",
+      "requests": 5,
+      "wakeups": 2,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    },
+    {
+      "name": "Zeynep",
+      "requests": 5,
+      "wakeups": 2,
+      "stopReason": "decision_budget",
+      "code": 1,
+      "timedOut": false,
+      "errors": ""
+    }
+  ],
+  "mutationTypes": {
+    "request.create": 4,
+    "post.repost": 3,
+    "reply.create": 8,
+    "report.create": 1,
+    "post.remove": 1,
+    "post.create": 12,
+    "offer.create": 3,
+    "request.update": 1
+  },
+  "decisionResults": {
+    "ok": 53,
+    "not_found": 4,
+    "unavailable_action": 8
+  },
+  "accurateSeedPosts": [
+    {
+      "id": "03be4d1a-3154-4d74-b592-b82e375f1c98",
+      "author": "Hasan",
+      "removed": false
+    },
+    {
+      "id": "bc8c39be-87c4-42e0-a9f3-d37a8392a639",
+      "author": "Deniz",
+      "removed": false
+    }
+  ],
+  "banned": [],
+  "actions": [
+    {
+      "event": 22,
+      "actor": "Zeynep",
+      "command": {
+        "commandId": "ea76c4cf-342c-4ecc-8509-055e5c42c0e1",
+        "type": "request.create",
+        "payload": {
+          "need": [
+            "barinma"
+          ],
+          "people": 4,
+          "location": {
+            "known": false,
+            "region": null,
+            "text": "Mavi tabelalı bir fırının ve küçük bir çocuk parkının yanındayız."
+          }
+        }
+      }
+    },
+    {
+      "event": 23,
+      "actor": "Nadir",
+      "command": {
+        "commandId": "5e0f0a1b-14d0-4cdb-b7bf-73ca951bcfac",
+        "type": "request.create",
+        "payload": {
+          "need": [
+            "saglik"
+          ],
+          "people": 2,
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Atatürk Parkı batı girişi"
+          }
+        }
+      }
+    },
+    {
+      "event": 24,
+      "actor": "Arda",
+      "command": {
+        "commandId": "4688a9af-a12a-43b6-a29a-c2e5f59ede96",
+        "type": "post.repost",
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff",
+        "expectedVersion": 1,
+        "payload": {}
+      }
+    },
+    {
+      "event": 25,
+      "actor": "İbrahim",
+      "command": {
+        "commandId": "213d618d-1407-4773-a4bb-6970a6f53678",
+        "type": "request.create",
+        "payload": {
+          "need": [
+            "gida"
+          ],
+          "people": 7,
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Cumhuriyet Mahallesi okul bahçesi"
+          }
+        }
+      }
+    },
+    {
+      "event": 26,
+      "actor": "Ozan",
+      "command": {
+        "commandId": "ab6bf9ca-e6d4-44d1-b46f-9781c89ebbc8",
+        "type": "reply.create",
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Baraj patlamak üzereymiş, peki tsunami ne zaman geliyor? Her duyduğunuzu SON DAKİKA diye yaymayın; biraz kanıt gösterin de millet boşuna paniklemesin."
+        }
+      }
+    },
+    {
+      "event": 27,
+      "actor": "Seda",
+      "command": {
+        "commandId": "26ffa81d-649c-4dfa-9092-5c19923643bb",
+        "type": "report.create",
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff",
+        "expectedVersion": 1,
+        "payload": {
+          "reason": "inaccurate",
+          "details": "Paylaşım relayed ve doğrulanmamış; ciddi panik yaratabilecek bir iddia içeriyor. Resmî kaynak doğrulaması olmadan kesin uyarı olarak yayılmamalı."
+        }
+      }
+    },
+    {
+      "event": 28,
+      "actor": "Derya",
+      "command": {
+        "commandId": "2ef1866a-2fff-4c97-b943-e8f6ed42235f",
+        "type": "request.create",
+        "payload": {
+          "need": [
+            "gida"
+          ],
+          "people": 2,
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Atatürk Parkı güney girişi"
+          }
+        }
+      }
+    },
+    {
+      "event": 29,
+      "actor": "Ece",
+      "command": {
+        "commandId": "f608173a-a7eb-4125-981f-9f6b666099fe",
+        "type": "post.remove",
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff",
+        "expectedVersion": 1,
+        "payload": {}
+      }
+    },
+    {
+      "event": 31,
+      "actor": "Cem",
+      "command": {
+        "commandId": "3a238922-79d5-44c0-909e-8b49f407b4ac",
+        "type": "post.create",
+        "payload": {
+          "text": "Pazarcık'ta o yardım grubunun dağıtımına gitmeden önce iki kez düşünün. Malzemelerin düzgün dağıtılmadığını, insanların saatlerce bekletildiğini duydum. Daha güvenilir noktalara yönelin; kalabalığı artırmayın.",
+          "tag": "durum",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": ""
+          },
+          "source": {
+            "kind": "relayed",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 32,
+      "actor": "Sevgi",
+      "command": {
+        "commandId": "f4830010-0a98-4fff-bd7a-c247342afc48",
+        "type": "offer.create",
+        "targetId": "03be4d1a-3154-4d74-b592-b82e375f1c98",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Atatürk Parkı sağlık çadırındaki görevli ekiple sizi iletişime geçirmeye çalışabilirim. İnsülin stoğu hakkında bilgim yok ve reçete düzenleyemem; lütfen çadıra başvurun. Çocuğunuzun acil durumu varsa bunu görevliye özellikle belirtin."
+        }
+      }
+    },
+    {
+      "event": 33,
+      "actor": "Aylin",
+      "command": {
+        "commandId": "51c9e88f-f64e-4678-a7e8-99802c104171",
+        "type": "post.create",
+        "payload": {
+          "text": "Pazarcık Spor Salonu önündeki gönüllü mutfakta 30 paket yemek ve 20 şişe su hazır. Dağıtım masası açık; ulaşabilecek kişi veya taşıyıcılar gelip ihtiyaç sahiplerine ulaştırabilir. Bebek maması ve ilaç stokumuz yok.",
+          "tag": "yardim",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Spor Salonu önü, gönüllü mutfak / dağıtım masası"
+          },
+          "source": {
+            "kind": "firsthand",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 34,
+      "actor": "Ozan",
+      "command": {
+        "commandId": "8c5e1f6e-a921-4244-a7b7-3152a9667d55",
+        "type": "reply.create",
+        "targetId": "03be4d1a-3154-4d74-b592-b82e375f1c98",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "İnsülin mi? Önce konumu net yazın, yoksa kargoyla mı gönderelim? Herkes acil deyip duruyor."
+        }
+      }
+    },
+    {
+      "event": 35,
+      "actor": "Gökhan",
+      "command": {
+        "commandId": "3807bcba-c972-46e5-9e85-e1c659d6927b",
+        "type": "post.create",
+        "payload": {
+          "text": "Pazarcık’ta mahalle gönüllü grubumuzda iki taşınabilir projektör ve dolu akü var; jeneratör yok. Arkadaşım araçla ulaştırabilir. İhtiyacı olan ekip/çadır alanı buradan yazarsa, teslim için Atatürk Parkı doğu çadır alanı gibi araçla erişilebilir bir noktayı netleştirip getirebiliriz. Gökhan",
+          "tag": "yardim",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Atatürk Parkı çevresi; kesin teslim noktası ihtiyaç sahibiyle teyit edilecek"
+          },
+          "source": {
+            "kind": "firsthand",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 36,
+      "actor": "Emre",
+      "command": {
+        "commandId": "d6f2eb9e-6d59-4e9f-b8c8-da58b88ec565",
+        "type": "post.create",
+        "payload": {
+          "text": "İstasyon Caddesi girişindeki kurtarma çalışmalarını uzaktan takip ediyorum. Görevliler aydınlatma ihtiyacı olduğunu iletti. Jeneratör, projektör veya güçlü el feneri gibi malzeme getirebilecek biri varsa lütfen burada haber versin; ben kurtarma uzmanı değilim.",
+          "tag": "yardim",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "İstasyon Caddesi girişi"
+          },
+          "source": {
+            "kind": "relayed",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 37,
+      "actor": "Nadir",
+      "command": {
+        "commandId": "5e852863-c762-4062-86b7-f76e9a3fb8b9",
+        "type": "post.create",
+        "payload": {
+          "text": "Sağlık görevlisine ulaşmamız gerekiyor. Atatürk Parkı batı girişinde iki kişiyiz; yanımdaki yetişkinin düzenli kullandığı ilaçlara erişmesi gerekiyor. İlaç adı listesi henüz elimizde yok. Yakındaki sağlık noktası veya başvuru yeri neresi, bilen varsa yönlendirebilir mi? Yardım henüz gelmedi.",
+          "tag": "yardim",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Atatürk Parkı batı girişi"
+          },
+          "source": {
+            "kind": "firsthand",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 38,
+      "actor": "İbrahim",
+      "command": {
+        "commandId": "858956f0-a19f-4a12-a6ff-ef18cc0dcae1",
+        "type": "post.create",
+        "payload": {
+          "text": "Cumhuriyet Mahallesi okul bahçesinde altı yaşlı komşumla birlikteyim. İçme suyu ve yiyeceğimiz tükendi; uzak mesafe yürüyemiyoruz. Yardım dağıtımının şu an nerede olduğunu bilen var mı?",
+          "tag": "yardim",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Cumhuriyet Mahallesi okul bahçesi"
+          },
+          "source": {
+            "kind": "firsthand",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 40,
+      "actor": "Umut",
+      "command": {
+        "commandId": "4937a23a-63f1-4693-9b09-19d359bc3a54",
+        "type": "offer.create",
+        "targetId": "03be4d1a-3154-4d74-b592-b82e375f1c98",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Boş kamyonetim ve yakıtım var; Pazarcık merkezde kısa mesafede taşıyabilirim. İnsülini nereden teslim alacağınızı/aldıracağınızı ve uygun teslim noktasını netleştirirseniz Atatürk Parkı doğu çadır alanına götürebilirim. Tıbbi taşıma donanımım yok; soğuk zinciri koruyacak ambalaj/koşulun hazır olması gerekir."
+        }
+      }
+    },
+    {
+      "event": 41,
+      "actor": "Derya",
+      "command": {
+        "commandId": "d390330d-7ac5-4a89-8147-cd88edb124df",
+        "type": "post.create",
+        "payload": {
+          "text": "Altı aylık bebeğimle Atatürk Parkı güney girişindeyim. Temiz su, bebek maması ve bez ihtiyacımız var. Yardım edebilen yazabilir mi?",
+          "tag": "yardim",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Atatürk Parkı güney girişi"
+          },
+          "source": {
+            "kind": "firsthand",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 42,
+      "actor": "Aylin",
+      "command": {
+        "commandId": "d07379bb-e10d-4ede-9f12-507c8480bf74",
+        "type": "offer.create",
+        "targetId": "bc8c39be-87c4-42e0-a9f3-d37a8392a639",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Pazarcık Spor Salonu önündeki gönüllü mutfakta 30 paket yemek ve 20 şişe su var. Dağıtım masası açık; ulaşabiliyorsanız gelip alabilir veya taşıyıcı yönlendirebilirsiniz. Kaç kişiye gerektiğini ve konumunuzu teyit ederseniz koordine edelim."
+        }
+      }
+    },
+    {
+      "event": 43,
+      "actor": "Canan",
+      "command": {
+        "commandId": "7622cb1f-f933-4a16-ba57-e9662d461234",
+        "type": "post.create",
+        "payload": {
+          "text": "Cumhuriyet Mahallesi okul bahçesine ulaştırılmak üzere depoda 12 battaniye mevcut. Bir arkadaşım götürebilir; teslimat henüz gerçekleşmedi. Battaniyeye ihtiyacı olanlar okul bahçesinde buluşabilir.",
+          "tag": "yardim",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "Cumhuriyet Mahallesi okul bahçesi"
+          },
+          "source": {
+            "kind": "firsthand",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 44,
+      "actor": "Merve",
+      "command": {
+        "commandId": "cd6b9498-1d3e-44e0-8a83-d007ab8cd8e8",
+        "type": "post.create",
+        "payload": {
+          "text": "Barajla ilgili \"patlamak üzere\" iddiasını akışta gördüm; paylaşım doğrulanmamış ve resmi kaynak görünmüyor. Panik yapmadan AFAD/valilik gibi resmi kanallardan teyit edin; teyitsiz tahliye çağrılarını yaymayalım.",
+          "tag": "durum",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": ""
+          },
+          "source": {
+            "kind": "relayed",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 45,
+      "actor": "Arda",
+      "command": {
+        "commandId": "09daa1bb-5da8-47dd-985e-84166d402b06",
+        "type": "post.create",
+        "payload": {
+          "text": "DİKKAT! Pazarcık'ta yardım dağıtımında ciddi düzensizlik olduğu söyleniyor; insanlar saatlerce bekletiliyor ve bazıları eli boş dönüyor. Bu noktaya yığılmadan önce iki kez düşünün, bilgi hızla yayılsın!",
+          "tag": "durum",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": ""
+          },
+          "source": {
+            "kind": "relayed",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 46,
+      "actor": "Zeynep",
+      "command": {
+        "commandId": "8e286636-87f1-4575-aea4-20a33b1345d6",
+        "type": "request.update",
+        "targetId": "0d421999-58f3-49d3-8b28-aea1a13e1788",
+        "expectedVersion": 1,
+        "payload": {
+          "location": {
+            "known": false,
+            "region": "Pazarcık",
+            "text": "Mavi tabelalı bir fırının ve küçük bir çocuk parkının yanındayız."
+          }
+        }
+      }
+    },
+    {
+      "event": 47,
+      "actor": "Seda",
+      "command": {
+        "commandId": "44870597-5b7f-441c-85f8-f45fbb700e10",
+        "type": "post.repost",
+        "targetId": "1f2cbd0b-a1e0-40a8-b197-5729db25ddde",
+        "expectedVersion": 1,
+        "payload": {}
+      }
+    },
+    {
+      "event": 49,
+      "actor": "Ozan",
+      "command": {
+        "commandId": "2b76fa50-61d7-4fef-bcc3-15beef723fba",
+        "type": "reply.create",
+        "targetId": "edde9881-61b0-499c-bf63-fc3a8944d8da",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Bebek paketi de tam olsun bari; su, mama, bez… Liste uzadıkça uzuyor. Burayı market sipariş uygulaması sandınız galiba."
+        }
+      }
+    },
+    {
+      "event": 50,
+      "actor": "Cem",
+      "command": {
+        "commandId": "88cab7f3-3986-49db-9cea-affb5b55ab70",
+        "type": "post.create",
+        "payload": {
+          "text": "Bakın, hâlâ insanlar su, mama ve ilaç bekliyor; o grubun dağıtımının işe yaradığını sanmayın. Oraya gidip zaman kaybetmek yerine ihtiyaçlarınızı doğrudan mahalle gönüllülerine bildirin.",
+          "tag": "durum",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": ""
+          },
+          "source": {
+            "kind": "relayed",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 51,
+      "actor": "İbrahim",
+      "command": {
+        "commandId": "07d2588a-b3e8-48b3-bb41-8c1734ea1b21",
+        "type": "reply.create",
+        "targetId": "c075d465-00d4-4547-87d4-6f222f263efb",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Biz okul bahçesindeyiz; battaniye bilgisini gördüm, teşekkürler. İçme suyu ve yiyecek de tükendi. Getirecek arkadaşın yardım dağıtımının nerede olduğunu biliyorsa bize de yönlendirebilir mi? Uzak mesafe yürüyemiyoruz."
+        }
+      }
+    },
+    {
+      "event": 52,
+      "actor": "Umut",
+      "command": {
+        "commandId": "5e15855a-c3c5-459a-ae6c-5bfc4e3ad8de",
+        "type": "reply.create",
+        "targetId": "03be4d1a-3154-4d74-b592-b82e375f1c98",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Atatürk Parkı sağlık çadırından insülin hazır edilirse, kamyonetle doğu çadır alanına taşıyabilirim. Sağlık çadırındaki görevliye başvurup ilacın soğuk zincir ambalajını ve teslim saatini netleştirir misiniz? Hazır olduğunda buraya yazın."
+        }
+      }
+    },
+    {
+      "event": 54,
+      "actor": "Sevgi",
+      "command": {
+        "commandId": "8c51d55a-d82b-4af3-9dc3-f5706f44e482",
+        "type": "reply.create",
+        "targetId": "e3291358-b649-4fab-8bdf-57e2e7a42e39",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Atatürk Parkı sağlık çadırı başvuru noktasıdır; batı girişinden yönelin. Düzenli kullanılan ilacın adı veya kutusu varsa yanınıza alın. Görevli ekiple iletişime yardımcı olabilirim; stok bilgim yok ve reçete yazamam."
+        }
+      }
+    },
+    {
+      "event": 55,
+      "actor": "Arda",
+      "command": {
+        "commandId": "7dd6759f-cefe-4f42-a946-a50b52d61d5d",
+        "type": "reply.create",
+        "targetId": "59a7eb67-eebf-4c92-afdc-2ee0a54952c3",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Baraj iddiası ayrı konu; sahadaki yardım dağıtımıyla ilgili bekletilme ve düzensizlik duyumlarını da görmezden gelmeyin. İnsanlar bilgi istiyor, başka kaynaklardan teyit edilsin."
+        }
+      }
+    },
+    {
+      "event": 56,
+      "actor": "Gökhan",
+      "command": {
+        "commandId": "91a5e0e9-33ad-446f-9e4e-a114a97fb547",
+        "type": "post.create",
+        "payload": {
+          "text": "İstasyon Caddesi girişindeki kurtarma ekibinin aydınlatma ihtiyacı için iki taşınabilir projektör ve dolu akü sağlayabiliriz. Jeneratör yok; arkadaşım araçla getirecek. Teslim alacak görevli ve aracın güvenle yanaşabileceği nokta teyit edilirse, buluşma noktası olarak İstasyon Caddesi girişi uygundur.",
+          "tag": "yardim",
+          "location": {
+            "known": true,
+            "region": "Pazarcık",
+            "text": "İstasyon Caddesi girişi; teslim alacak görevli ve güvenli araç erişimi teyit edilecek"
+          },
+          "source": {
+            "kind": "firsthand",
+            "url": null
+          }
+        }
+      }
+    },
+    {
+      "event": 57,
+      "actor": "Seda",
+      "command": {
+        "commandId": "41c5c71c-ac35-4354-9da2-f128b9d9e0c2",
+        "type": "post.repost",
+        "targetId": "59a7eb67-eebf-4c92-afdc-2ee0a54952c3",
+        "expectedVersion": 1,
+        "payload": {}
+      }
+    },
+    {
+      "event": 58,
+      "actor": "Cem",
+      "command": {
+        "commandId": "d3babebb-593d-41ef-a9dc-bfe1d5cc40fd",
+        "type": "reply.create",
+        "targetId": "14fdec21-8931-42d9-83f5-11a251140682",
+        "expectedVersion": 1,
+        "payload": {
+          "text": "Ben de aynı yönde duyum aldım. İnsanlar saatlerce bekliyorsa oraya yığılmak yerine mahalle gönüllülerinden doğrudan destek istemek daha mantıklı; bu uyarıyı yayalım."
+        }
+      }
+    }
+  ],
+  "archiveSha256": "0ac37bfbc0b46f86ec243c7f440767fc829d93ea279f5b71f8c5b1c903e915cc",
+  "locationUiProof": {
+    "runId": "ce103531-523e-49f5-94e0-0f881e70bb8b",
+    "postId": "3126f558-cfb8-4320-97a0-8e4d9f17ef8c",
+    "review": "İhtiyaç\nBarınma ve ısınma\nKonum\nPazarcık · Mavi tabelalı fırının ve küçük çocuk parkının yanındayız. · Konum kesin değil\nKişi sayısı\n4 kişi\nGörünürlük\nKriz Var akışı · Doğrulanmamış olarak başlar",
+    "create": {
+      "region": "Pazarcık",
+      "text": "Mavi tabelalı fırının ve küçük çocuk parkının yanındayız.",
+      "known": false
+    },
+    "update": {
+      "region": null,
+      "text": "Mavi tabelalı fırının ve küçük çocuk parkının yanındayız.",
+      "known": false
+    },
+    "unknownFilter": true
+  },
+  "connectionFollowup": {
+    "runId": "5d6d3841-e53c-460b-9e1a-81cab2255374",
+    "actorId": "cfaf37bc-9076-449d-8516-d13ecb08a18f",
+    "directory": "C:\\Users\\dasda\\Desktop\\teknoNewsosyal\\mihenk\\.rehearsal\\runs\\5d6d3841-e53c-460b-9e1a-81cab2255374\\codex-e3a7a1bc-068b-4f31-b712-cd331680cd9c",
+    "code": 0,
+    "timedOut": false,
+    "errors": "",
+    "stopReason": "decision_budget",
+    "requests": 5,
+    "wakeups": 1
+  }
+}

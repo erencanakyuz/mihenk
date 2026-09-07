@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { run } from './runner.mjs';
-import { ADVERSARIAL_CONFIG, ADVERSARIAL_WORKFLOW_V2_CONFIG } from './adversarial-crisis-20.mjs';
+import { ADVERSARIAL_CONFIG, ADVERSARIAL_WORKFLOW_V2_CONFIG, ADVERSARIAL_FICTIONAL_INSTRUCTIONS } from './adversarial-crisis-20.mjs';
 import { evaluateAdversarialCohort } from './adversarial-evaluation.mjs';
 import { operatorConfig, operatorCall } from '../tools/rehearsal.mjs';
 
@@ -161,6 +161,7 @@ function reportMarkdown(evaluation, runId) {
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   if(options.workflow!==undefined&&!['baseline','v2'].includes(options.workflow))throw new Error('Use --workflow=baseline or --workflow=v2.');
+  if(options['adversary-frame']!==undefined&&!['original','fictional'].includes(options['adversary-frame']))throw new Error('Use --adversary-frame=original or --adversary-frame=fictional.');
   const profile=options.workflow==='v2'?ADVERSARIAL_WORKFLOW_V2_CONFIG:ADVERSARIAL_CONFIG;
   const engine = options.engine || ADVERSARIAL_CONFIG.engine || 'model';
   const decisions = positiveInteger(options.decisions, ADVERSARIAL_CONFIG.maxDecisionsPerParticipant);
@@ -183,6 +184,7 @@ async function main() {
 
   const runConfig = {
     ...profile,
+    ...(options['adversary-frame']==='fictional'?{participantInstructions:ADVERSARIAL_FICTIONAL_INSTRUCTIONS}:{}),
     engine,
     inferenceConcurrency: concurrency,
     maxDecisionsPerParticipant: decisions,

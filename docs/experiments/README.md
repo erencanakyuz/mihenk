@@ -12,12 +12,17 @@ Bu klasör operatör içindir. Model değerlendirmeleri, senaryo etiketleri ve b
 | [İlk kampanya raporu](../agent-experiment-report.md) | 24 oturumluk kampanyanın karşılaştırmaları ve kapsanmayan senaryolar |
 | [Senaryo bankası](../agent-experiment-handoff.md) | 72 senaryo, koşullar ve çalıştırma bilgisi |
 | [Yetki sınırları](../participant-access.md) | Rol, araç, görünüm ve sunucu kontrolleri |
+| [Luna low / Qwen kısa karşılaştırması](2026-09-07-luna-low-qwen-short.md) | İki ayrı dünyada 20'şer hesap; gerçek paralellik, moderasyon ve rol davranışı bulguları |
+| [Luna kurgu çerçevesi karşılaştırması](2026-09-07-luna-roleplay-framing.md) | Üç saldırgan rolde açık kurgu çerçevesi davranışı değiştirdi; aynı koşullarda kısa karşılaştırma |
+| [Devam döngüsü ve belirsiz konum](2026-09-07-luna-watch-location.md) | Yeni akışla uyanan Luna hesapları, korunan yer tarifi ve 20 hesaplı koşunun sonuçları |
 
 Yeni kayıtta model profili, koşul/karşılaştırma, run ID, görünüm modu, prompt ve araç sunumu, gerçekten gösterilen kanıtlar, girişimler, sunucu sonuçları ve bitiş nedeni bulunmalı. Gözlem, yorum ve uygulama değişikliğini ayır. Sonuçları düzeltirken eski davranışı yeni kodla yeniden yazma.
 
 Ham girdiler ve günlükler `.rehearsal/runs/RUN_ID/` altında kalır. Hesap dosyaları ve operatör anahtarları buraya kopyalanmaz. Kalıcı JSON yalnız seçilmiş sonuç alanlarını içerir.
 
 ## Luna'yı nasıl etiketliyoruz?
+
+Önceki kampanyaların ayarı `max`; 7 Eylül kısa paralel karşılaştırması açıkça `low` kullandı. Düşünme ayarı her deneyde ayrıca kaydedilir.
 
 **gpt-5.6-luna**, düşünme ayarı **max**, OpenAI üzerinden çalışan kapalı model. Proje sahibinin çalışma değerlendirmesi: **orta düzey zekâlı, düşünen; Qwen3.5-9B gibi küçük yerel modellerden belirgin biçimde daha yetenekli olması beklenen, en güçlü frontier modellerin altında konumlanan model**. Bu bir proje etiketi; Qwen ile aynı koşullarda yapılmış ölçüm değil.
 

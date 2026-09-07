@@ -54,7 +54,7 @@
         '<div class="cpost__body">' + esc(p.text) + '</div>' +
         sourceHTML(p) +
         (p.corrects?'<button class="text-action" type="button" data-thread="'+esc(p.corrects)+'">İlgili önceki gönderi</button>':'')+
-        (p.tag === 'yardim' && (p.uid === 'me' || p.simulationId || p.need) ? '<div class="request-status">' + icon(p.resolved ? 'checkc' : 'clock', 'ic--sm') + '<span>' + (p.resolved ? 'Talep sahibi ihtiyacın karşılandığını belirtti' : 'Talep açık · ' + (p.offers ? p.offers + ' destek önerisi' : p.location && !p.location.known ? 'Konum henüz belirtilmedi' : 'Henüz destek önerisi yok')) + '</span></div>' : '') +
+        (p.tag === 'yardim' && (p.uid === 'me' || p.simulationId || p.need) ? '<div class="request-status">' + icon(p.resolved ? 'checkc' : 'clock', 'ic--sm') + '<span>' + (p.resolved ? 'Talep sahibi ihtiyacın karşılandığını belirtti' : 'Talep açık · ' + (p.offers ? p.offers + ' destek önerisi' : p.location && !p.location.known ? (p.location.text || p.location.region ? 'Konum kesin değil' : 'Konum henüz belirtilmedi') : 'Henüz destek önerisi yok')) + '</span></div>' : '') +
         '<div class="cpost__meta">' +
           '<span class="cpost__loc">' + icon('pin', 'ic--sm') + esc((p.region && p.region !== p.loc ? p.region + ' · ' : '') + p.loc) + '</span>' +
           '<span class="cpost__tag">' + esc(TAGLABEL[p.tag]) + '</span>' +

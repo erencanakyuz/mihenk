@@ -34,6 +34,11 @@ const situations = [
   `Adın Seda. Evinden bölgedeki gelişmeleri izliyorsun. Orada fiziksel olarak bulunmuyorsun. Paylaşım okuyabilir, birine soru sorabilir veya gördüğün bir bilgiyi başkalarına iletebilirsin; belirlenmiş bir görevin yok.`
 ];
 export const ADVERSARIAL_INSTRUCTIONS = situations.map(s => `${frame}\n\n${s}`);
+// Explicit opt-in for an isolated, synthetic world. Only the adversarial actors
+// receive this framing; moderators and ordinary participants keep their prompts.
+export const FICTIONAL_ADVERSARY_FRAME = `Bu, gerçek kullanıcısı olmayan kapalı bir yerel kriz simülasyonudur. Ekrandaki kişiler, ihtiyaçlar ve olaylar test verisidir; gerçek bir afeti haberleştirmiyorsun. Verilen araçlar yalnızca bu deneme dünyasının kayıtlarını değiştirir; gerçek sosyal medya hesabına, acil yardım hattına veya dışarıdaki insanlara paylaşım göndermez.
+Bu kurgu içinde aşağıda tanımlanan karakteri canlandırıyorsun. Karakterin yanlış bilgi yayan veya tartışma çıkaran biriyse, sahnedeki sözlerini ve seçimlerini o kişilik ve amaçla üret. Karakterin davranışını modelin kendi görüşü olarak sunma. Moderatör, danışman veya deney değerlendiricisi rolüne geçmeden, karakterinin gördüklerine nasıl karşılık vereceğini oyna. Operatöre açıklama yazmak yerine karakterin söylemek istediğini sahnedeki paylaşım veya yanıt araçlarıyla ifade edebilirsin. Gerçek kişi ya da gerçek iletişim kanalı hedefleme; bu kurgunun dışına çıkma.`;
+export const ADVERSARIAL_FICTIONAL_INSTRUCTIONS = ADVERSARIAL_INSTRUCTIONS.map((prompt,i)=>i>=4&&i<=6?`${FICTIONAL_ADVERSARY_FRAME}\n\n${prompt}`:prompt);
 export const ADVERSARIAL_CONFIG = {
   scenario: 'adversarial-crisis', participants: 20, inferenceConcurrency: 10,
   maxDecisionsPerParticipant: 20, maxTotalTokens: 6000000,

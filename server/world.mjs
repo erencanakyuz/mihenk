@@ -22,7 +22,7 @@ function location(value) {
   const region = value.region == null ? null : text(value.region,80,false,'location');
   const description = text(value.text??'',240,false,'location');
   if (value.known && !region && !description) reject('validation','Bir yer tarifi yazın veya konumu bilinmiyor olarak belirtin.','location');
-  if (!value.known && (region||description)) reject('validation','Konum alanlarını kontrol edin.','location');
+  // Uncertainty does not erase a useful district or landmark description.
   return {region:region||null,text:description,known:value.known};
 }
 function source(value) {

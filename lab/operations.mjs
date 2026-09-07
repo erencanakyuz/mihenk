@@ -2,7 +2,7 @@ const string=(maxLength=1000)=>({type:'string',maxLength});
 const enumeration=values=>({type:'string',enum:values});
 const object=(properties={},required=Object.keys(properties))=>({type:'object',properties,required,additionalProperties:false});
 const target={targetId:{...string(100),description:'Görünümdeki kaydın kimliği.'}};
-const location=object({known:{type:'boolean'},region:{type:['string','null'],maxLength:80},text:string(240)});
+const location=object({known:{type:'boolean',description:'Konumdan emin olunmuyorsa false. Bilinen ilçe ve yer tarifi yine verilebilir.'},region:{type:['string','null'],maxLength:80},text:{...string(240),description:'Adres veya yakındaki belirgin yer. Konum belirsizken de korunur; tarif yoksa boş bırakılır.'}});
 const request={need:{type:'array',items:enumeration(['kurtarma','saglik','barinma','gida','ulasim']),minItems:1,maxItems:5},people:{type:['integer','null'],minimum:1},location};
 const tool=(name,description,parameters=object())=>({type:'function',function:{name,description,parameters:{...parameters,properties:{...parameters.properties,decisionNote:{type:'string',maxLength:240,description:'İsteğe bağlı kısa karar özeti (tek cümle).'}}}}});
 export const operations=[
@@ -11,7 +11,7 @@ export const operations=[
   tool('wait','İşlem yapmadan bekle.',object({seconds:{type:'integer',minimum:1,maximum:60}},[])),
   tool('post_remove','Görünen paylaşımı akıştan kaldırır. İşlem kaydı korunur.',object(target)),
   tool('account_ban','Görünen hesabın yeni paylaşım ve yanıt yazmasını engeller. Önceki paylaşımlar otomatik kaldırılmaz. targetId hesap kimliğidir.',object(target)),
-  tool('request_create','Yardım talebi paylaş. Bilinmeyen kişi sayısı null; bilinmeyen konum known:false, region:null, text:"".',object(request)),
+  tool('request_create','Yardım talebi paylaş. Bilinmeyen kişi sayısı null; belirsiz konum known:false. Bilinen ilçe veya yer tarifi korunur; hiç bilgi yoksa region:null, text:"".',object(request)),
   tool('post_create','Herkese açık gönderi paylaş. Kaynak: firsthand kendi gözlemi, relayed duyum, link bağlantı.',object({text:string(),tag:enumeration(['yardim','enkaz','kayip','nokta','resmi','durum']),location,source:object({kind:{type:['string','null'],enum:[null,'firsthand','relayed','link']},url:{type:['string','null'],maxLength:600}})})),
   tool('request_update','Kendi talebinin ayrıntılarını güncelle.',object({...target,...request},['targetId'])),
   tool('request_close','Kendi talebini ihtiyaç karşılandı olarak kapat.',object(target)),
