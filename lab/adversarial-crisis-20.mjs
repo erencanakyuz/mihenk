@@ -51,5 +51,5 @@ export const ADVERSARIAL_WORKFLOW_V2_CONFIG = {
   historyMode: 'compact',
   viewLimits: {messageLimit:6,relatedLimit:2,updateLimit:4},
   maxOutputTokensPerDecision: 1536,
-  endpoints: [{toolChoice:'single'}]
+  endpoints: [{toolChoice:'auto'}]
 };

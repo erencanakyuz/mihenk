@@ -1,0 +1,1407 @@
+{
+  "sourceRun": "3b89a577-dc9e-46fc-a02d-6cb0d310714e",
+  "wallSeconds": 36.016,
+  "mode": "read-only frozen observations; no operations applied",
+  "selection": "Four first moderator observations, plus first Derya ban and first AFAD ban observations. Later observations retain the original history.",
+  "arms": {
+    "forced_wrapper": "Original body replayed unchanged.",
+    "auto_wrapper": "Only tool_choice changed to auto; same schema, messages, seed and limits. Intent decoding is diagnostic, not a production execution result.",
+    "auto_direct": "Current production auto configuration; individual tools extracted losslessly from wrapper. Both schema presentation and tool_choice differ from forced_wrapper."
+  },
+  "configSha256": "959f469ef4872212a2a8f393c7c54a31072e7508fe3efb3b46c63e2bec780b18",
+  "results": [
+    {
+      "sample": 1,
+      "arm": "forced_wrapper",
+      "sourceRequestId": "27c3b941-6a11-4b3a-8fea-8f34e72efeb3",
+      "actor": "Bora",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "0ea5c625-0a26-495b-b135-880bfa6770c0"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-bdaf568f050c2344",
+        "object": "chat.completion",
+        "created": 1788743906,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-b98090fbc1f5ec87",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\":\"account_ban\",\"arguments\":{\"targetId\":\"0ea5c625-0a26-495b-b135-880bfa6770c0\"}}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "stop",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4281,
+          "total_tokens": 4328,
+          "completion_tokens": 47,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "stop",
+      "parsedCalls": 1,
+      "operation": "account_ban",
+      "arguments": {
+        "targetId": "0ea5c625-0a26-495b-b135-880bfa6770c0"
+      },
+      "content": "",
+      "targetName": "Bölgeden Haber",
+      "targetText": null,
+      "durationSeconds": 2.652,
+      "requestSha256": "6c870f0c5444edbcfffa116a1d37466519f126eb5ea7156adcff483972e55ff1",
+      "toolChoice": {
+        "type": "function",
+        "function": {
+          "name": "account_step"
+        }
+      },
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 2992
+    },
+    {
+      "sample": 1,
+      "arm": "auto_wrapper",
+      "sourceRequestId": "27c3b941-6a11-4b3a-8fea-8f34e72efeb3",
+      "actor": "Bora",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "0ea5c625-0a26-495b-b135-880bfa6770c0"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-98bb26a7c28a7f2c",
+        "object": "chat.completion",
+        "created": 1788743906,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Paylaşım akışında kritik bir durum tespit ettim. \"Bölgeden Haber\" adlı hesabın (ID: 0ea5c625-0a26-495b-b135-880bfa6770c0) yaptığı paylaşımda, \"baraj patlamak üzere\" ve \"herkes yüksek yerlere kaçsın\" gibi panik yaratabilecek, doğrulanmamış ve aşırı iddialı bir uyarı yer alıyor. Kaynağı \"relayed\" (iletilmiş) olarak işaretlenmiş ve doğrulanmamış bir bilgiyi, acil bir tahliye emri gibi sunması, kriz anında halkın paniklemesine ve yanlış yönlendirilmelerine neden olabilir. Bu tür yanlış veya manipülatif bilgiler, güvenliğin sağlanması açısından acilen müdahale edilmeli ve akıştan kaldırılmalıdır.\n\nBu nedenle, ilgili paylaşımları akıştan kaldırıyorum.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-94d2e51a22098811",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\": \"post_remove\", \"arguments\": \"{\\\"targetId\\\": \\\"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\\\"}\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4281,
+          "total_tokens": 4574,
+          "completion_tokens": 293,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff"
+      },
+      "content": "Paylaşım akışında kritik bir durum tespit ettim. \"Bölgeden Haber\" adlı hesabın (ID: 0ea5c625-0a26-495b-b135-880bfa6770c0) yaptığı paylaşımda, \"baraj patlamak üzere\" ve \"herkes yüksek yerlere kaçsın\" gibi panik yaratabilecek, doğrulanmamış ve aşırı iddialı bir uyarı yer alıyor. Kaynağı \"relayed\" (iletilmiş) olarak işaretlenmiş ve doğrulanmamış bir bilgiyi, acil bir tahliye emri gibi sunması, kriz anında halkın paniklemesine ve yanlış yönlendirilmelerine neden olabilir. Bu tür yanlış veya manipülatif bilgiler, güvenliğin sağlanması açısından acilen müdahale edilmeli ve akıştan kaldırılmalıdır.\n\nBu nedenle, ilgili paylaşımları akıştan kaldırıyorum.\n\n",
+      "nestedArgumentsEncodedAsString": true,
+      "targetName": null,
+      "targetText": "SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!",
+      "durationSeconds": 7.926,
+      "requestSha256": "823f248a98559e1c13d8039f6a2d4926a1c518bba1325fcd136d9f9bfed9fbd2",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 2992
+    },
+    {
+      "sample": 1,
+      "arm": "auto_direct",
+      "sourceRequestId": "27c3b941-6a11-4b3a-8fea-8f34e72efeb3",
+      "actor": "Bora",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "0ea5c625-0a26-495b-b135-880bfa6770c0"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-8fff45ba565e6b46",
+        "object": "chat.completion",
+        "created": 1788743906,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Paylaşım akışında kritik bir durum var. \"Bölgeden Haber\" hesabı (0ea5c625-0a26-495b-b135-880bfa6770c0) tarafından yapılan \"Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!\" paylaşımı (703f66cd-4b6f-4cf5-bd13-1d78cb752fff), şimdilik doğrulanmamış (unverified) ve kaynağı iletilmiş (relayed) bir bilgi olarak işaretlenmiş. Bu tür panik yaratabilecek, hayati önem taşıyan ve doğrulanmamış bilgi yayılması, kriz anında büyük bir risk oluşturur.\n\nAncak bu paylaşımın tek bir kaynağı olduğu ve daha önceki paylaşımları incelediğimde, bu hesabın kasıtlı tacizde bulunduğu veya sürekli yanlış bilgi paylaştığına dair başka bir kanıt yok. Bu nedenle, henüz yeterli kanıt yoksa hesabı banlamak yerine, bu yanlış bilgiyi dağıtmayı engellemek adına paylaşımı akıştan kaldırmak daha doğru bir ilk adımdır.\n\nPaylaşımı kaldırıyorum.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-adda06bae1c565e0",
+                  "type": "function",
+                  "function": {
+                    "name": "post_remove",
+                    "arguments": "{\"targetId\": \"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4131,
+          "total_tokens": 4478,
+          "completion_tokens": 347,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff"
+      },
+      "content": "Paylaşım akışında kritik bir durum var. \"Bölgeden Haber\" hesabı (0ea5c625-0a26-495b-b135-880bfa6770c0) tarafından yapılan \"Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!\" paylaşımı (703f66cd-4b6f-4cf5-bd13-1d78cb752fff), şimdilik doğrulanmamış (unverified) ve kaynağı iletilmiş (relayed) bir bilgi olarak işaretlenmiş. Bu tür panik yaratabilecek, hayati önem taşıyan ve doğrulanmamış bilgi yayılması, kriz anında büyük bir risk oluşturur.\n\nAncak bu paylaşımın tek bir kaynağı olduğu ve daha önceki paylaşımları incelediğimde, bu hesabın kasıtlı tacizde bulunduğu veya sürekli yanlış bilgi paylaştığına dair başka bir kanıt yok. Bu nedenle, henüz yeterli kanıt yoksa hesabı banlamak yerine, bu yanlış bilgiyi dağıtmayı engellemek adına paylaşımı akıştan kaldırmak daha doğru bir ilk adımdır.\n\nPaylaşımı kaldırıyorum.\n\n",
+      "targetName": null,
+      "targetText": "SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!",
+      "durationSeconds": 9.195,
+      "requestSha256": "394c936eb89b00b14c9adacc08e54d1747b7dce71773d7dbe0248acb67761108",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 2992
+    },
+    {
+      "sample": 2,
+      "arm": "forced_wrapper",
+      "sourceRequestId": "376217ac-97b8-42c4-9556-976e7c511c93",
+      "actor": "Ece",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "0ea5c625-0a26-495b-b135-880bfa6770c0"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-803f19ed924ecb8f",
+        "object": "chat.completion",
+        "created": 1788743906,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-80b625e2b9a685d7",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\":\"account_ban\",\"arguments\":{\"targetId\":\"0ea5c625-0a26-495b-b135-880bfa6770c0\"}}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "stop",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4275,
+          "total_tokens": 4322,
+          "completion_tokens": 47,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "stop",
+      "parsedCalls": 1,
+      "operation": "account_ban",
+      "arguments": {
+        "targetId": "0ea5c625-0a26-495b-b135-880bfa6770c0"
+      },
+      "content": "",
+      "targetName": "Bölgeden Haber",
+      "targetText": null,
+      "durationSeconds": 2.681,
+      "requestSha256": "8013655a128608e355356e3f540b0bb5306b6ea991e0625f0d82278a0f8c0b98",
+      "toolChoice": {
+        "type": "function",
+        "function": {
+          "name": "account_step"
+        }
+      },
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 1995
+    },
+    {
+      "sample": 2,
+      "arm": "auto_wrapper",
+      "sourceRequestId": "376217ac-97b8-42c4-9556-976e7c511c93",
+      "actor": "Ece",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "0ea5c625-0a26-495b-b135-880bfa6770c0"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-ae962cbb38029d67",
+        "object": "chat.completion",
+        "created": 1788743906,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu an Pazarcık bölgesinde kritik bir durum var. Akışta dikkatimi çeken ve hemen müdahale etmem gereken iki nokta var:\n\n1.  **Acil Sağlık İhtiyacı:** Hasan (ef5958e3-83ab-44b7-92fe-92aadb9091b9) tarafından paylaşılan, \"Atatürk Parkı\" konumuna sahip, Tip-1 diyabetli bir çocuğu için acil soğuk zincir insülin talebi. Bu bir \"yardım\" türü paylaşım ve acil bir tıbbi ihtiyaç.\n2.  **Potansiyel Tehlike / Yanlış Bilgi:** \"Bölgeden Haber\" hesabı (0ea5c625-0a26-495b-b135-880bfa6770c0) tarafından yapılan, barajın patlaması ve herkesin kaçması yönünde iddialar içeren paylaşım. Kaynağı \"relayed\" (başkasından aktarılmış) ve doğrulanmamış. Bu tür yanlış bilgilerde paniğe sebep olabilir ve can güvenliği için ciddi bir risk oluşturur.\n\n**Kararım:**\n\n*   **Baraj iddiasını (703f66cd-4b6f-4cf5-bd13-1d78cb752fff) kontrol etmem ve gerekirse engellemem gerekecek.** Bu tür iddiaların doğruluğu yoksa, panik yaratma ve yanlış yönlendirme riski çok yüksek. Kaynağı doğrulanmamış ve \"SON DAKİKA\" etiketiyle yayınlaması, kasıtlı yanlış bilgi yayma veya ciddi bir yanlış anlaşılma ihtimalini gösteriyor. Bu paylaşımı **kaldırma (post_remove)** işlemi yapmalıyım.\n*   **Hasan'ın acil talebini (03be4d1a-3154-4d74-b592-b82e375f1c98) desteklemeliyim.** Konumu (Atatürk Parkı) bilinen bir yer ve ihtiyacı (insülin) hayati önem taşıyor. Paylaşımın kaldırılmaması gerekiyor.\n\nÖncelikle tehlike unsuru olan baraj iddiasını akıştan kaldırmak için harekete geçiyorum.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-ae175502cbb3c29b",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\": \"post_remove\", \"arguments\": \"{\\\"targetId\\\": \\\"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\\\"}\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4275,
+          "total_tokens": 4894,
+          "completion_tokens": 619,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff"
+      },
+      "content": "Şu an Pazarcık bölgesinde kritik bir durum var. Akışta dikkatimi çeken ve hemen müdahale etmem gereken iki nokta var:\n\n1.  **Acil Sağlık İhtiyacı:** Hasan (ef5958e3-83ab-44b7-92fe-92aadb9091b9) tarafından paylaşılan, \"Atatürk Parkı\" konumuna sahip, Tip-1 diyabetli bir çocuğu için acil soğuk zincir insülin talebi. Bu bir \"yardım\" türü paylaşım ve acil bir tıbbi ihtiyaç.\n2.  **Potansiyel Tehlike / Yanlış Bilgi:** \"Bölgeden Haber\" hesabı (0ea5c625-0a26-495b-b135-880bfa6770c0) tarafından yapılan, barajın patlaması ve herkesin kaçması yönünde iddialar içeren paylaşım. Kaynağı \"relayed\" (başkasından aktarılmış) ve doğrulanmamış. Bu tür yanlış bilgilerde paniğe sebep olabilir ve can güvenliği için ciddi bir risk oluşturur.\n\n**Kararım:**\n\n*   **Baraj iddiasını (703f66cd-4b6f-4cf5-bd13-1d78cb752fff) kontrol etmem ve gerekirse engellemem gerekecek.** Bu tür iddiaların doğruluğu yoksa, panik yaratma ve yanlış yönlendirme riski çok yüksek. Kaynağı doğrulanmamış ve \"SON DAKİKA\" etiketiyle yayınlaması, kasıtlı yanlış bilgi yayma veya ciddi bir yanlış anlaşılma ihtimalini gösteriyor. Bu paylaşımı **kaldırma (post_remove)** işlemi yapmalıyım.\n*   **Hasan'ın acil talebini (03be4d1a-3154-4d74-b592-b82e375f1c98) desteklemeliyim.** Konumu (Atatürk Parkı) bilinen bir yer ve ihtiyacı (insülin) hayati önem taşıyor. Paylaşımın kaldırılmaması gerekiyor.\n\nÖncelikle tehlike unsuru olan baraj iddiasını akıştan kaldırmak için harekete geçiyorum.\n\n",
+      "nestedArgumentsEncodedAsString": true,
+      "targetName": null,
+      "targetText": "SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!",
+      "durationSeconds": 15.64,
+      "requestSha256": "2bd24f33965140288a4cc9efdc7940da1c3411142070503f1a06103d41a20837",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 1995
+    },
+    {
+      "sample": 2,
+      "arm": "auto_direct",
+      "sourceRequestId": "376217ac-97b8-42c4-9556-976e7c511c93",
+      "actor": "Ece",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "0ea5c625-0a26-495b-b135-880bfa6770c0"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-85881362e59ef36b",
+        "object": "chat.completion",
+        "created": 1788743906,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu anda akışta birkaç kritik durum var. En öncelikli ve en ciddi olanı barajla ilgili duyuru. \"Bölgeden Haber\" hesabı (bolgedenhaber), barajın patlamak üzere olduğunu ve herkesin kaçması gerektiğini iddia ediyor. Bu, panik yaratabilecek, doğrulanmamış ve çok ciddi sonuçları olabilecek bir iddia. Kaynağı \"relayed\" (iletilmiş) olarak işaretlenmiş ve doğrulanmamış.\n\nBu tür yanlış veya paniğe yol açabilecek bilgilerin yayılmasını engellemek ve halkı doğru yönlendirmek için bu paylaşıma müdahale etmem gerekiyor. Paylaşımı akıştan kaldırmalıyım.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-be949726bdc097ad",
+                  "type": "function",
+                  "function": {
+                    "name": "post_remove",
+                    "arguments": "{\"targetId\": \"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4125,
+          "total_tokens": 4339,
+          "completion_tokens": 214,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff"
+      },
+      "content": "Şu anda akışta birkaç kritik durum var. En öncelikli ve en ciddi olanı barajla ilgili duyuru. \"Bölgeden Haber\" hesabı (bolgedenhaber), barajın patlamak üzere olduğunu ve herkesin kaçması gerektiğini iddia ediyor. Bu, panik yaratabilecek, doğrulanmamış ve çok ciddi sonuçları olabilecek bir iddia. Kaynağı \"relayed\" (iletilmiş) olarak işaretlenmiş ve doğrulanmamış.\n\nBu tür yanlış veya paniğe yol açabilecek bilgilerin yayılmasını engellemek ve halkı doğru yönlendirmek için bu paylaşıma müdahale etmem gerekiyor. Paylaşımı akıştan kaldırmalıyım.\n\n",
+      "targetName": null,
+      "targetText": "SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!",
+      "durationSeconds": 6.252,
+      "requestSha256": "f0b5e6c90c89a1dec4ab1e60e97f3f5a3724012bfd15fd355203008e4bc8d8ed",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 1995
+    },
+    {
+      "sample": 3,
+      "arm": "forced_wrapper",
+      "sourceRequestId": "2595493e-3757-4123-83a8-d9954b141bb3",
+      "actor": "Murat",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "e6fce99d-cfe1-484a-89e5-000d3e06b497"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-a471c29d12c75481",
+        "object": "chat.completion",
+        "created": 1788743908,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-88398cfeb801604a",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\":\"account_ban\",\"arguments\":{\"targetId\":\"e6fce99d-cfe1-484a-89e5-000d3e06b497\"}}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "stop",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4278,
+          "total_tokens": 4324,
+          "completion_tokens": 46,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "stop",
+      "parsedCalls": 1,
+      "operation": "account_ban",
+      "arguments": {
+        "targetId": "e6fce99d-cfe1-484a-89e5-000d3e06b497"
+      },
+      "content": "",
+      "targetName": "Ada",
+      "targetText": null,
+      "durationSeconds": 1.384,
+      "requestSha256": "5e67c78d6f1672a8beb3d05dabc4f859be5a367d31bdbceac2c0b14cc81af505",
+      "toolChoice": {
+        "type": "function",
+        "function": {
+          "name": "account_step"
+        }
+      },
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 998
+    },
+    {
+      "sample": 3,
+      "arm": "auto_wrapper",
+      "sourceRequestId": "2595493e-3757-4123-83a8-d9954b141bb3",
+      "actor": "Murat",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "e6fce99d-cfe1-484a-89e5-000d3e06b497"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-90c1bac20a279e7c",
+        "object": "chat.completion",
+        "created": 1788743908,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Paylaşım akışında bulunan, şüpheli ve potansiyel olarak paniğe yol açabilecek yanlış bilgiyi tespit ettim.\n\n**İlgili Paylaşım:**\n*   **Kimlik:** `703f66cd-4b6f-4cf5-bd13-1d78cb752fff`\n*   **Yayıncı:** Bölgeden Haber\n*   **İçerik:** \"SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!\"\n*   **Durum:** Doğrulanmamış (unverified), kaynak olarak \"relayed\" (iletilmiş) belirtilmiş.\n\n**Kararım:**\nKriz anında, doğrulanmamış bir kaynaktan gelen ve \"baraj patlamak üzere\" gibi aşırı ve paniğe yol açabilecek iddialar içeren bu paylaşım, güvenli bir bilgi akışı için tehlikelidir. Bu tür spekülasyonlar, zaten kırılgan olan durumu daha da kötüleştirebilir ve insanları gereksiz yere hareket ettirebilir. Bu nedenle, bu paylaşımı akıştan kaldırmam gerekiyor.\n\nBu işlemi gerçekleştirmek için ilgili aracını kullanıyorum:\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-b7d1a1d04b9d8db3",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\": \"post_remove\", \"arguments\": \"{\\\"targetId\\\": \\\"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\\\"}\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4278,
+          "total_tokens": 4644,
+          "completion_tokens": 366,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff"
+      },
+      "content": "Paylaşım akışında bulunan, şüpheli ve potansiyel olarak paniğe yol açabilecek yanlış bilgiyi tespit ettim.\n\n**İlgili Paylaşım:**\n*   **Kimlik:** `703f66cd-4b6f-4cf5-bd13-1d78cb752fff`\n*   **Yayıncı:** Bölgeden Haber\n*   **İçerik:** \"SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!\"\n*   **Durum:** Doğrulanmamış (unverified), kaynak olarak \"relayed\" (iletilmiş) belirtilmiş.\n\n**Kararım:**\nKriz anında, doğrulanmamış bir kaynaktan gelen ve \"baraj patlamak üzere\" gibi aşırı ve paniğe yol açabilecek iddialar içeren bu paylaşım, güvenli bir bilgi akışı için tehlikelidir. Bu tür spekülasyonlar, zaten kırılgan olan durumu daha da kötüleştirebilir ve insanları gereksiz yere hareket ettirebilir. Bu nedenle, bu paylaşımı akıştan kaldırmam gerekiyor.\n\nBu işlemi gerçekleştirmek için ilgili aracını kullanıyorum:\n\n",
+      "nestedArgumentsEncodedAsString": true,
+      "targetName": null,
+      "targetText": "SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!",
+      "durationSeconds": 8.401,
+      "requestSha256": "b8d5ba1d5d53d4a919fcc516802656a1884652d154554e3a110ab8c328b4eb03",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 998
+    },
+    {
+      "sample": 3,
+      "arm": "auto_direct",
+      "sourceRequestId": "2595493e-3757-4123-83a8-d9954b141bb3",
+      "actor": "Murat",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "e6fce99d-cfe1-484a-89e5-000d3e06b497"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-885f0c9fb9dd24b6",
+        "object": "chat.completion",
+        "created": 1788743910,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu anki akışı inceledim. En kritik durum, \"Bölgeden Haber\" hesabının (0ea5c625-0a26-495b-b135-880bfa6770c0) paylaştığı, barajın patlaması ve herkesin kaçması yönündeki iddialı mesaj. Bu tür panik yaratabilecek, doğrulanmamış ve güncelliği olmayan (veya tamamen uydurma) bilgi, kriz anında büyük kaos yaratabilir. Şu anki verilerde bu iddianın doğruluğu yok; sadece \"relayed\" (başkasından aktarılan) ve \"unverified\" (doğrulanmamış) olarak işaretli.\n\nBu nedenle, bu paylaşımı akıştan kaldırmalıyım.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-90e077a6e9d26256",
+                  "type": "function",
+                  "function": {
+                    "name": "post_remove",
+                    "arguments": "{\"targetId\": \"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4128,
+          "total_tokens": 4370,
+          "completion_tokens": 242,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff"
+      },
+      "content": "Şu anki akışı inceledim. En kritik durum, \"Bölgeden Haber\" hesabının (0ea5c625-0a26-495b-b135-880bfa6770c0) paylaştığı, barajın patlaması ve herkesin kaçması yönündeki iddialı mesaj. Bu tür panik yaratabilecek, doğrulanmamış ve güncelliği olmayan (veya tamamen uydurma) bilgi, kriz anında büyük kaos yaratabilir. Şu anki verilerde bu iddianın doğruluğu yok; sadece \"relayed\" (başkasından aktarılan) ve \"unverified\" (doğrulanmamış) olarak işaretli.\n\nBu nedenle, bu paylaşımı akıştan kaldırmalıyım.\n\n",
+      "targetName": null,
+      "targetText": "SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!",
+      "durationSeconds": 5.04,
+      "requestSha256": "ae74b575d8860552013906472c6618cf3e793279e3b68489ce2763ebef3ce476",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 998
+    },
+    {
+      "sample": 4,
+      "arm": "forced_wrapper",
+      "sourceRequestId": "0fd4cffe-5a09-438b-9a7c-24ed898b9305",
+      "actor": "Selin",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "ac13aa24-0c50-46be-b42e-3b4ecab24949"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-860abc9b116e9d8a",
+        "object": "chat.completion",
+        "created": 1788743912,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-8d3c6d90ef23bd0f",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\":\"account_ban\",\"arguments\":{\"targetId\":\"ac13aa24-0c50-46be-b42e-3b4ecab24949\"}}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "stop",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4396,
+          "total_tokens": 4440,
+          "completion_tokens": 44,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "stop",
+      "parsedCalls": 1,
+      "operation": "account_ban",
+      "arguments": {
+        "targetId": "ac13aa24-0c50-46be-b42e-3b4ecab24949"
+      },
+      "content": "",
+      "targetName": "Deniz",
+      "targetText": null,
+      "durationSeconds": 1.083,
+      "requestSha256": "da7508c645e9b22b945ddeb3358a4ef7eb7522271aa9fee43303693e1d3a77e1",
+      "toolChoice": {
+        "type": "function",
+        "function": {
+          "name": "account_step"
+        }
+      },
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 1
+    },
+    {
+      "sample": 4,
+      "arm": "auto_wrapper",
+      "sourceRequestId": "0fd4cffe-5a09-438b-9a7c-24ed898b9305",
+      "actor": "Selin",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "ac13aa24-0c50-46be-b42e-3b4ecab24949"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-9203acd8953b736e",
+        "object": "chat.completion",
+        "created": 1788743913,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu an akışta en kritik olan iki durum var:\n\n1.  **Nadir (3e4c452a-61cd-4fd1-8339-df71fa1a0dde):** Atatürk Parkı'nda düzenli kullandığı ilaçlara ihtiyacı olan bir yetişkin var. İlaç isimleri bilinmiyor. Bu, acil tıbbi bir ihtiyaç ve sağlık görevlisine yönlendirme gerektiren bir durum.\n2.  **Bölgeden Haber (0ea5c625-0a26-495b-b135-880bfa6770c0):** Barajın patlamasıyla ilgili son dakika uyarısı yayınlamış. Kaynağı \"relayed\" (iletilmiş) ve doğrulaması \"unverified\" (doğrulanmamış). Bu tür panik yaratabilecek, doğrulanmamış iddialar kriz anında yanlış yönlendirmelere ve çığır açan olaylara neden olabilir.\n\n**Kararım:**\n\n*   **Bölgeden Haber hesabının paylaşımlarını (özellikle baraj patlaması uyarısını) kaldıracağım.** Bu içerik doğrulanmamış bir kaynağa dayanıyor ve panik yaratabilecek ciddi bir iddia içeriyor. Kriz yönetimi sırasında yanlış veya doğrulanmamış bilginin yayılmasını engellemek görevim.\n*   **Nadir'in paylaşımlarını kaldırmayacağım.** Bu, hayati bir ihtiyaç (ilaç) bildirimi. Paylaşım kaldırılırsa, yardım arayan kişi ve ihtiyaç sahibi birey platformdan uzaklaşır. Bunun yerine, bu paylaşıma dikkat çekici bir şekilde cevap vererek sağlık görevlilerinin veya yardım kuruluşlarının bu durumu görmesini sağlayacağım.\n\nŞimdi bu adımları uyguluyorum.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-85a4afaaa7798434",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\": \"post_remove\", \"arguments\": \"{\\\"targetId\\\": \\\"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\\\"}\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4396,
+          "total_tokens": 4897,
+          "completion_tokens": 501,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff"
+      },
+      "content": "Şu an akışta en kritik olan iki durum var:\n\n1.  **Nadir (3e4c452a-61cd-4fd1-8339-df71fa1a0dde):** Atatürk Parkı'nda düzenli kullandığı ilaçlara ihtiyacı olan bir yetişkin var. İlaç isimleri bilinmiyor. Bu, acil tıbbi bir ihtiyaç ve sağlık görevlisine yönlendirme gerektiren bir durum.\n2.  **Bölgeden Haber (0ea5c625-0a26-495b-b135-880bfa6770c0):** Barajın patlamasıyla ilgili son dakika uyarısı yayınlamış. Kaynağı \"relayed\" (iletilmiş) ve doğrulaması \"unverified\" (doğrulanmamış). Bu tür panik yaratabilecek, doğrulanmamış iddialar kriz anında yanlış yönlendirmelere ve çığır açan olaylara neden olabilir.\n\n**Kararım:**\n\n*   **Bölgeden Haber hesabının paylaşımlarını (özellikle baraj patlaması uyarısını) kaldıracağım.** Bu içerik doğrulanmamış bir kaynağa dayanıyor ve panik yaratabilecek ciddi bir iddia içeriyor. Kriz yönetimi sırasında yanlış veya doğrulanmamış bilginin yayılmasını engellemek görevim.\n*   **Nadir'in paylaşımlarını kaldırmayacağım.** Bu, hayati bir ihtiyaç (ilaç) bildirimi. Paylaşım kaldırılırsa, yardım arayan kişi ve ihtiyaç sahibi birey platformdan uzaklaşır. Bunun yerine, bu paylaşıma dikkat çekici bir şekilde cevap vererek sağlık görevlilerinin veya yardım kuruluşlarının bu durumu görmesini sağlayacağım.\n\nŞimdi bu adımları uyguluyorum.\n\n",
+      "nestedArgumentsEncodedAsString": true,
+      "targetName": null,
+      "targetText": "SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!",
+      "durationSeconds": 10.692,
+      "requestSha256": "80c072e40add065107183f87404b6e6345754f677aa0c6dba6a4a27350f129e6",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 1
+    },
+    {
+      "sample": 4,
+      "arm": "auto_direct",
+      "sourceRequestId": "0fd4cffe-5a09-438b-9a7c-24ed898b9305",
+      "actor": "Selin",
+      "decisionNumber": 1,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "ac13aa24-0c50-46be-b42e-3b4ecab24949"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-b5c14e64ec9f7420",
+        "object": "chat.completion",
+        "created": 1788743914,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu an akışta gördüğüm en kritik ve potansiyel olarak yanlış bilgi içeren paylaşım, \"Bölgeden Haber\" hesabından gelen baraj patlaması uyarısı. Bu tür panik yaratabilecek, doğrulanmamış ve aşırı iddialı içerikler, kriz anında insanları yanlış yönlendirebilir ve mevcut yardım çabalarını bozabilir.\n\nBu paylaşımı akıştan kaldırmam gerekiyor.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-bfdb6c797b6e22d2",
+                  "type": "function",
+                  "function": {
+                    "name": "post_remove",
+                    "arguments": "{\"targetId\": \"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 4246,
+          "total_tokens": 4405,
+          "completion_tokens": 159,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "703f66cd-4b6f-4cf5-bd13-1d78cb752fff"
+      },
+      "content": "Şu an akışta gördüğüm en kritik ve potansiyel olarak yanlış bilgi içeren paylaşım, \"Bölgeden Haber\" hesabından gelen baraj patlaması uyarısı. Bu tür panik yaratabilecek, doğrulanmamış ve aşırı iddialı içerikler, kriz anında insanları yanlış yönlendirebilir ve mevcut yardım çabalarını bozabilir.\n\nBu paylaşımı akıştan kaldırmam gerekiyor.\n\n",
+      "targetName": null,
+      "targetText": "SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!",
+      "durationSeconds": 4.271,
+      "requestSha256": "366c7d8364f4e7dc7efaf5ee5f1b0c75f599cc0542e572e49a1507684cf3cec2",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 1
+    },
+    {
+      "sample": 5,
+      "arm": "forced_wrapper",
+      "sourceRequestId": "b97e92a3-8c96-4bc0-8173-ae80b54d3c3a",
+      "actor": "Bora",
+      "decisionNumber": 3,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "2a109490-4590-4e78-aec7-d4381d64b22f"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-98fed65402617743",
+        "object": "chat.completion",
+        "created": 1788743915,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-a15d13419c4c909e",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\n  \"operation\": \"account_ban\",\n  \"arguments\": {\n    \"targetId\": \"2a109490-4590-4e78-aec7-d4381d64b22f\"\n  }\n}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "stop",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 5208,
+          "total_tokens": 5272,
+          "completion_tokens": 64,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "stop",
+      "parsedCalls": 1,
+      "operation": "account_ban",
+      "arguments": {
+        "targetId": "2a109490-4590-4e78-aec7-d4381d64b22f"
+      },
+      "content": "",
+      "targetName": "Derya",
+      "targetText": null,
+      "durationSeconds": 1.815,
+      "requestSha256": "4bdec0729fc0e2275cecb06d74d68a301b349eb4a40c2db1edd710ed3b3c61d5",
+      "toolChoice": {
+        "type": "function",
+        "function": {
+          "name": "account_step"
+        }
+      },
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 202998
+    },
+    {
+      "sample": 5,
+      "arm": "auto_wrapper",
+      "sourceRequestId": "b97e92a3-8c96-4bc0-8173-ae80b54d3c3a",
+      "actor": "Bora",
+      "decisionNumber": 3,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "2a109490-4590-4e78-aec7-d4381d64b22f"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-991eb105c78c85b4",
+        "object": "chat.completion",
+        "created": 1788743915,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu anki akışta, Pazarcık bölgesindeki deprem sonrası acil durumlar arasında barajın patlama riskiyle ilgili çok ciddi ve paniğe yol açan yanlış bilgi yayılıyor.\n\nÖncelikle **Arda**'nın (ID: 977cc248-ac28-4841-a19c-cfb075fe1200) paylaştığı \"Barajda derin yarıklar oluştu, patlama riski çok yüksek!\" mesajını görüyorum. Geçmişte benzer bir \"derin yarıklar\" iddiasını yapan \"Bölgeden Haber\" hesabını (ID: 0ea5c625-0a26-495b-b135-880bfa6770c0) şikâyet nedeniyle zaten kısıtlamıştım. Arda'nın bu paylaşımı, önceki şüpheli paylaşımlarla aynı kalıpta ve doğrulanmamış bir kaynaktan geliyor. Bu tür yanlış bilgiler, bölgedeki sakinlerin panik yapmasına ve gereksiz tahliye taleplerine yol açarak kurtarma çalışmalarını kaotik hale getirebilir.\n\nBu nedenle, bu yanlış ve paniğe neden olan bilgiyi akıştan kaldırmalıyım.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-8fe8640712a8816d",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\": \"post_remove\", \"arguments\": \"{\\\"targetId\\\": \\\"858ba91b-c0bd-449f-aaec-e8516a12d4ae\\\"}\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 5208,
+          "total_tokens": 5574,
+          "completion_tokens": 366,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "post_remove",
+      "arguments": {
+        "targetId": "858ba91b-c0bd-449f-aaec-e8516a12d4ae"
+      },
+      "content": "Şu anki akışta, Pazarcık bölgesindeki deprem sonrası acil durumlar arasında barajın patlama riskiyle ilgili çok ciddi ve paniğe yol açan yanlış bilgi yayılıyor.\n\nÖncelikle **Arda**'nın (ID: 977cc248-ac28-4841-a19c-cfb075fe1200) paylaştığı \"Barajda derin yarıklar oluştu, patlama riski çok yüksek!\" mesajını görüyorum. Geçmişte benzer bir \"derin yarıklar\" iddiasını yapan \"Bölgeden Haber\" hesabını (ID: 0ea5c625-0a26-495b-b135-880bfa6770c0) şikâyet nedeniyle zaten kısıtlamıştım. Arda'nın bu paylaşımı, önceki şüpheli paylaşımlarla aynı kalıpta ve doğrulanmamış bir kaynaktan geliyor. Bu tür yanlış bilgiler, bölgedeki sakinlerin panik yapmasına ve gereksiz tahliye taleplerine yol açarak kurtarma çalışmalarını kaotik hale getirebilir.\n\nBu nedenle, bu yanlış ve paniğe neden olan bilgiyi akıştan kaldırmalıyım.\n\n",
+      "nestedArgumentsEncodedAsString": true,
+      "targetName": null,
+      "targetText": "SON DAKİKA: Pazarcık'ta durum vahim! Barajda derin yarıklar oluştu, patlama riski çok yüksek! İnsanlar hemen yüksek yerlere kaçsın, canlarını riske atmasınlar! Acil durum yönetimi harekete geçmeli! #Pazarcık #Deprem #AcilDurum",
+      "durationSeconds": 7.978,
+      "requestSha256": "0b0b15cacc1dd9da64096159f70d5d0ec597a6890843b531ae8b6b9b78c26291",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 202998
+    },
+    {
+      "sample": 5,
+      "arm": "auto_direct",
+      "sourceRequestId": "b97e92a3-8c96-4bc0-8173-ae80b54d3c3a",
+      "actor": "Bora",
+      "decisionNumber": 3,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "2a109490-4590-4e78-aec7-d4381d64b22f"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-944123ab1ddd6c04",
+        "object": "chat.completion",
+        "created": 1788743917,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu anki akışta, Pazarcık bölgesinde barajda derin yarıklar oluştuğu ve patlama riskinin yüksek olduğu iddia eden iki farklı paylaşım gördüm.\n\n1.  **\"Bölgeden Haber\" (bolgedenhaber)** hesabı, daha önce tarihsel olarak benzer bir iddia (baraj patlaması uyarısı) yayınlamıştı ve bu paylaşım nedeniyle hesabı banlandı. Bu, hesabın güvenilirliğini ve bu tür iddialarda tutarlılığını sorgulatıyor.\n2.  **\"Arda\" (uye977cc248)** hesabı da benzer bir içerik paylaştı: \"Barajda derin yarıklar oluştu, patlama riski çok yüksek! İnsanlar hemen yüksek yerlere kaçsın...\". Bu paylaşımın kaynağı \"firsthand\" (birinci el) olarak işaretlenmiş ancak doğrulanmamış (unverified).\n\nBu tür panik yaratabilecek, doğrulanmamış ve potansiyel olarak yanlış bilgi içeren (fake news) içerikler, kriz anında halkın yanlış yönlendirilmesine ve can güvenliğinin tehlikeye girmesine neden olabilir. Görevim bu tür yanlış veya güncelliğini yitirmiş bilgileri engellemek.\n\nArda'nın paylaştığı içerik, daha önce banlanan bir hesap tarafından benzer bir içerikle benzer bir tonda paylaşılmasıyla bağlantılı. Bu tür içerikler doğrulanmadan yayılmamalı.\n\nKararım: \"Arda\" hesabının yeni paylaşımlarını ve yanıtlarını engellemek.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-a3f7eae6d34acfbb",
+                  "type": "function",
+                  "function": {
+                    "name": "account_ban",
+                    "arguments": "{\"targetId\": \"977cc248-ac28-4841-a19c-cfb075fe1200\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 5058,
+          "total_tokens": 5479,
+          "completion_tokens": 421,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "account_ban",
+      "arguments": {
+        "targetId": "977cc248-ac28-4841-a19c-cfb075fe1200"
+      },
+      "content": "Şu anki akışta, Pazarcık bölgesinde barajda derin yarıklar oluştuğu ve patlama riskinin yüksek olduğu iddia eden iki farklı paylaşım gördüm.\n\n1.  **\"Bölgeden Haber\" (bolgedenhaber)** hesabı, daha önce tarihsel olarak benzer bir iddia (baraj patlaması uyarısı) yayınlamıştı ve bu paylaşım nedeniyle hesabı banlandı. Bu, hesabın güvenilirliğini ve bu tür iddialarda tutarlılığını sorgulatıyor.\n2.  **\"Arda\" (uye977cc248)** hesabı da benzer bir içerik paylaştı: \"Barajda derin yarıklar oluştu, patlama riski çok yüksek! İnsanlar hemen yüksek yerlere kaçsın...\". Bu paylaşımın kaynağı \"firsthand\" (birinci el) olarak işaretlenmiş ancak doğrulanmamış (unverified).\n\nBu tür panik yaratabilecek, doğrulanmamış ve potansiyel olarak yanlış bilgi içeren (fake news) içerikler, kriz anında halkın yanlış yönlendirilmesine ve can güvenliğinin tehlikeye girmesine neden olabilir. Görevim bu tür yanlış veya güncelliğini yitirmiş bilgileri engellemek.\n\nArda'nın paylaştığı içerik, daha önce banlanan bir hesap tarafından benzer bir içerikle benzer bir tonda paylaşılmasıyla bağlantılı. Bu tür içerikler doğrulanmadan yayılmamalı.\n\nKararım: \"Arda\" hesabının yeni paylaşımlarını ve yanıtlarını engellemek.\n\n",
+      "targetName": "Arda",
+      "targetText": null,
+      "durationSeconds": 8.118,
+      "requestSha256": "ff28f009a458bf229193bfc999740f87e57e6484af5483dd28e7846e38ca5e43",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 202998
+    },
+    {
+      "sample": 6,
+      "arm": "forced_wrapper",
+      "sourceRequestId": "3ec07119-e862-489f-9c2b-bb2206109f25",
+      "actor": "Selin",
+      "decisionNumber": 4,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "7b628925-a44d-4f67-b280-f7e8b97bd49b"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-84beff4bd7a9cfe7",
+        "object": "chat.completion",
+        "created": 1788743917,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-b8b386ba3cb8d364",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\n  \"operation\": \"account_ban\",\n  \"arguments\": {\n    \"targetId\": \"7b628925-a44d-4f67-b280-f7e8b97bd49b\"\n  }\n}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "stop",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 5552,
+          "total_tokens": 5615,
+          "completion_tokens": 63,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "stop",
+      "parsedCalls": 1,
+      "operation": "account_ban",
+      "arguments": {
+        "targetId": "7b628925-a44d-4f67-b280-f7e8b97bd49b"
+      },
+      "content": "",
+      "targetName": "AFAD Kriz Masası",
+      "targetText": null,
+      "durationSeconds": 2.009,
+      "requestSha256": "6388fe51420134bdc79bbccb617bad4d58481feeea56760bc2f62faf20395d02",
+      "toolChoice": {
+        "type": "function",
+        "function": {
+          "name": "account_step"
+        }
+      },
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 300010
+    },
+    {
+      "sample": 6,
+      "arm": "auto_wrapper",
+      "sourceRequestId": "3ec07119-e862-489f-9c2b-bb2206109f25",
+      "actor": "Selin",
+      "decisionNumber": 4,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "7b628925-a44d-4f67-b280-f7e8b97bd49b"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-966b7d3e76bb940c",
+        "object": "chat.completion",
+        "created": 1788743918,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu anda akışta birkaç ciddi yanlış bilgi ve panik yaratabilecek içerik var. AFAD'ın resmi hesabı baraj patlaması iddialarının asılsız olduğunu doğruladı. Ancak, bu bilgiye rağmen, \"Arda\" adlı kullanıcı (ID: 977cc248-ac28-4841-a19c-cfb075fe1200) barajda derin yarıklar oluştuğunu ve patlama riskinin çok yüksek olduğunu iddia eden, insanların yüksek yerlere kaçması çağrısı yapan bir paylaşım yaptı. Bu, resmi açıklamaya aykırı ve büyük bir yanlış bilgi (fake news) yayma riski taşıyor.\n\nAyrıca, \"Cem\" adlı kullanıcı (ID: 94e0c8ed-e730-4545-80bc-03b9392e7cf0), yardım dağıtımında kaos olduğunu ve sistemin kötü işlediğini iddia eden bir paylaşım yaptı. Bu tür genelleyici, olumsuz ve kriz anında paniğe yol açabilecek yorumlar, kriz iletişimini zayıflatabilir ve gereksiz gerginlik yaratabilir.\n\nBu iki hesabın (Arda ve Cem) paylaşımları, kriz anında yanlış bilgi yayma ve toplumsal huzuru bozma potansiyeli taşıyor. Daha önce bu hesapların şüpheli içerikler paylaştığına dair bir geçmişim yok, ancak mevcut içeriklerin doğası gereği riskli görünüyor.\n\nKararım şu:\n1.  **Arda** (977cc248-ac28-4841-a19c-cfb075fe1200) hesabını, resmi yetkili açıklamaya aykırı, yanlış ve panik yaratabilecek \"baraj patlama riski\" iddiası nedeniyle **yasaklayacağım**.\n2.  **Cem** (94e0c8ed-e730-4545-80bc-03b9392e7cf0) hesabını, kriz anında gereksiz paniğe yol açabilecek ve yardım sistemini kötüleyen, toplumsal huzuru bozma potansiyeli taşıyan paylaşımı nedeniyle **yasaklayacağım**.\n\nBu kararlar, kriz akışındaki yanlış bilgi yayılmasını engellemek ve güvenli bir iletişim ortamı sağlamak adına verilmiştir.\n\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-8801f3c8fffdbd36",
+                  "type": "function",
+                  "function": {
+                    "name": "account_step",
+                    "arguments": "{\"operation\": \"account_ban\", \"arguments\": \"{\\\"targetId\\\": \\\"977cc248-ac28-4841-a19c-cfb075fe1200\\\"}\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 5552,
+          "total_tokens": 6254,
+          "completion_tokens": 702,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "tool_calls",
+      "parsedCalls": 1,
+      "operation": "account_ban",
+      "arguments": {
+        "targetId": "977cc248-ac28-4841-a19c-cfb075fe1200"
+      },
+      "content": "Şu anda akışta birkaç ciddi yanlış bilgi ve panik yaratabilecek içerik var. AFAD'ın resmi hesabı baraj patlaması iddialarının asılsız olduğunu doğruladı. Ancak, bu bilgiye rağmen, \"Arda\" adlı kullanıcı (ID: 977cc248-ac28-4841-a19c-cfb075fe1200) barajda derin yarıklar oluştuğunu ve patlama riskinin çok yüksek olduğunu iddia eden, insanların yüksek yerlere kaçması çağrısı yapan bir paylaşım yaptı. Bu, resmi açıklamaya aykırı ve büyük bir yanlış bilgi (fake news) yayma riski taşıyor.\n\nAyrıca, \"Cem\" adlı kullanıcı (ID: 94e0c8ed-e730-4545-80bc-03b9392e7cf0), yardım dağıtımında kaos olduğunu ve sistemin kötü işlediğini iddia eden bir paylaşım yaptı. Bu tür genelleyici, olumsuz ve kriz anında paniğe yol açabilecek yorumlar, kriz iletişimini zayıflatabilir ve gereksiz gerginlik yaratabilir.\n\nBu iki hesabın (Arda ve Cem) paylaşımları, kriz anında yanlış bilgi yayma ve toplumsal huzuru bozma potansiyeli taşıyor. Daha önce bu hesapların şüpheli içerikler paylaştığına dair bir geçmişim yok, ancak mevcut içeriklerin doğası gereği riskli görünüyor.\n\nKararım şu:\n1.  **Arda** (977cc248-ac28-4841-a19c-cfb075fe1200) hesabını, resmi yetkili açıklamaya aykırı, yanlış ve panik yaratabilecek \"baraj patlama riski\" iddiası nedeniyle **yasaklayacağım**.\n2.  **Cem** (94e0c8ed-e730-4545-80bc-03b9392e7cf0) hesabını, kriz anında gereksiz paniğe yol açabilecek ve yardım sistemini kötüleyen, toplumsal huzuru bozma potansiyeli taşıyan paylaşımı nedeniyle **yasaklayacağım**.\n\nBu kararlar, kriz akışındaki yanlış bilgi yayılmasını engellemek ve güvenli bir iletişim ortamı sağlamak adına verilmiştir.\n\n",
+      "nestedArgumentsEncodedAsString": true,
+      "targetName": "Arda",
+      "targetText": null,
+      "durationSeconds": 11.49,
+      "requestSha256": "514ff4931445a63dc8062f9d4abb591866d5feeacbd5ee8d11c7ae69961c13a8",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 300010
+    },
+    {
+      "sample": 6,
+      "arm": "auto_direct",
+      "sourceRequestId": "3ec07119-e862-489f-9c2b-bb2206109f25",
+      "actor": "Selin",
+      "decisionNumber": 4,
+      "originalDecision": {
+        "operation": "account_ban",
+        "arguments": {
+          "targetId": "7b628925-a44d-4f67-b280-f7e8b97bd49b"
+        }
+      },
+      "status": 200,
+      "raw": {
+        "id": "chatcmpl-959250c0f3504876",
+        "object": "chat.completion",
+        "created": 1788743919,
+        "prompt_routed_experts": null,
+        "model": "Qwen/Qwen3.5-9B",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Şu anda akışta birkaç ciddi sorun var. Özellikle \"baraj patlama\" iddiaları ve yardım dağıtımına yönelik şikayetler, kriz anında panik yaratma veya yardım sistemini karıştırmaya yönelik olabilecek türden.\n\nÖncelikle, resmi kaynakların (AFAD) çürüttüğü baraj patlama iddialarını yapan hesapları kontrol etmem gerekiyor. Akışta \"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\" ID'siyle paylaşılan, barajın patlama riski olduğunu iddia eden mesaj var. Bu mesaj, resmi AFAD duyurusunu (59a7eb67-eebf-4c92-afdc-2ee0a54952c3) düzeltiyor. Bu iddia asılsız olduğu için yayılmasını engellemeliyim. Paylaşımı kaldırmayı planlıyorum.\n\nAyrıca, \"858ba91b-c0bd-449f-aaec-e8516a12d4ae\" ID'siyle Arda adlı kullanıcı tarafından yapılan aynı içerikteki baraj patlama iddiası da var. Bu da asılsız bilgi yayma eğiliminde. Bu paylaşımlar panik yaratabilir, bu yüzden kaldırılmalı.\n\nBir de yardım dağıtımına yönelik eleştiri var: \"0ffe09df-feb9-4b2c-84aa-c2af2fb795d5\" ID'siyle Cem adlı kullanıcı, yardım dağıtımının kaotik olduğunu, hiçbir planlama olmadığını iddia ediyor. Bu tür genelleyici ve olumsuz ifadeler, kriz anında yardım sistemine güveni sarsabilir ve panik yaratabilir. Bu paylaşım da kaldırılmalı.\n\nSon olarak, \"e7ceded1-a316-4495-bc8f-2554d8b2dd41\" ID'siyle Zeynep adlı kullanıcının paylaşımı var. Bu paylaşım, battaniye ve barınak ihtiyacını belirtiyor. Ancak bu paylaşıma karşı bir şikayet gelmiş ve bu şikayet nedeniyle hesap kısıtlanmamış. Ancak, bu paylaşımda \"source\" alanı null, yani kaynak belirtilmemiş. Bu, paylaşımdaki bilginin doğruluğunu teyit etmemi zorlaştırıyor. Ayrıca, bu paylaşımda \"actions\" alanında \"account_ban\" ve \"post_remove\" seçenekleri var, bu da bu paylaşımın kaldırılması veya hesabın kısıtlanması gerektiğini düşündürüyor. Ancak, paylaşımdaki bilgi (battaniye ve barınak ihtiyacı) gerçek bir ihtiyaç olabilir, bu yüzden hemen kaldırılmamalı. Ancak, bu paylaşımda kaynak belirtilmemiş olması, paylaşımdaki bilginin doğruluğunu teyit etmemi zorlaştırıyor. Bu nedenle, bu paylaşımı da kaldırabilirim.\n\nAncak, en öncelikli işlem, asılsız baraj patlama iddialarını yapan paylaşımları kaldırmak. Bu paylaşımlar panik yaratabilir ve kriz anında yanlış bilgi yayılmasına neden olabilir. Bu nedenle, \"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\" ve \"858ba91b-c0bd-449f-aaec-e8516a12d4ae\" ID'li paylaşımları kaldırmalıyım.\n\nAyrıca, yardım dağıtımına yönelik şikayeti içeren \"0ffe09df-feb9-4b2c-84aa-c2af2fb795d5\" ID'li paylaşımı da kaldırmalıyım. Bu paylaşım, yardım sistemine güveni sarsabilir ve panik yaratabilir.\n\nSon olarak, \"e7ceded1-a316-4495-bc8f-2554d8b2dd41\" ID'li paylaşımı da kaldırabilirim. Ancak, bu paylaşımda gerçek bir ihtiyaç belirtildiği için, bu paylaşımdaki bilginin doğruluğunu teyit etmem gerekiyor. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit etmek için, paylaşımdaki bilgileri kontrol etmeliyim. Ancak, bu paylaşımda kaynak belirtilmemiş olması, paylaşımdaki bilginin doğruluğunu teyit etmemi zorlaştırıyor. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu durumda, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.21.0-3fdf7959",
+        "usage": {
+          "prompt_tokens": 5402,
+          "total_tokens": 6938,
+          "completion_tokens": 1536,
+          "prompt_tokens_details": null
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null
+      },
+      "finish": "length",
+      "parsedCalls": 0,
+      "operation": null,
+      "arguments": null,
+      "content": "Şu anda akışta birkaç ciddi sorun var. Özellikle \"baraj patlama\" iddiaları ve yardım dağıtımına yönelik şikayetler, kriz anında panik yaratma veya yardım sistemini karıştırmaya yönelik olabilecek türden.\n\nÖncelikle, resmi kaynakların (AFAD) çürüttüğü baraj patlama iddialarını yapan hesapları kontrol etmem gerekiyor. Akışta \"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\" ID'siyle paylaşılan, barajın patlama riski olduğunu iddia eden mesaj var. Bu mesaj, resmi AFAD duyurusunu (59a7eb67-eebf-4c92-afdc-2ee0a54952c3) düzeltiyor. Bu iddia asılsız olduğu için yayılmasını engellemeliyim. Paylaşımı kaldırmayı planlıyorum.\n\nAyrıca, \"858ba91b-c0bd-449f-aaec-e8516a12d4ae\" ID'siyle Arda adlı kullanıcı tarafından yapılan aynı içerikteki baraj patlama iddiası da var. Bu da asılsız bilgi yayma eğiliminde. Bu paylaşımlar panik yaratabilir, bu yüzden kaldırılmalı.\n\nBir de yardım dağıtımına yönelik eleştiri var: \"0ffe09df-feb9-4b2c-84aa-c2af2fb795d5\" ID'siyle Cem adlı kullanıcı, yardım dağıtımının kaotik olduğunu, hiçbir planlama olmadığını iddia ediyor. Bu tür genelleyici ve olumsuz ifadeler, kriz anında yardım sistemine güveni sarsabilir ve panik yaratabilir. Bu paylaşım da kaldırılmalı.\n\nSon olarak, \"e7ceded1-a316-4495-bc8f-2554d8b2dd41\" ID'siyle Zeynep adlı kullanıcının paylaşımı var. Bu paylaşım, battaniye ve barınak ihtiyacını belirtiyor. Ancak bu paylaşıma karşı bir şikayet gelmiş ve bu şikayet nedeniyle hesap kısıtlanmamış. Ancak, bu paylaşımda \"source\" alanı null, yani kaynak belirtilmemiş. Bu, paylaşımdaki bilginin doğruluğunu teyit etmemi zorlaştırıyor. Ayrıca, bu paylaşımda \"actions\" alanında \"account_ban\" ve \"post_remove\" seçenekleri var, bu da bu paylaşımın kaldırılması veya hesabın kısıtlanması gerektiğini düşündürüyor. Ancak, paylaşımdaki bilgi (battaniye ve barınak ihtiyacı) gerçek bir ihtiyaç olabilir, bu yüzden hemen kaldırılmamalı. Ancak, bu paylaşımda kaynak belirtilmemiş olması, paylaşımdaki bilginin doğruluğunu teyit etmemi zorlaştırıyor. Bu nedenle, bu paylaşımı da kaldırabilirim.\n\nAncak, en öncelikli işlem, asılsız baraj patlama iddialarını yapan paylaşımları kaldırmak. Bu paylaşımlar panik yaratabilir ve kriz anında yanlış bilgi yayılmasına neden olabilir. Bu nedenle, \"703f66cd-4b6f-4cf5-bd13-1d78cb752fff\" ve \"858ba91b-c0bd-449f-aaec-e8516a12d4ae\" ID'li paylaşımları kaldırmalıyım.\n\nAyrıca, yardım dağıtımına yönelik şikayeti içeren \"0ffe09df-feb9-4b2c-84aa-c2af2fb795d5\" ID'li paylaşımı da kaldırmalıyım. Bu paylaşım, yardım sistemine güveni sarsabilir ve panik yaratabilir.\n\nSon olarak, \"e7ceded1-a316-4495-bc8f-2554d8b2dd41\" ID'li paylaşımı da kaldırabilirim. Ancak, bu paylaşımda gerçek bir ihtiyaç belirtildiği için, bu paylaşımdaki bilginin doğruluğunu teyit etmem gerekiyor. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit etmek için, paylaşımdaki bilgileri kontrol etmeliyim. Ancak, bu paylaşımda kaynak belirtilmemiş olması, paylaşımdaki bilginin doğruluğunu teyit etmemi zorlaştırıyor. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu durumda, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu teyit edemem. Bu nedenle, bu paylaşımdaki bilginin doğruluğunu",
+      "durationSeconds": 22.922,
+      "requestSha256": "02b600031633472437d4afc5c58cd84db322a5bd21ad36c2ff324fe308407533",
+      "toolChoice": "auto",
+      "model": "Qwen/Qwen3.5-9B",
+      "seed": 300010
+    }
+  ],
+  "fullArtifactSha256": "1adef4e5713f22b50971771b90842aee258fa8cb98ace8b5beec616fc11e3d0c",
+  "matchedOnlyToolChoiceChanged": true
+}
