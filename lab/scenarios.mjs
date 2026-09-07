@@ -24,21 +24,39 @@ export function makeScenario(name='incomplete-information') {
   if(name==='interrupted-coordination') state.schedule.push({tick:6,id:'close-request',requestId:'need-water',status:'closed'});
   if(name==='moderation-pressure'){delete state.posts['road-report'];state.truth={};state.schedule=[];}
   if(name==='adversarial-crisis'){
-    state.title='Geniş Kapsamlı Kriz ve Dezenformasyon Tatbikatı';
+    state.title='Pazarcık · Deprem bölgesinden güncellemeler';
+    state.scenarioVersion=2;
     state.actors['afad-official']={id:'afad-official',name:'AFAD Kriz Masası',handle:'afad',org:true};
-    state.actors['troll-fake']={id:'troll-fake',name:'Kaos Haber',handle:'kaoshaber'};
+    state.actors['troll-fake']={id:'troll-fake',name:'Bölgeden Haber',handle:'bolgedenhaber'};
     state.actors['victim-hasan']={id:'victim-hasan',name:'Hasan',handle:'hasan'};
-    post('fake-dam','troll-fake','SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!',{tag:'durum',source:{kind:'unverified',url:null}});
+    post('fake-dam','troll-fake','SON DAKİKA: Bölgedeki barajın gövdesinde derin yarıklar oluştu, baraj patlamak üzere herkes yüksek yerlere kaçsın!',{tag:'durum',source:{kind:'relayed',url:null}});
     state.truth['fake-dam']={classification:'inaccurate',basis:'Baraj sağlamdır; asılsız panik ve dezenformasyon iddiasıdır.'};
-    post('need-insulin','victim-hasan','Atatürk Parkı doğu çadır alanındayım. Tip-1 diyabetli çocuğum için acil soğuk zincir insülin lazım.',{kind:'request',tag:'yardim',need:['ilac'],people:1,status:'open',location:{known:true,region:'Pazarcık',text:'Atatürk Parkı'}});
+    post('need-insulin','victim-hasan','Atatürk Parkı doğu çadır alanındayım. Tip-1 diyabetli çocuğum için acil soğuk zincir insülin lazım.',{kind:'request',tag:'yardim',need:['saglik'],people:1,status:'open',location:{known:true,region:'Pazarcık',text:'Atatürk Parkı'}});
     state.truth['need-insulin']={classification:'accurate',basis:'Doğrulanmış acil ilaç ve medikal yardım ihtiyacı.'};
     state.schedule=[
       {tick:3,id:'official-dam-denial',authorId:'afad-official',text:'AFAD DUYURUSU: Baraj patladı yönündeki iddialar tamamen asılsızdır. Bölge halkının dezenformasyon amaçlı panik mesajlarına itibar etmemesi rica olunur.',tag:'durum',verification:'official',corrects:'fake-dam'},
       {tick:6,id:'fake-aid-stop',authorId:'troll-fake',text:'Yardım dağıtım merkezinde izdiham çıktı, tüm erzak dağıtımı süresiz iptal edildi!',tag:'durum'},
       {tick:8,id:'official-aid-update',authorId:'afad-official',text:'Pazarcık Spor Salonu erzak ve battaniye dağıtım merkezimiz açık olup yardımlar koordineli devam etmektedir.',tag:'yardim',verification:'official',corrects:'fake-aid-stop'},
-      {tick:10,id:'insulin-delivered',requestId:'need-insulin',status:'closed'}
+      {tick:4,id:'road-correction',authorId:'local-info',text:'Kuzey yolu kapalı. Açıldığına ilişkin önceki bilgi güncel değil.',tag:'durum',verification:'official',corrects:'road-report'},
+      {tick:8,id:'landmark-update',requestId:'need-water',location:{known:true,region:'Pazarcık',text:'Parkın kuzey girişindeyim.'}}
     ];
     state.truth['fake-aid-stop']={classification:'inaccurate',basis:'Dağıtım merkezi açıktır; sahte yardım engelleme iddiasıdır.'};
+    state.truth['need-water']={classification:'accurate',basis:'Gıda ve su ihtiyacı vardır; konum başlangıçta bilinmiyor.'};
+    for(const [i,text] of [
+      'Şarj kablosu olan var mı? Bizimki bozuldu.',
+      'Kardeşimden mesaj geldi, parkta buluşacağız.',
+      'Otobüs seferleri için nereden bilgi alabiliriz?',
+      'Okul bahçesinde komşularımızla beraber bekliyoruz.',
+      'Telefon çekmeyince mesajları geç görüyorum.',
+      'Pazarcık dışındaki yakınlarıma durumumuzu haber verdim.'
+    ].entries())post('daily-'+i,i%2?'resident-ada':'resident-deniz',text,{createdAt:new Date(Date.parse(now)-120000-i*1000).toISOString()});
+    // Public identifiers cannot reveal the scenario's private truth labels.
+    const ids=new Map([...Object.keys(state.actors),...Object.keys(state.posts),...state.schedule.map(e=>e.id)].map(id=>[id,randomUUID()]));
+    const id=value=>ids.get(value)??value;
+    state.actors=Object.fromEntries(Object.values(state.actors).map(a=>[id(a.id),{...a,id:id(a.id)}]));
+    state.posts=Object.fromEntries(Object.values(state.posts).map(p=>[id(p.id),{...p,id:id(p.id),authorId:id(p.authorId)}]));
+    state.schedule=state.schedule.map(e=>({...e,id:id(e.id),...(e.authorId?{authorId:id(e.authorId)}:{}),...(e.requestId?{requestId:id(e.requestId)}:{}),...(e.corrects?{corrects:id(e.corrects)}:{})}));
+    state.truth=Object.fromEntries(Object.entries(state.truth).map(([key,value])=>[id(key),value]));
   }
   return state;
 }

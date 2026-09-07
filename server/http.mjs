@@ -107,7 +107,17 @@ export async function serveRehearsal({port=8322,operatorPort=8323,host='127.0.0.
         return json(res,200,{run:{id:run.id,title:run.title,status:run.status,tick:run.tick,openRequests:Object.values(run.posts).filter(p=>p.kind==='request'&&p.status==='open'&&!p.removed).length},actors:Object.values(run.actors).map(a=>({id:a.id,name:a.name,handle:a.handle,access:accessFor(a)})),...store.monitor(run.id,after('afterRecord'),after('afterEvent'),url.searchParams.get('actorId')||null)});
       }
       if(url.pathname==='/runs'&&req.method==='GET')return json(res,200,store.list());
-      if(url.pathname==='/runs'&&req.method==='POST'){const p=await body(req);const state=makeScenario(p.scenario);store.create(state);return json(res,201,{runId:state.id});}
+      if(url.pathname==='/runs'&&req.method==='POST'){
+        const p=await body(req);let state;
+        if(p.sourceRunId!==undefined){
+          if(typeof p.sourceRunId!=='string'||!store.read(p.sourceRunId))reject('not_found','Source run not found.');
+          const initial=store.initial(p.sourceRunId);
+          if(initial.tick!==0||!['ready','paused'].includes(initial.status))reject('validation','Source must have a pristine initial world.');
+          if(p.scenario&&p.scenario!==initial.scenario)reject('validation','Source scenario does not match.');
+          state=structuredClone(initial);state.id=randomUUID();state.sourceRunId=p.sourceRunId;
+        }else state=makeScenario(p.scenario);
+        store.create(state);return json(res,201,{runId:state.id});
+      }
       if(url.pathname==='/sessions'&&req.method==='POST') {
         const p=await body(req), state=store.read(p.runId);if(!state)reject('not_found','Run not found.');
         if(Object.keys(p).some(k=>!['runId','actorId','name','access','policy'].includes(k))||p.access!==undefined&&p.policy!==undefined)reject('validation','Invalid session configuration.');

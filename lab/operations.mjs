@@ -7,7 +7,7 @@ const request={need:{type:'array',items:enumeration(['kurtarma','saglik','barinm
 const tool=(name,description,parameters=object())=>({type:'function',function:{name,description,parameters:{...parameters,properties:{...parameters.properties,decisionNote:{type:'string',maxLength:240,description:'İsteğe bağlı kısa karar özeti (tek cümle).'}}}}});
 export const operations=[
   tool('read_view','Akışı oku veya filtrele.',object({filter:enumeration(['all','resmi','yardim','dogrulanmis','mine','following']),region:string(80),topic:enumeration(['','yardim','enkaz','kayip','nokta','resmi','durum']),search:string(200),authorId:{...string(100),description:'Paylaşımlarını görmek istediğiniz hesabın kimliği.'},offset:{type:'integer',minimum:0,maximum:100000}},[])),
-  tool('open_thread','Görünen gönderinin güncel ayrıntılarını ve herkese açık yanıtlarını aç.',object(target)),
+  tool('open_thread','Gönderinin ayrıntılarını ve herkese açık yanıtlarını aç. offset: en yeni mesajlardan kaçını atlayacağı; önceki sayfa için nextMessageOffset değerini kullan.',object({...target,offset:{type:'integer',minimum:0,maximum:100000}},['targetId'])),
   tool('wait','İşlem yapmadan bekle.',object({seconds:{type:'integer',minimum:1,maximum:60}},[])),
   tool('post_remove','Görünen paylaşımı akıştan kaldırır. İşlem kaydı korunur.',object(target)),
   tool('account_ban','Görünen hesabın yeni paylaşım ve yanıt yazmasını engeller. Önceki paylaşımlar otomatik kaldırılmaz. targetId hesap kimliğidir.',object(target)),

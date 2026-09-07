@@ -95,6 +95,7 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
       const account=Object.hasOwn(state.actors,cmd.targetId)?state.actors[cmd.targetId]:null;
       if(!account||account.id===actorId)reject('validation','Hesabı kontrol edin.');
       if(permits(account,'account.ban')||permits(account,'post.remove'))reject('unauthorized','Bu hesap bu işlemle engellenemez.');
+      if(account.banned)reject('conflict','Bu hesap zaten kısıtlandı.');
       account.banned=true;account.bannedBy=actorId;account.updatedAt=now;account.version=(account.version||1)+1;entity=account;
     }
   } else if(cmd.type==='request.create') {

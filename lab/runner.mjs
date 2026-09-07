@@ -8,12 +8,17 @@ import { ModelAdapter } from './model.mjs';
 import { seededRandom,shuffle,ruleDecision } from './rule-participants.mjs';
 import { normalizeAccess } from '../server/access.mjs';
 import { ToolSurface,normalizePresentation } from './tool-surface.mjs';
+import { remember,recall,receipt } from './memory.mjs';
 
 const root=path.resolve(import.meta.dirname,'..');
 export const defaults={engine:'model',mode:'tool',participants:5,inferenceConcurrency:2,maxDecisionsPerParticipant:20,maxInputTokensPerDecision:4096,maxOutputTokensPerDecision:256,maxTotalTokens:450000,requestTimeoutSeconds:60,maxWallMinutes:20,seed:1,pageSize:2,scenario:'incomplete-information',roles:null,participantInstructions:null};
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 function validate(settings){
   normalizePresentation(settings.toolPresentation);
+  if(settings.historyMode!==undefined&&!['snapshots','compact'].includes(settings.historyMode))throw new Error('Invalid history mode.');
+  if(settings.sourceRunId&&(settings.runId||typeof settings.sourceRunId!=='string'))throw new Error('Choose a new run from a source, or an existing run.');
+  if(settings.contextMode!==undefined&&!['page','author-history'].includes(settings.contextMode))throw new Error('Invalid observation context mode.');
+  if(settings.participantNames!==undefined&&(settings.accounts||!Array.isArray(settings.participantNames)||settings.participantNames.length!==settings.participants||settings.participantNames.some(s=>typeof s!=='string'||!s.trim()||s.length>80)))throw new Error('Provide one name per new account.');
   if(settings.mode==='browser'&&settings.toolPresentation?.names==='random')throw new Error('Random tool names require tool mode.');
   if(settings.participantInstructions!==null&&(!Array.isArray(settings.participantInstructions)||settings.participantInstructions.length!==settings.participants||settings.participantInstructions.some(s=>s!==null&&(typeof s!=='string'||s.length>8000))))throw new Error('Provide one optional instruction string per participant.');
   if(settings.roles!==null){if(settings.accounts||!Array.isArray(settings.roles)||settings.roles.length!==settings.participants)throw new Error('Provide one role policy per new account. Existing accounts keep their server-managed policies.');settings.roles.forEach(normalizeAccess);}
@@ -38,9 +43,10 @@ export async function run(config={},resume=false){
     for(const key of Object.keys(defaults))if(JSON.stringify(state.settings[key])!==JSON.stringify(settings[key]))throw new Error('Resume settings changed: '+key);
     if(JSON.stringify(normalizePresentation(state.settings.toolPresentation))!==JSON.stringify(normalizePresentation(settings.toolPresentation)))throw new Error('Resume tool presentation changed; start a new cohort.');
     if(JSON.stringify(state.settings.endpoints)!==JSON.stringify(settings.endpoints))throw new Error('Resume endpoint configuration changed.');
+    for(const key of ['contextMode','participantNames','historyMode','sourceRunId','viewLimits'])if(JSON.stringify(state.settings[key])!==JSON.stringify(settings[key]))throw new Error('Resume settings changed: '+key);
   }else{
     if(checkpoint&&existsSync(checkpoint))throw new Error('Checkpoint exists; use --resume or a new path.');
-    const runId=settings.runId||(await operatorCall('/runs',{scenario:settings.scenario},op)).runId;
+    const runId=settings.runId||(await operatorCall('/runs',{scenario:settings.scenario,...(settings.sourceRunId?{sourceRunId:settings.sourceRunId}:{})},op)).runId;
     const cohortId=randomUUID();
     checkpoint=checkpoint||path.join(root,'.rehearsal/runs',runId,'cohort-'+cohortId+'.json');
     state={version:1,runId,cohortId,settings,createdAt:new Date().toISOString(),elapsedMs:0,round:0,spentTokens:0,reservations:{},actors:[],stopReason:null};
@@ -79,8 +85,8 @@ export async function run(config={},resume=false){
       for(let i=0;i<settings.participants;i++){
         let account;
         if(settings.accounts){account=JSON.parse(readFileSync(settings.accounts[i],'utf8'));if(account.runId!==state.runId)throw new Error('Account belongs to a different world.');}
-        else {const session=await operatorCall('/sessions',{runId:state.runId,name:'Üye '+(i+1),policy:settings.roles?.[i]??'participant'},op);account={token:session.token,url:new URL(session.url).origin,actorId:session.actorId,runId:state.runId};}
-        state.actors.push({id:account.actorId,account:{...account,pageSize:settings.pageSize},history:[],decisions:0,nextAt:0,client:{},pendingDecision:null});save();
+        else {const session=await operatorCall('/sessions',{runId:state.runId,name:settings.participantNames?.[i]??'Üye '+(i+1),policy:settings.roles?.[i]??'participant'},op);account={token:session.token,url:new URL(session.url).origin,actorId:session.actorId,runId:state.runId};}
+        state.actors.push({id:account.actorId,account:{...account,pageSize:settings.pageSize,...(settings.viewLimits?{viewLimits:settings.viewLimits}:{}),...(settings.contextMode?{contextMode:settings.contextMode}:{})},history:[],decisions:0,nextAt:0,client:{},pendingDecision:null});save();
       }
       if(new Set(state.actors.map(a=>a.id)).size!==state.actors.length)throw new Error('Participant accounts must be independent.');
     }
@@ -98,24 +104,38 @@ export async function run(config={},resume=false){
       let pending=actor.pendingDecision;
       if(!pending){
         const previousRevision=client.view?.accessRevision;
-        const observation=await client.read();
-        if(previousRevision!==undefined&&previousRevision!==client.view?.accessRevision)actor.history=[];
+        let observation=await client.read();
+        if(previousRevision!==undefined&&previousRevision!==client.view?.accessRevision){actor.history=[];actor.memory={};}
+        if(settings.historyMode==='compact')actor.memory=remember(actor.memory,observation,actor.decisions+1);
         saveActor();
         await record('observation',{actorId:actor.id,observation,...(client.evidence||{viewId:client.view?.viewId,providedPostIds:client.view?.items.map(p=>p.originalId||p.id)}),at:new Date().toISOString()});
         actor.decisions++;save();
         const decisionSeed=(settings.seed+state.round*100003+state.actors.indexOf(actor)*997)>>>0;
         let selected;
         if(settings.engine==='rule')selected={decision:ruleDecision(observation,seededRandom(decisionSeed)),history:actor.history,dropped:0};
-        else selected=await models[state.actors.indexOf(actor)%models.length].decide({observation,history:actor.history,operations:client.available(),surface:surfaces.get(actor.id),instructions:settings.participantInstructions?.[state.actors.indexOf(actor)],limits:{...settings,deadline:started+settings.maxWallMinutes*60000-previousElapsed},seed:decisionSeed,ledger,record:(kind,value)=>record(kind,{actorId:actor.id,decisionNumber:actor.decisions,...value})});
+        else for(let fit=0;fit<4;fit++){
+          selected=await models[state.actors.indexOf(actor)%models.length].decide({observation,history:actor.history,memory:settings.historyMode==='compact'?recall(actor.memory,observation):[],operations:client.available(),surface:surfaces.get(actor.id),instructions:settings.participantInstructions?.[state.actors.indexOf(actor)],limits:{...settings,deadline:started+settings.maxWallMinutes*60000-previousElapsed},seed:decisionSeed,ledger,record:(kind,value)=>record(kind,{actorId:actor.id,decisionNumber:actor.decisions,...value})});
+          if(selected.error?.code!=='input_budget'||settings.historyMode!=='compact'||fit===3||!client.narrowView?.())break;
+          // Tokenization found an oversized screen before any model request.
+          // Read a smaller real page, with the same account and permissions.
+          observation=await client.read();actor.memory=remember(actor.memory,observation,actor.decisions);saveActor();
+          await record('observation',{actorId:actor.id,decisionNumber:actor.decisions,observation,viewId:client.view?.viewId,budgetAdjusted:true,previousInputTokens:selected.inputTokens,at:new Date().toISOString()});
+        }
         if(selected.error){
           await record('decision-error',{actorId:actor.id,decisionNumber:actor.decisions,...selected,at:new Date().toISOString()});
+          if(['schema','truncated_output','missing_operation'].includes(selected.error.code)){
+            const {image,...past}=observation;
+            if(settings.historyMode!=='compact')actor.history=selected.history||actor.history;
+            actor.history.push(settings.historyMode==='compact'?receipt(actor.decisions,selected.attemptedDecision||null,{ok:false,error:selected.error},observation):{observation:past,operation:selected.attemptedDecision||null,result:{ok:false,error:selected.error}});
+            if(settings.historyMode==='compact')actor.history=actor.history.slice(-24);
+          }
           if(['inference','token_budget','input_budget','tokenizer_mismatch','wall_budget'].includes(selected.error.code)){state.stopReason=selected.error.code;if(selected.error.code==='inference')state.suggestedConcurrency=Math.max(1,Math.floor(settings.inferenceConcurrency/2));}
           saveActor();return;
         }
-        actor.history=selected.history||actor.history;
+        if(settings.historyMode!=='compact')actor.history=selected.history||actor.history;
         if(selected.noAction){
           await record('participant-comment',{actorId:actor.id,text:selected.text,decisionNumber:actor.decisions,at:new Date().toISOString()});
-          const {image,...past}=observation;actor.history.push({observation:past,text:selected.text,noAction:true});actor.nextAt=Date.now()+5000;saveActor();return;
+          const {image,...past}=observation;actor.history.push(settings.historyMode==='compact'?{turn:actor.decisions,text:selected.text,noAction:true}:{observation:past,text:selected.text,noAction:true});if(settings.historyMode==='compact')actor.history=actor.history.slice(-24);actor.nextAt=Date.now()+5000;saveActor();return;
         }
         pending={decision:selected.decision,observation,prepared:client.prepare(selected.decision),repaired:!!selected.repaired};actor.pendingDecision=pending;saveActor();
       }
@@ -127,7 +147,10 @@ export async function run(config={},resume=false){
       await record('decision',{actorId:actor.id,decisionNumber:actor.decisions,decision:pending.decision,commandId:pending.prepared.command?.commandId,result,repaired:pending.repaired,at:new Date().toISOString()});
       if(result.error?.code==='transport'){state.stopReason='participant_transport';saveActor();return;}
       const {image,...past}=pending.observation;
-      actor.history.push({observation:past,operation:pending.decision,result});
+      if(settings.historyMode==='compact'){
+        actor.history.push(receipt(actor.decisions,pending.decision,result,pending.observation));actor.history=actor.history.slice(-24);
+        if(result.observation)actor.memory=remember(actor.memory,result.observation,actor.decisions);
+      }else actor.history.push({observation:past,operation:pending.decision,result});
       // Older images remain in recordings; future inputs retain their visible text and actions.
       actor.pendingDecision=null;actor.nextAt=Date.now()+(result.waitSeconds||0)*1000;saveActor();
     }

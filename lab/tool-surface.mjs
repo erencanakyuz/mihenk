@@ -44,7 +44,7 @@ export class ToolSurface {
     if(Array.isArray(value))return value.map(item=>this.project(item));
     if(!value||typeof value!=='object')return value;
     return Object.fromEntries(Object.entries(value).filter(([key])=>this.options.decisionNotes||key!=='decisionNote').map(([key,child])=>{
-      if(key==='actions'&&Array.isArray(child))return [key,child.map(name=>this.name(name))];
+      if(['actions','authorActions'].includes(key)&&Array.isArray(child))return [key,child.map(name=>this.name(name))];
       if(key==='operations'&&Array.isArray(child))return [key,child.every(t=>typeof t==='string')?child.map(n=>this.name(n)):this.tools(child)];
       if(key==='operation'&&typeof child==='string')return [key,this.name(child)];
       return [key,this.project(child)];

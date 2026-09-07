@@ -39,6 +39,7 @@ export function canTarget(state,actorId,id){
   if(Object.hasOwn(state.offers,id))return canSeePost(state,actorId,state.posts[state.offers[id].targetId]);
   // Removal changes feed visibility, not the scope of an already observed account.
   // The command service still requires this session to have seen the target.
-  if(Object.hasOwn(state.actors,id))return Object.values(state.posts).some(p=>p.authorId===id&&canSeePost(state,actorId,p));
+  if(Object.hasOwn(state.actors,id))return Object.values(state.posts).some(p=>p.authorId===id&&canSeePost(state,actorId,p))||
+    [...Object.values(state.replies),...Object.values(state.offers)].some(m=>m.authorId===id&&canSeePost(state,actorId,state.posts[m.targetId]));
   return false;
 }

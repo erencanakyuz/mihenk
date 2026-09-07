@@ -25,6 +25,7 @@ export function openStore(filename) {
     },
     create(state) { db.prepare('INSERT INTO runs VALUES(?,?,?)').run(state.id, JSON.stringify(state), JSON.stringify(state)); },
     read(id) { const row = db.prepare('SELECT state FROM runs WHERE id=?').get(id); return row ? JSON.parse(row.state) : null; },
+    initial(id) { const row = db.prepare('SELECT initial FROM runs WHERE id=?').get(id); return row ? JSON.parse(row.initial) : null; },
     save(state) { db.prepare('UPDATE runs SET state=? WHERE id=?').run(JSON.stringify(state), state.id); },
     list() { return db.prepare('SELECT id,state FROM runs ORDER BY rowid DESC').all().map(r => { const s = JSON.parse(r.state); return { id:r.id, title:s.title, status:s.status, tick:s.tick, participants:Object.keys(s.actors).length }; }); },
     receipt(runId, actorId, id) { return db.prepare('SELECT * FROM receipts WHERE run_id=? AND actor_id=? AND command_id=?').get(runId, actorId, id); },
