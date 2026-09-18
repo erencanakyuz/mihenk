@@ -51,17 +51,19 @@
   .snote__ok { margin-left: 0; }
 }
 
-/* düz mod: tonlama yok, plaka düz bir satır etiketine döner, ince çerçeve kalır */
+/* düz mod (Terminal): tonlama yok, kutu yok; şerit iki ince çizgi arasında bir
+   satır, plaka büyük harfli bir etiket, "Anladım" ince çerçeveli bir düğme */
 :root[data-plain="1"] .snote {
   display: block;
-  margin-top: 12px;
+  margin: 12px 0 0;
+  padding: 12px var(--pad-x);
   background: none;
-  border: 1px solid #777;
-  padding: 10px var(--pad-x);
+  border: 0; border-top: 1px solid #fff; border-bottom: 1px solid #fff;
 }
-:root[data-plain="1"] .snote__t { color: #fff; font-size: 15px; }
+:root[data-plain="1"] .rp-conversation > .snote { padding: 12px 0; }
+:root[data-plain="1"] .snote__t { color: #fff; font-size: 16px; line-height: 1.5; }
 :root[data-plain="1"] .snote__ok {
-  margin: 10px 0 0; width: auto;
-  border: 1px solid #777; color: #fff; font-weight: 400;
+  margin: 8px 0 0; width: auto; min-height: 44px; padding: 0 16px;
+  border: 1px solid #fff; color: #fff; font-size: 16px; font-weight: 700;
 }
 :root[data-plain="1"] .snote__ok:hover { background: none; }

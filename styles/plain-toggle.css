@@ -9,16 +9,20 @@
 .band-toggle__state { flex: none; min-width: 64px; padding: 6px 12px; border: 1px solid var(--c-border); border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--c-text-2); text-align: center; }
 .band-toggle[aria-pressed="true"] { border-color: var(--c-accent); }
 .band-toggle[aria-pressed="true"] .band-toggle__state { background: var(--c-accent-fill); border-color: var(--c-accent-fill); color: #fff; }
-.band-exit { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 6px 14px; background: #000; color: #fff; border-bottom: 2px solid #fff; font-size: 14px; font-weight: 700; }
+/* Exit bar (only exists while the mode is on): black, one white rule, and the
+   second and last place the amber accent is allowed - the way back. */
+.band-exit { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 6px 16px; background: #000; color: #fff; border-bottom: 1px solid #fff; font-size: 14px; font-weight: 700; }
 .band-exit > span { display: inline-flex; align-items: center; gap: 8px; }
-.band-exit .ic { width: 18px; height: 18px; }
-.band-exit button { min-height: 40px; padding: 0 16px; border: 2px solid #fff; background: #fff; color: #000; font-size: 14px; font-weight: 800; }
-.band-exit button:focus-visible { outline: 3px solid #6bb9ff; outline-offset: 2px; }
+.band-exit button { min-height: 40px; padding: 0 16px; border: 0; background: #f5b400; color: #000; font: inherit; }
+.band-exit button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 :root[data-plain="1"] body { padding-top: 52px; }
-:root[data-plain="1"] .topbar, :root[data-plain="1"] .nav, :root[data-plain="1"] .side, :root[data-plain="1"] .rp-header { top: 52px; }
-:root[data-plain="1"] .band-toggle { border: 1px solid #777; background: #000; color: #fff; }
-:root[data-plain="1"] .band-toggle__text small { color: #ddd; }
-:root[data-plain="1"] .band-toggle__state { background: #fff; border-color: #fff; color: #000; }
+:root[data-plain="1"] .band-row { margin: 0; }
+:root[data-plain="1"] .band-toggle { min-height: 56px; padding: 8px var(--pad-x); border: 0; border-bottom: 1px solid #fff; background: #000; color: #fff; font-family: inherit; }
+:root[data-plain="1"] .band-toggle__text b { font-size: 16px; }
+:root[data-plain="1"] .band-toggle__text small { color: #bdbdbd; font-size: 14px; }
+:root[data-plain="1"] .band-toggle__state { min-width: 0; padding: 0; border: 0; background: none; color: #fff; font-size: 16px; }
+:root[data-plain="1"] .band-toggle__state::before { content: "["; }
+:root[data-plain="1"] .band-toggle__state::after { content: "]"; }
 @media (max-width: 700px) {
   .band-row { margin: 8px 12px 4px; }
   .band-toggle__text small { display: none; }

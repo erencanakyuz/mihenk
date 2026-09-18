@@ -21,7 +21,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~311 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~320 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -483,7 +483,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   min-height: 100vh;
 }
 
-/* header hides on scroll down, reveals on scroll up */
+/* header stays put: the tab bar must be reachable at any scroll depth */
 .topbar {
   position: sticky; top: 0; z-index: 30;
   transition: transform 200ms var(--ease-out);
@@ -520,8 +520,10 @@ ul { list-style: none; margin: 0; padding: 0; }
 .tab:hover { background: rgba(255,255,255,.06); }
 .tab[aria-selected="true"] { color: var(--c-text); font-weight: 700; }
 .tab__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tab--crisis { color: var(--c-accent); }
-.tab--crisis[aria-selected="true"] { color: var(--c-accent); }
+/* the crisis tab carries its own warm identity, never the navigation blue */
+.tab--crisis { color: var(--c-text-2); }
+.tab--crisis[aria-selected="true"] { color: var(--c-crisis-ink); }
+.tab--crisis[aria-selected="true"] .ic { color: var(--c-crisis-ink); }
 .tab--crisis .ic { animation: warn-pulse var(--pulse-dur, 2s) ease-in-out infinite; transform-origin: 50% 60%; }
 @keyframes warn-pulse {
   0%, 100% { opacity: .65; transform: scale(1); }
@@ -548,6 +550,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   transition: transform 300ms var(--spring);
 }
 .tabs__underline[data-squash="1"] { transition: transform 150ms var(--ease-out); }
+/* on the crisis tab the sliding underline turns warm along with the label */
+:root[data-tab="crisis"] .tabs__underline { background: var(--c-crisis); }
 
 /* ---- right sidebar ----------------------------------------------------- */
 .side {
@@ -1119,7 +1123,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 .post[data-flip="1"] { transition: transform 420ms var(--ease-out); }
 
 /* ---- crisis feed head -------------------------------------------------- */
-.crisis-head { border-bottom: 1px solid var(--c-border); }
+/* padding, margin değil: künye plakasının taştığı yeri açar ve kartın üst
+   payı sekme çubuğuna doğru çökmez (margin collapsing). */
+.crisis-head { padding-top: 13px; border-bottom: 1px solid var(--c-border); }
 .sos {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   width: calc(100% - var(--pad-x) * 2); margin: 12px var(--pad-x);
@@ -1592,7 +1598,7 @@ ul { list-style: none; margin: 0; padding: 0; }
    yarısı kadar boşluk bırakır; sol kenar çizgisi kaldırıldı. */
 .crisis-card {
   position: relative;
-  margin: 27px var(--pad-x) 12px;
+  margin: 14px var(--pad-x) 12px;
   border: 1px solid var(--c-border);
   border-radius: 16px;
   background: linear-gradient(180deg, var(--c-bg-3) 0%, var(--c-bg-2) 58%);
@@ -1609,7 +1615,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   padding: 15px 18px 18px;
 }
 @media (max-width: 700px) {
-  .crisis-card { margin: 25px 12px 12px; border-radius: 14px; }
+  .crisis-card { margin: 12px; border-radius: 14px; }
   .crisis-card .crisis-intro { padding: 16px 15px 0; }
   .crisis-card .crisis-intro h1 { font-size: 21px; }
   .crisis-card .crisis-actions { gap: 8px; padding: 14px 15px 15px; }
@@ -1642,103 +1648,192 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .nav__item > span:not(.nav__count) { white-space: nowrap; }
 
+/* ==========================================================================
+   Warm crisis identity. Blue stays the app's navigation accent; everything
+   that belongs to the crisis path - the "Kriz Var" tab, its underline, the
+   low-bandwidth switch - speaks amber, so the two never read as one thing.
+   Both values clear 4.5:1 on --c-bg (#1b1e27) and on plain-mode black.
+   ========================================================================== */
+:root {
+  --c-crisis:     #f2a154;   /* amber frame, underline, icons  (7.9:1 on --c-bg) */
+  --c-crisis-ink: #f6b678;   /* amber label text, small sizes  (9.4:1 on --c-bg) */
+}
+
+/* The low-bandwidth switch is the first control a thin connection needs, so
+   it wears the amber frame instead of blending into the card stack. The
+   selectors are id-scoped on purpose: this file loads before
+   styles/plain-toggle.css, so a bare .band-toggle would lose the cascade. */
+#band-row > .band-toggle {
+  border: 2px solid var(--c-crisis);
+  background: color-mix(in srgb, var(--c-crisis) 10%, var(--c-bg-2));
+}
+#band-row > .band-toggle:hover { background: color-mix(in srgb, var(--c-crisis) 16%, var(--c-bg-2)); }
+#band-row > .band-toggle > .ic { color: var(--c-crisis); }
+#band-row > .band-toggle[aria-pressed="false"] .band-toggle__state { border-color: var(--c-crisis); color: var(--c-crisis); }
+/* Plain mode keeps its flat black block; only the frame thickens. */
+:root[data-plain="1"] #band-row > .band-toggle { background: #000; border: 2px solid #fff; }
+
 /* ===== styles/plain.css ===== */
 /* ==========================================================================
-   MİHENK - düşük bant genişliği modu (low-bandwidth / plain HTML mode)
-   Deliberately austere. Everything decorative is removed; nothing is broken.
-   Also styles the <noscript> document, which must work with JS fully off.
+   MİHENK - düşük bant genişliği modu: "Terminal"
+   Siyah zemin, beyaz metin, tek yazı tipi (sistem monospace), kutu yok.
+   Ayrım ince beyaz çizgiler ve boşlukla kurulur. Tek renk amber (#f5b400)
+   yalnızca iki yerde: birincil eylem (Yardım talebi oluştur) ve çıkış
+   çubuğundaki "Normal görünüme dön" (styles/plain-toggle.css). Her başka
+   eylem altı çizili metin ya da çizgiyle sınırlı bir satır.
+   Kontrast: #fff/#000 21:1 · #bdbdbd/#000 11,2:1 · #000/#f5b400 11,4:1.
+   Seçiciler :is() ile gruplanır: bayt bütçesi için öneki bir kez yazmak
+   yeter. Also styles the <noscript> document (JS fully off).
    ========================================================================== */
 
+/* the palette collapses to ink / paper / muted; everything that reads a
+   token turns monochrome for free */
 :root[data-plain="1"] {
-  --pad-x: 14px;
+  --pad-x: 16px;
+  --c-bg: #000; --c-bg-2: #000; --c-bg-3: #000; --c-border: #fff;
+  --c-text: #fff; --c-text-2: #bdbdbd;
+  --c-accent: #fff; --c-accent-2: #fff; --c-accent-fill: #000; --c-accent-ink: #fff;
+  --v-verified: #fff; --v-official: #fff; --v-unverified: #fff; --v-disputed: #fff;
+  --hover-row: transparent; --halo-alpha: 0;
+  --ff: ui-monospace, "SFMono-Regular", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  --ff-display: var(--ff);
 }
 
 /* kill every non-essential visual */
-:root[data-plain="1"] *,
-:root[data-plain="1"] *::before,
-:root[data-plain="1"] *::after {
-  animation: none !important;
-  transition: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-radius: 0 !important;
-  filter: none !important;
-  text-shadow: none !important;
+:root[data-plain="1"] *, :root[data-plain="1"] ::before, :root[data-plain="1"] ::after {
+  animation: none !important; transition: none !important; box-shadow: none !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important; filter: none !important; text-shadow: none !important;
 }
+:root[data-plain="1"] body { font-family: var(--ff); background: #000; color: #fff; font-size: 16px; line-height: 1.5; }
+:root[data-plain="1"] :is(button, input, select, textarea) { font: inherit; }
 
-:root[data-plain="1"] body {
-  font-family: ui-monospace, "SFMono-Regular", "DejaVu Sans Mono", Menlo, Consolas, monospace;
-  background: #000; color: #fff;
-  font-size: 16px; line-height: 1.5;
-}
-
-/* single column: no nav, no sidebar, no media, no avatars */
+/* single column: no nav, no sidebar, no media, no avatars, no icons */
 :root[data-plain="1"] .shell { display: block; max-width: 680px; margin: 0 auto; }
-:root[data-plain="1"] .nav,
-:root[data-plain="1"] .side,
-:root[data-plain="1"] .av,
-:root[data-plain="1"] .sk--av,
-:root[data-plain="1"] .post__media,
-:root[data-plain="1"] .post__quote,
-:root[data-plain="1"] .acts,
-:root[data-plain="1"] .post__more,
-:root[data-plain="1"] .fab,
-:root[data-plain="1"] .bottombar,
-:root[data-plain="1"] .composer__tool,
-:root[data-plain="1"] .map,
-:root[data-plain="1"] .cursor,
-:root[data-plain="1"] .tabs__underline { display: none !important; }
+:root[data-plain="1"] :is(.nav, .side, .av, .sk--av, .post__media, .post__quote, .acts, .post__more, .fab, .bottombar,
+  .composer__tool, .map, .cursor, .tabs__underline, .rp-avatar, .ic),
+:root[data-plain="1"] .rp-message--reply::before { display: none !important; }
 
+/* icon-only controls get their word back */
+:root[data-plain="1"] #crisis-find::after { content: "Ara"; }
+:root[data-plain="1"] .report-action::after { content: "Bildir"; }
+:root[data-plain="1"] :is(#close-ccomposer, #compose-about-x, [data-cancel-reply], [data-flow="close"], [data-search-close])::after { content: "Kapat"; }
+:root[data-plain="1"] [data-flow="prev"] { width: auto !important; }
+:root[data-plain="1"] [data-flow="prev"]::after { content: "Geri"; }
+:root[data-plain="1"] [data-step="-1"]::after { content: "−"; }
+:root[data-plain="1"] [data-step="1"]::after { content: "+"; }
+:root[data-plain="1"] .post__verified::after { content: "✓"; }
+:root[data-plain="1"] .request-page summary::after { content: "▾"; margin-left: auto; }
+:root[data-plain="1"] .request-page details[open] > summary::after { content: "▴"; }
+
+/* frame */
 :root[data-plain="1"] .main { border: 0; }
 :root[data-plain="1"] .topbar { position: static; transform: none !important; }
-:root[data-plain="1"] .topbar__row { display: flex; background: #000; font-family: inherit; }
-:root[data-plain="1"] .tabs { background: #000; border-bottom: 1px solid #666; height: auto; }
-:root[data-plain="1"] .tab { padding: 12px 8px; color: #bbb; }
-:root[data-plain="1"] .tab[aria-selected="true"] { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+:root[data-plain="1"] .topbar__row { display: flex; background: #000; font-size: 16px; letter-spacing: .1em; }
+:root[data-plain="1"] .tabs { background: #000; border-bottom: 1px solid #fff; height: auto; }
+:root[data-plain="1"] .tab { padding: 12px 8px; color: #bdbdbd; }
+:root[data-plain="1"] .tab[aria-selected="true"] { color: #fff; text-decoration: underline; text-underline-offset: 6px; }
 
-:root[data-plain="1"] .post,
-:root[data-plain="1"] .cpost {
-  display: block; padding: 12px var(--pad-x);
-  border-bottom: 1px solid #444; border-left: 0 !important;
-}
-:root[data-plain="1"] .post:hover,
-:root[data-plain="1"] .cpost:hover { background: none; }
-:root[data-plain="1"] .post__name,
-:root[data-plain="1"] .cpost__name { font-size: 16px; max-width: none; }
-:root[data-plain="1"] .post__head,
-:root[data-plain="1"] .cpost__head { display: block; color: #bbb; font-size: 14px; }
-:root[data-plain="1"] .post__body,
-:root[data-plain="1"] .cpost__body { font-size: 16px; }
+/* form fields are the one thing that keeps a thin box */
+:root[data-plain="1"] :is(input, select, textarea) { padding: 8px; border: 1px solid #bdbdbd; background: #000; color: #fff; }
+:root[data-plain="1"] .crisis-filters select { border: 0; }
+:root[data-plain="1"] .crisis-filters { flex-wrap: wrap; padding: 12px var(--pad-x); }
+:root[data-plain="1"] :is(.crisis-filters label, .crisis-filters button) { min-height: 44px; border: 1px solid #bdbdbd; }
+:root[data-plain="1"] .crisis-filters button { width: auto; padding: 0 12px; }
 
-/* verification stays - it is the one thing that must survive */
-:root[data-plain="1"] .vpill {
-  border: 2px solid currentColor; background: none;
-  height: auto; padding: 2px 8px; margin: 6px 0;
-  font-size: 14px;
+/* crisis head: label, title, one amber row, one ruled row */
+:root[data-plain="1"] .crisis-card { margin: 0; border: 0; background: #000; }
+:root[data-plain="1"] .crisis-intro { padding: 16px var(--pad-x) 0; }
+:root[data-plain="1"] .crisis-intro h1 { font-size: 20px; line-height: 1.25; margin: 4px 0 2px; }
+:root[data-plain="1"] .crisis-intro p { color: #bdbdbd; font-size: 16px; line-height: 1.5; margin: 0; }
+:root[data-plain="1"] :is(.kunye, .rp-note-k) {
+  position: static; transform: none; display: block; height: auto; max-width: none;
+  padding: 0; margin: 0 0 6px; background: none; color: #bdbdbd;
+  font: 14px/1.5 var(--ff); letter-spacing: .1em; text-transform: uppercase; white-space: normal;
 }
-:root[data-plain="1"] .vpill .ic { display: none; }
-:root[data-plain="1"] .vpill::before { content: "["; }
-:root[data-plain="1"] .vpill::after  { content: "]"; }
-:root[data-plain="1"] .vpill--verified { color: var(--v-verified); }
-:root[data-plain="1"] .vpill--official { color: var(--v-official); }
-:root[data-plain="1"] .vpill--unverified { color: var(--v-unverified); }
-:root[data-plain="1"] .vpill--disputed { color: var(--v-disputed); }
+:root[data-plain="1"] .crisis-actions { display: grid; grid-template-columns: 1fr; gap: 4px; padding: 16px var(--pad-x) 12px; }
+:root[data-plain="1"] :is(.sos, .crisis-actions #crisis-write) {
+  display: block; width: 100%; height: auto; min-height: 48px; margin: 0; padding: 12px 16px;
+  border: 0; font-size: 16px; font-weight: 700; letter-spacing: 0; text-align: left;
+}
+:root[data-plain="1"] :is(.sos, #crisis-write)::before { content: "> "; }
+:root[data-plain="1"] .sos { background: #f5b400; color: #000; }
+:root[data-plain="1"] .crisis-actions #crisis-write { background: none; color: #fff; border-top: 1px solid #fff; border-bottom: 1px solid #fff; }
+:root[data-plain="1"] .my-requests { margin: 0; width: 100%; padding: 12px var(--pad-x); border: 0; border-bottom: 1px solid #fff; background: none; color: #bdbdbd; font-size: 14px; }
+:root[data-plain="1"] .my-requests b { color: #fff; text-decoration: underline; }
 
-:root[data-plain="1"] .cpost__meta { color: #bbb; font-size: 14px; }
-:root[data-plain="1"] .cpost__tag { border: 1px solid #666; }
-:root[data-plain="1"] .sos {
-  height: auto; padding: 12px; margin: 12px var(--pad-x);
-  border: 2px solid var(--c-accent); background: none; color: var(--c-accent);
-  width: auto;
+/* filters: [ ] / [x] */
+:root[data-plain="1"] .chips { gap: 0 20px; padding: 0 var(--pad-x) 4px; border-bottom: 1px solid #fff; }
+:root[data-plain="1"] .chip { height: auto; min-height: 44px; padding: 0; gap: 0; border: 0; background: none; color: #bdbdbd; font-size: 16px; white-space: pre; }
+:root[data-plain="1"] .chip::before { content: "[ ] "; }
+:root[data-plain="1"] :is(.chip[aria-pressed="true"], .chip[data-on="1"]) { background: none; color: #fff; font-weight: 700; }
+:root[data-plain="1"] :is(.chip[aria-pressed="true"], .chip[data-on="1"])::before { content: "[x] "; }
+:root[data-plain="1"] .chip__n { opacity: 1; margin-left: 4px; }
+
+/* posts: ruled rows, no cards */
+:root[data-plain="1"] :is(.post, .cpost) { display: block; margin: 0; padding: 16px var(--pad-x); background: #000; border: 0; border-bottom: 1px solid #fff; }
+:root[data-plain="1"] :is(.post__head, .cpost__head) { flex-wrap: wrap; gap: 0 6px; color: #bdbdbd; font-size: 14px; }
+:root[data-plain="1"] :is(.post__name, .cpost__name) { color: #fff; font-size: 16px; max-width: none; }
+:root[data-plain="1"] :is(.post__body, .cpost__body) { font-size: 16px; line-height: 1.5; }
+
+/* verification survives as a bracketed word */
+:root[data-plain="1"] :is(.vpill, .rp-verification) {
+  display: inline-block; height: auto; padding: 0; margin: 8px 12px 8px 0; gap: 0;
+  background: none; color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0; text-transform: uppercase;
 }
-:root[data-plain="1"] .crisis-actions { grid-template-columns: 1fr; }
-:root[data-plain="1"] .crisis-actions .sos,
-:root[data-plain="1"] .crisis-actions .btn { margin: 0; width: 100%; min-height: 44px; font-size: 15px; }
-:root[data-plain="1"] .chip { border: 1px solid #666; }
-:root[data-plain="1"] .chip[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
-:root[data-plain="1"] .pin { margin-top: 12px; border: 2px solid var(--c-accent); background: none; }
-:root[data-plain="1"] .btn { border: 2px solid currentColor; }
+:root[data-plain="1"] :is(.vpill, .rp-verification)::before { content: "["; }
+:root[data-plain="1"] :is(.vpill, .rp-verification)::after { content: "]"; }
+
+:root[data-plain="1"] .cpost__meta { gap: 4px 16px; margin-top: 8px; }
+:root[data-plain="1"] .cpost__tag { height: auto; padding: 0; border: 0; color: #bdbdbd; font-size: 14px; letter-spacing: 0; text-transform: none; }
+:root[data-plain="1"] .cpost__request { display: block; margin-top: 8px; }
+:root[data-plain="1"] .cpost__need { display: block; min-height: 0; padding: 0; background: none; color: #fff; font-size: 16px; font-weight: 700; }
+:root[data-plain="1"] .cpost__need::before { content: "- "; }
+:root[data-plain="1"] .cpost__facts { display: block; margin-top: 4px; }
+:root[data-plain="1"] :is(.cpost__facts, .rp-facts) > span + span::before { content: "\a0·\a0"; }
+:root[data-plain="1"] .request-actions { border: 0; margin-top: 4px; padding-top: 0; gap: 0 20px; }
+
+/* every secondary action is underlined text, 44 px tall; compact buttons keep a thin outline */
+:root[data-plain="1"] :is(.cpost__why, .cpost__verify, .cpost__about-go, .request-actions button, .rp-back, .rp-text-button,
+  .rp-endorse, .rp-message-actions > button, .rp-updates, .rp-earlier) {
+  height: auto; min-height: 44px; padding: 0; border: 0; background: none; color: #fff; font-size: 16px;
+  text-decoration: underline; text-underline-offset: 4px;
+}
+:root[data-plain="1"] :is(.rp-back, .rp-endorse, .rp-message-actions > button) { color: #bdbdbd; font-size: 14px; }
+:root[data-plain="1"] .open-request { font-weight: 700; }
+:root[data-plain="1"] .open-request::after { content: "\a0>"; }
+:root[data-plain="1"] :is(.btn, .rp-send, .rp-primary, .rp-button) { height: auto; min-height: 44px; padding: 0 16px; border: 1px solid #fff; background: none; color: #fff; font-size: 16px; font-weight: 700; }
+:root[data-plain="1"] .pin { margin: 12px var(--pad-x); padding: 12px; border: 1px solid #fff; background: none; }
+
+/* muted metadata reads at 14 px, never smaller */
+:root[data-plain="1"] :is(.cpost__facts, .cpost__state, .request-counts, .rp-id, .rp-state, .rp-facts, .rp-statement-peek,
+  .rp-statement-author small, .rp-message-meta, .rp-note-m, .rp-endorsed, .rp-public-note, .rp-compose-hint, .rp-hint) {
+  color: #bdbdbd; font-size: 14px; font-weight: 400;
+}
+
+/* request / information page: ruled sections, no boxes, nothing sticky */
+:root[data-plain="1"] .rp-header { position: static; flex-wrap: wrap; gap: 0 16px; padding: 0 0 8px; border-bottom: 1px solid #fff; }
+:root[data-plain="1"] .rp-back { flex: 1 1 100%; width: auto; min-width: 0; justify-content: flex-start; }
+:root[data-plain="1"] :is(.rp-back > span, .rp-id) { display: inline; }
+:root[data-plain="1"] .rp-header > div { flex: 1; flex-direction: row; align-items: baseline; gap: 8px; }
+:root[data-plain="1"] :is(.rp-header h1, .rp-overview h2) { font-size: 20px; line-height: 1.25; letter-spacing: 0; }
+:root[data-plain="1"] .rp-overview { padding-top: 12px; }
+:root[data-plain="1"] .rp-facts { gap: 4px 0; margin: 8px 0 12px; }
+:root[data-plain="1"] .rp-facts .rp-verification { margin: 0; }
+:root[data-plain="1"] .rp-statement { margin: 0; border-width: 1px 0 0; }
+:root[data-plain="1"] .request-page summary { padding: 12px 0; font-size: 16px; }
+:root[data-plain="1"] .rp-statement-author strong { font-size: 16px; font-weight: 700; }
+:root[data-plain="1"] .rp-statement-peek { padding-left: 0; }
+:root[data-plain="1"] .rp-statement-body { padding: 0 0 16px; }
+:root[data-plain="1"] :is(.rp-statement-body > p, .rp-note-b, .rp-message p, .rp-message-meta > b, .rp-compose > label) { font-size: 16px; line-height: 1.5; }
+:root[data-plain="1"] .rp-tabs { position: static; margin-top: 0; }
+:root[data-plain="1"] .rp-tabs > button { flex: 1; min-height: 56px; padding: 8px; color: #bdbdbd; font-size: 16px; }
+:root[data-plain="1"] .rp-tabs > button[aria-selected="true"] { color: #fff; font-weight: 700; }
+:root[data-plain="1"] .rp-note { margin: 12px 0 0; padding: 12px 0; border: 0; border-top: 1px solid #fff; border-bottom: 1px solid #fff; background: none; }
+:root[data-plain="1"] .rp-message { padding: 16px 0; gap: 0; }
+:root[data-plain="1"] .rp-message--reply { margin-left: 16px; }
+:root[data-plain="1"] .rp-compose { padding: 16px 0 0; border-width: 1px 0 0; }
+:root[data-plain="1"] .rp-empty { padding: 32px 0; }
 
 /* byte-size comparison chip */
 .bytechip {
@@ -1798,7 +1893,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .nojs .who b { color: #fff; }
 .nojs .meta { font-size: 13px; color: #bbb; margin-top: 6px; }
 
-:root[data-plain="1"] .post__verified { display: inline-block; vertical-align: -2px; }
 :root[data-plain="1"] .crisis-tools { display: block; }
 :root[data-plain="1"] .bytechip { display: inline-flex; margin: 8px 0 0; }
 
@@ -1966,7 +2060,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   .rp-management>summary { padding:4px 0; }.rp-manage-body>div { flex-wrap:wrap; gap:10px; }.rp-empty { padding:30px 8px; }
 }
 @media(prefers-reduced-motion:reduce){.request-page summary>.ic { transition:none; }}
-:root[data-plain="1"] .request-page { --c-bg:#000; --c-bg-2:#000; --c-text:#fff; --c-text-2:#ddd; --c-border:#777; }
+:root[data-plain="1"] .request-page { --c-bg:#000; --c-bg-2:#000; --c-text:#fff; --c-text-2:#bdbdbd; --c-border:#fff; }
 
 /* The reference card: this information post is about a help request. */
 .rp-about { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 20px; margin-top:16px; padding:14px 16px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
@@ -2011,7 +2105,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   .cpost__about-go { justify-content:center; display:inline-flex; align-items:center; min-height:40px; }
   .rp-about { padding:12px; }.rp-about .rp-primary { width:100%; justify-content:center; }
 }
-:root[data-plain="1"] .request-actions--entry .open-request { border:1px solid #fff; }
+:root[data-plain="1"] .request-actions--entry .open-request { border:0; padding:0; min-width:0; }
 
 /* ===== styles/section-notes.css ===== */
 /* ==========================================================================
@@ -2067,18 +2161,20 @@ ul { list-style: none; margin: 0; padding: 0; }
   .snote__ok { margin-left: 0; }
 }
 
-/* düz mod: tonlama yok, plaka düz bir satır etiketine döner, ince çerçeve kalır */
+/* düz mod (Terminal): tonlama yok, kutu yok; şerit iki ince çizgi arasında bir
+   satır, plaka büyük harfli bir etiket, "Anladım" ince çerçeveli bir düğme */
 :root[data-plain="1"] .snote {
   display: block;
-  margin-top: 12px;
+  margin: 12px 0 0;
+  padding: 12px var(--pad-x);
   background: none;
-  border: 1px solid #777;
-  padding: 10px var(--pad-x);
+  border: 0; border-top: 1px solid #fff; border-bottom: 1px solid #fff;
 }
-:root[data-plain="1"] .snote__t { color: #fff; font-size: 15px; }
+:root[data-plain="1"] .rp-conversation > .snote { padding: 12px 0; }
+:root[data-plain="1"] .snote__t { color: #fff; font-size: 16px; line-height: 1.5; }
 :root[data-plain="1"] .snote__ok {
-  margin: 10px 0 0; width: auto;
-  border: 1px solid #777; color: #fff; font-weight: 400;
+  margin: 8px 0 0; width: auto; min-height: 44px; padding: 0 16px;
+  border: 1px solid #fff; color: #fff; font-size: 16px; font-weight: 700;
 }
 :root[data-plain="1"] .snote__ok:hover { background: none; }
 
@@ -2096,7 +2192,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 .ai-note__legend li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #8a93a5; }
 .ai-note__legend li[data-verdict="true"]::before { background: var(--v-verified); }
 .ai-note__legend li[data-verdict="false"]::before { background: var(--v-disputed); }
-:root[data-plain="1"] .ai-note { border-color: #777; background: #000; }
+:root[data-plain="1"] .ai-note { padding: 12px 0; border: 0; border-bottom: 1px solid #bdbdbd; background: none; color: #bdbdbd; font-size: 14px; }
+:root[data-plain="1"] .ai-note__tag, :root[data-plain="1"] .ai-note__state { color: #fff; }
+:root[data-plain="1"] .ai-note__legend { display: none; }
 
 /* ===== styles/plain-toggle.css ===== */
 /* Low-bandwidth mode switch under the crisis head, and the exit bar while the mode is on. */
@@ -2110,16 +2208,20 @@ ul { list-style: none; margin: 0; padding: 0; }
 .band-toggle__state { flex: none; min-width: 64px; padding: 6px 12px; border: 1px solid var(--c-border); border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--c-text-2); text-align: center; }
 .band-toggle[aria-pressed="true"] { border-color: var(--c-accent); }
 .band-toggle[aria-pressed="true"] .band-toggle__state { background: var(--c-accent-fill); border-color: var(--c-accent-fill); color: #fff; }
-.band-exit { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 6px 14px; background: #000; color: #fff; border-bottom: 2px solid #fff; font-size: 14px; font-weight: 700; }
+/* Exit bar (only exists while the mode is on): black, one white rule, and the
+   second and last place the amber accent is allowed - the way back. */
+.band-exit { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 6px 16px; background: #000; color: #fff; border-bottom: 1px solid #fff; font-size: 14px; font-weight: 700; }
 .band-exit > span { display: inline-flex; align-items: center; gap: 8px; }
-.band-exit .ic { width: 18px; height: 18px; }
-.band-exit button { min-height: 40px; padding: 0 16px; border: 2px solid #fff; background: #fff; color: #000; font-size: 14px; font-weight: 800; }
-.band-exit button:focus-visible { outline: 3px solid #6bb9ff; outline-offset: 2px; }
+.band-exit button { min-height: 40px; padding: 0 16px; border: 0; background: #f5b400; color: #000; font: inherit; }
+.band-exit button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 :root[data-plain="1"] body { padding-top: 52px; }
-:root[data-plain="1"] .topbar, :root[data-plain="1"] .nav, :root[data-plain="1"] .side, :root[data-plain="1"] .rp-header { top: 52px; }
-:root[data-plain="1"] .band-toggle { border: 1px solid #777; background: #000; color: #fff; }
-:root[data-plain="1"] .band-toggle__text small { color: #ddd; }
-:root[data-plain="1"] .band-toggle__state { background: #fff; border-color: #fff; color: #000; }
+:root[data-plain="1"] .band-row { margin: 0; }
+:root[data-plain="1"] .band-toggle { min-height: 56px; padding: 8px var(--pad-x); border: 0; border-bottom: 1px solid #fff; background: #000; color: #fff; font-family: inherit; }
+:root[data-plain="1"] .band-toggle__text b { font-size: 16px; }
+:root[data-plain="1"] .band-toggle__text small { color: #bdbdbd; font-size: 14px; }
+:root[data-plain="1"] .band-toggle__state { min-width: 0; padding: 0; border: 0; background: none; color: #fff; font-size: 16px; }
+:root[data-plain="1"] .band-toggle__state::before { content: "["; }
+:root[data-plain="1"] .band-toggle__state::after { content: "]"; }
 @media (max-width: 700px) {
   .band-row { margin: 8px 12px 4px; }
   .band-toggle__text small { display: none; }
@@ -2854,6 +2956,8 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       var on = t.dataset.tab === state.tab;
       t.setAttribute('aria-selected', on ? 'true' : 'false');
       t.tabIndex = on ? 0 : -1;
+      // tapping the tab you are already on is the way back to the top
+      if (on) t.title = 'En üste çık ve güncelle'; else t.removeAttribute('title');
     });
     moveUnderline();
   }
@@ -2998,16 +3102,16 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     window.scrollTo(0, state.scroll[id] || 0);
   };
 
-  /* ---------------------------------------------------- header on scroll */
+  /* ---------------------------------------------------- header on scroll
+     The tab bar is the only way between the normal feed and the crisis feed,
+     so the sticky header never hides: in a crisis nobody should have to
+     scroll back up to find it. */
   var lastY = 0;
   function onScroll() {
     var y = window.scrollY;
     var bar = $('#topbar');
     if (!bar) return;
-    var d = y - lastY;
-    if (y < 60) bar.dataset.hidden = '';
-    else if (d > 4) bar.dataset.hidden = '1';
-    else if (d < -4) bar.dataset.hidden = '';
+    bar.dataset.hidden = '';
     lastY = y;
   }
 
@@ -3196,7 +3300,12 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
 
     $('#tabs').addEventListener('click', function (e) {
       var t = e.target.closest('.tab');
-      if (t) setTab(t.dataset.tab);
+      if (!t) return;
+      if (t.dataset.tab !== state.tab) { setTab(t.dataset.tab); return; }
+      // already here: jump to the top of this feed and pull fresh items
+      window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' });
+      if (M.shared) { if (M.refreshShared) M.refreshShared(true); }
+      else if (state.tab === 'crisis' && M.renderCrisisList) M.renderCrisisList();
     });
     $('#tabs').addEventListener('keydown', function (e) {
       var ids = order();

@@ -161,7 +161,7 @@
   .rp-management>summary { padding:4px 0; }.rp-manage-body>div { flex-wrap:wrap; gap:10px; }.rp-empty { padding:30px 8px; }
 }
 @media(prefers-reduced-motion:reduce){.request-page summary>.ic { transition:none; }}
-:root[data-plain="1"] .request-page { --c-bg:#000; --c-bg-2:#000; --c-text:#fff; --c-text-2:#ddd; --c-border:#777; }
+:root[data-plain="1"] .request-page { --c-bg:#000; --c-bg-2:#000; --c-text:#fff; --c-text-2:#bdbdbd; --c-border:#fff; }
 
 /* The reference card: this information post is about a help request. */
 .rp-about { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 20px; margin-top:16px; padding:14px 16px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
@@ -206,4 +206,4 @@
   .cpost__about-go { justify-content:center; display:inline-flex; align-items:center; min-height:40px; }
   .rp-about { padding:12px; }.rp-about .rp-primary { width:100%; justify-content:center; }
 }
-:root[data-plain="1"] .request-actions--entry .open-request { border:1px solid #fff; }
+:root[data-plain="1"] .request-actions--entry .open-request { border:0; padding:0; min-width:0; }

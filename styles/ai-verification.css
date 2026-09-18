@@ -11,4 +11,6 @@
 .ai-note__legend li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #8a93a5; }
 .ai-note__legend li[data-verdict="true"]::before { background: var(--v-verified); }
 .ai-note__legend li[data-verdict="false"]::before { background: var(--v-disputed); }
-:root[data-plain="1"] .ai-note { border-color: #777; background: #000; }
+:root[data-plain="1"] .ai-note { padding: 12px 0; border: 0; border-bottom: 1px solid #bdbdbd; background: none; color: #bdbdbd; font-size: 14px; }
+:root[data-plain="1"] .ai-note__tag, :root[data-plain="1"] .ai-note__state { color: #fff; }
+:root[data-plain="1"] .ai-note__legend { display: none; }
