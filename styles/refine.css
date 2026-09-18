@@ -208,3 +208,39 @@
 .crisis-actions #crisis-write:active { transform: scale(.985); }
 .crisis-actions #crisis-write .ic { width: 22px; height: 22px; }
 :root[data-plain="1"] .crisis-actions #crisis-write { background: none; border: 2px solid var(--c-accent); color: var(--c-accent); }
+
+/* ==========================================================================
+   "Kriz Var" head as a card · sibling of the pinned .pin card
+   Same hairline border, 16px radius, thin blue left accent and blue label
+   treatment as .pin, one notch warmer: a soft lift off the page, roomier
+   padding and the two action buttons sitting inside the card.
+   ========================================================================== */
+.crisis-card {
+  margin: 14px var(--pad-x) 12px;
+  border: 1px solid var(--c-border);
+  border-left: 1px solid var(--c-accent);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--c-bg-3) 0%, var(--c-bg-2) 58%);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+  overflow: hidden;
+}
+.crisis-card .crisis-intro { padding: 18px 18px 0; }
+.crisis-card .scenario-label { font-weight: 700; letter-spacing: .01em; }
+.crisis-card .crisis-intro h1 { font-size: 23px; margin: 8px 0 5px; }
+/* the shared read-only view keeps its bigger headline */
+[data-shared="1"] .crisis-card .crisis-intro h1 { font-size: clamp(24px, 5vw, 32px); }
+.crisis-card .crisis-intro p { font-size: 14px; line-height: 21px; }
+.crisis-card .crisis-actions {
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 10px;
+  padding: 15px 18px 18px;
+}
+@media (max-width: 700px) {
+  .crisis-card { margin: 12px; border-radius: 14px; }
+  .crisis-card .crisis-intro { padding: 16px 15px 0; }
+  .crisis-card .crisis-intro h1 { font-size: 21px; }
+  .crisis-card .crisis-actions { gap: 8px; padding: 14px 15px 15px; }
+  .crisis-card .crisis-actions .sos { font-size: 14px; }
+}
+/* Low-bandwidth mode keeps the flat black block: no card chrome at all. */
+:root[data-plain="1"] .crisis-card { margin: 0; border: 0; border-bottom: 1px solid #666; background: #000; }
