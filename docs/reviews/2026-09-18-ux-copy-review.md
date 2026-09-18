@@ -870,9 +870,27 @@ copy.
 
 ## What was applied on `fix/request-ux-copy`
 
-Copy and UX fixes were applied in a separate worktree
-(`../mihenk-ux-fixes`, branch `fix/request-ux-copy`, based on `722c223`). See that
-branch's commit for the exact diff; findings left unfixed there are listed in its commit
-message, chiefly F52 (needs a wizard step split and a `scripts/demo.js` update), F9
-(relative timestamps), F26 (role-dependent tab label) and F7's heading decision, which
-needs a product call rather than an edit.
+Copy and UX fixes were applied in a separate worktree (`../mihenk-ux-fixes`, branch
+`fix/request-ux-copy`), rebased onto `feature/request-thread-page` at `2e64abf` after the
+parallel code-review and explainer-strip work was merged there, and recorded as section 23
+of the implementation plan on that branch. The main working tree was not modified apart
+from this file.
+
+Overlap with that parallel work: the wizard review rows and the `locationKnown` rule
+(F46, F47) were already fixed on the mainline in `b22ec9a`; this branch keeps the
+finer-grained rows (`İlçe`, `Herkese açık yer tarifi`, `Ayrıntılı adres`, `Telefon`,
+`Akışta`). Everything else in the ten-item list was still open on the mainline when the
+branch was rebased.
+
+Left unfixed by decision: F52 (needs a wizard step split and a `scripts/demo.js` update),
+F9 (relative timestamps), F26 (role-dependent tab label), F8 (the `#id` chip), F62
+(heading level on the unavailable screen) and F7, where a help call still has no `h2`
+although the verification chip now joins the fact row so no orphan title row remains.
+
+Verified on that branch: `npm run check:syntax`, `npm run contrast` (ALL PASS),
+`node lab/request-access-check.mjs` (63/63 after the rebase), `npm run bundle`, and
+Playwright captures at
+1440/390/320 px in local and shared mode — statement preview, owner action row, closure
+notice, management labels, both confirmation modals, the blocked close without a reason,
+focus retained on a clicked tab, no per-message audience badge in community, a 44 px back
+control, no horizontal scroll, no private strings in the outsider page, no console errors.
