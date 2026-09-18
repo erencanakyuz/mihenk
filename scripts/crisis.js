@@ -119,12 +119,14 @@
 
     var head = el(
       '<div class="crisis-head">' +
+        '<div class="crisis-card">' +
         '<div class="crisis-intro"><span class="scenario-label">' + icon('shield', 'ic--sm') + 'Kriz bilgi merkezi</span>' +
         '<h1>' + (M.shared ? esc(M.sharedView.title) : 'Kahramanmaraş depremi') + '</h1><p>Bölgeni seç, güvenilir bilgiyi takip et.</p></div>' +
         '<div class="crisis-actions">' +
         '<button class="sos" id="sos" type="button">' + icon('sos') +
           '<span>Yardım talebi oluştur</span></button>' +
         '<button class="btn btn--ghost" type="button" id="crisis-write">' + icon('quill') + 'Bilgi paylaş</button></div>' +
+        '</div>' +
         '<button class="my-requests" type="button" id="my-requests" hidden></button>' +
         '<div class="composer" id="ccomposer" hidden>' +
           '<span class="av">' + S.me.avatar + '</span>' +
