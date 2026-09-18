@@ -815,3 +815,34 @@ Verification: `npm run check:syntax` passes; `node lab/request-access-check.mjs`
 unverified filter); crisis head captures at 1440, 390 and 320 px show one chip row on
 desktop and two on phones with no horizontal scroll; the toggle returns to
 `Bölgeden güncellemeler`; the official card carries the closed-comments note.
+
+## 22. Merged follow-ups (18 September 2026, later)
+
+- **Card-style crisis head** (`04edfbd`, merged in `55a4713`): `.crisis-intro` and
+  `.crisis-actions` sit in one `.crisis-card` styled as a sibling of the pinned crisis
+  card (border, 1 px accent edge, 16 px radius); the red and green buttons keep their size
+  and stack on phones; plain mode falls back to a flat black block.
+- **Code review fixes** (`1f96d38`, from `docs/reviews/2026-09-18-code-review.md`):
+  `request.close`/`request.reopen` are state transitions (a second close cannot rewrite
+  the recorded reason), an empty `request.manage` is rejected instead of bumping the
+  version, a pending command keeps its frozen parent so an uncertain retry reuses the
+  same command ID, a refresh during a failed send rebuilds the composer, only a selection
+  inside the card blocks the body click, help-call moderators get the community dot,
+  parent authors join the `seen` list, `accessChanged` fires only for the viewer's own
+  policy, and the local adapter guards partial updates, missing offers and private
+  community messages. Stale `localStorage` help drafts are removed.
+- **Wizard review** (`b22ec9a`): the review step shows `Herkese açık konum`,
+  `Adres tarifi` and `Telefon` with their visibility; a public landmark alone counts as a
+  known location on the server and in the wizard.
+- **Chat cap** (`92e6bae`): 1000 characters per message with a visible counter from 800
+  and the server message `Mesaj en fazla 1000 karakter olabilir.`
+- **Explainer strips** (`3b1d4bd`, merged in `5d2ce1a`): `scripts/section-notes.js` and
+  `styles/section-notes.css` render a tinted strip with an `Anladım` button above every
+  section (feed tabs, each crisis filter, both request channels); dismissal is remembered
+  per key in `localStorage`. `.rp-channel-note` was replaced by the strip.
+
+Verification on the merged tree: `npm run check:syntax` passes; `npm run contrast` ALL
+PASS; `node lab/request-access-check.mjs` 63 of 63; `npm run verify` 23 of 24 with only the
+pre-existing byte-chip failure; the visual tour (feed, crisis tab, filters, wizard, old
+modal, request page open/closed, shared moderator and owner views) at 1440 and 390 px shows
+no console errors.
