@@ -46,8 +46,7 @@ ok('klavye: her öğede görünür odak halkası', noRing.length === 0, noRing.j
 await page.click('.side [data-ctl="crisis"]');
 await page.waitForTimeout(1500);
 ok('kriz sekmesi eklendi', await page.locator('.tab[data-tab="crisis"]').count() === 1);
-ok('normal akışlar korunuyor', await page.locator('#panel-foryou .post').count() >= 30 &&
-                               await page.locator('#panel-following .post').count() >= 12);
+ok('normal akışlar korunuyor', await page.locator('#panel-foryou .post').count() >= 30);
 // scroll position retention (drive the app API so the assertion is not
 // confused by the browser scrolling a hidden sticky header into view)
 await page.evaluate(()=>window.scrollTo(0,900));
@@ -85,7 +84,7 @@ const t1 = await page.evaluate(()=>window.MIHENK.state.tab);
 await page.keyboard.press('ArrowRight'); await page.waitForTimeout(1000);
 const t2 = await page.evaluate(()=>window.MIHENK.state.tab);
 ok('klavye: sekmeler ok tuşlarıyla geziliyor (kriz sekmesi dahil)',
-   t1 === 'following' && t2 === 'crisis', t1 + ' → ' + t2);
+   t1 === 'crisis' && t2 === 'foryou', t1 + ' → ' + t2);
 await page.evaluate(()=>window.MIHENK.setTab('crisis'));
 await page.waitForTimeout(1000);
 await page.focus('#sos'); await page.keyboard.press('Enter');

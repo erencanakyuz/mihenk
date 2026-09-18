@@ -1368,7 +1368,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== styles/refine.css ===== */
 /* NSosyal-inspired calm social surfaces. Urgency belongs to the action. */
-.shell { max-width: 1320px; column-gap: 24px; padding: 0 24px; grid-template-columns: 220px minmax(0, 620px) 280px; }
+.shell { max-width: 1320px; column-gap: 24px; padding: 0 24px; grid-template-columns: 244px minmax(0, 620px) 280px; }
 .nav { border: 0; padding-top: 24px; }
 .nav__brand { width: auto; border-radius: 12px; gap: 12px; margin-bottom: 28px; }
 .brand-word { font-family: var(--ff-display); font-size: 23px; letter-spacing: -.6px; }
@@ -1631,6 +1631,13 @@ ul { list-style: none; margin: 0; padding: 0; }
 .field textarea:focus { border-color: var(--c-accent); }
 .field textarea::placeholder { color: var(--c-text-2); }
 @media (prefers-reduced-motion: reduce) { .flow-private > summary::after { transition: none; } }
+
+/* Own-activity counts next to the navigation labels; hidden when zero. */
+.nav__count { margin-left: auto; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px; background: var(--c-accent-fill); color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+.nav__count:empty { display: none; }
+:root[data-plain="1"] .nav__count { background: #fff; color: #000; }
+
+.nav__item > span:not(.nav__count) { white-space: nowrap; }
 
 /* ===== styles/plain.css ===== */
 /* ==========================================================================
@@ -2584,11 +2591,10 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
 
   var TABS = {
     foryou:    { id: 'foryou',    label: 'Akış',       path: '/' },
-    following: { id: 'following', label: 'Takip',     path: '/takip' },
     crisis:    { id: 'crisis',    label: 'Kriz Var',  path: '/kriz' }
   };
   M.TABS = TABS;
-  function order() { return state.crisis ? ['foryou', 'following', 'crisis'] : ['foryou', 'following']; }
+  function order() { return state.crisis ? ['foryou', 'crisis'] : ['foryou']; }
   M.order = order;
 
   /* ---------------------------------------------------------------- toast */
@@ -2675,8 +2681,8 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
      yerine. Bkz. GORSEL_KIMLIK_SPEC.md §3. */
   var NAV = [
     ['home', 'Ana Akış', 'home'],
-    ['warn', 'Kriz Durumu', 'crisis'],
-    ['sos', 'İmdat', 'imdat'],
+    ['sos', 'Yardım taleplerim', 'mine'],
+    ['quill', 'Bilgi paylaşımlarım', 'myposts'],
     ['user', 'Profil']
   ];
 
@@ -2689,7 +2695,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   function buildShell() {
     var navHtml = NAV.filter(function(n){return !M.shared || n[2];}).map(function (n) {
       var active = n[2] === 'home';
-      var badge = n[2] === 'crisis' ? '<span class="nav__dot" data-crisis-dot aria-hidden="true"></span>' : '';
+      var badge = n[2] === 'mine' || n[2] === 'myposts' ? '<span class="nav__count" data-nav-count="' + n[2] + '"></span>' : '';
       return '<li><button class="nav__item" type="button" ' +
         (n[2] ? 'data-nav="' + n[2] + '" ' : 'disabled aria-disabled="true" title="Prototip kapsamı dışında" ') +
         (active ? 'aria-current="page"' : '') + '>' + icon(n[0], 'ic--lg') + '<span>' + n[1] + '</span>' + badge + '</button></li>';
@@ -2783,9 +2789,10 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   }
 
   function syncTabs() {
-    $$('[data-nav="home"], [data-nav="crisis"]').forEach(function (n) {
+    $$('[data-nav="home"], [data-nav="crisis"], [data-nav="mine"], [data-nav="myposts"]').forEach(function (n) {
       if (n.classList.contains('nav__brand')) return;
-      var selected = n.dataset.nav === (state.tab === 'crisis' ? 'crisis' : 'home');
+      var own = state.tab === 'crisis' && (state.filter === 'mine' || state.filter === 'myposts');
+      var selected = n.dataset.nav === 'home' ? state.tab !== 'crisis' : n.dataset.nav === 'crisis' ? state.tab === 'crisis' && !own : own && n.dataset.nav === state.filter;
       if (selected) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');
     });
     $$('.tab').forEach(function (t) {
@@ -2990,14 +2997,19 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     catch (e) { /* sandboxed host: navigation state is optional */ }
   }
   M.pushURL = pushURL;
+  M.syncTabs = function () { syncTabs(); };
+  /* Own-activity counts in the left navigation: hidden at zero. */
+  M.syncNavCounts = function (counts) {
+    $$('[data-nav-count]').forEach(function (n) { var v = counts && counts[n.dataset.navCount]; n.textContent = v ? String(v) : ''; });
+  };
 
   function routeFromLocation() {
     var p = location.pathname.replace(/\/+$/, '') || '/';
     if (/(^|\/)kriz$/.test(p)) return 'crisis';
-    if (/(^|\/)takip$/.test(p)) return 'following';
+    if (/(^|\/)takip$/.test(p)) return 'foryou';
     var t = new URLSearchParams(location.search).get('t');
     if (t === 'kriz') return 'crisis';
-    if (t === 'takip') return 'following';
+    if (t === 'takip') return 'foryou';
     return 'foryou';
   }
 
@@ -3093,6 +3105,12 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
           if (state.crisis) setTab('crisis');
           else toast('Şu anda bölgenizde aktif bir kriz yok. Tespit edilirse burada görünür.', { muted: true, life: 2400 });
         }
+        if (nav.dataset.nav === 'mine' || nav.dataset.nav === 'myposts') {
+          if (!state.crisis) M.activateCrisis({ immediate: true });
+          if (state.tab !== 'crisis') setTab('crisis');
+          if (M.setCrisisFilter) M.setCrisisFilter(nav.dataset.nav, true);
+          window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' });
+        }
         if (nav.dataset.nav === 'imdat') {
           if (!state.crisis) M.activateCrisis({ immediate: true });
           M.openImdat();
@@ -3139,7 +3157,6 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     document.documentElement.dataset.tab = state.tab;
     if (!M.shared && M.transport && M.transport.initLocal) M.transport.initLocal();
     var initial = routeFromLocation();
-    if (initial === 'following') M.setTabInstant('following');
     if (M.shared || initial === 'crisis') { M.activateCrisis({ immediate: true }); M.setTabInstant(initial); }
 
     if (!M.shared && M.initDemo) M.initDemo();
@@ -3515,7 +3532,8 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       case 'yardim': return !!p.need && !p.resolved;
       case 'dogrulanmis': return v === 'verified';
       case 'dogrulanmamis': return v === 'unverified';
-      case 'mine': return p.uid === 'me' && p.tag === 'yardim';
+      case 'mine': return p.uid === 'me' && !!p.need;
+      case 'myposts': return p.uid === 'me' && !p.need;
       default: return true;
     }
   }
@@ -3535,7 +3553,6 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
           '<span>Yardım talebi oluştur</span></button>' +
         '<button class="btn btn--ghost" type="button" id="crisis-write">' + icon('quill') + 'Bilgi paylaş</button></div>' +
         '</div>' +
-        '<button class="my-requests" type="button" id="my-requests" hidden></button>' +
         '<div class="composer" id="ccomposer" hidden>' +
           '<span class="av">' + S.me.avatar + '</span>' +
           '<div class="composer__col">' +
@@ -3561,7 +3578,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
           '</div>' +
         '</div>' +
         '<div class="chips" role="group" aria-label="Filtreler">' +
-          [['resmi', 'Resmî'], ['yardim', 'Yardım'], ['dogrulanmis', 'Doğrulanmış'], ['dogrulanmamis', 'Doğrulanmamış'], ['mine', 'Taleplerim']]
+          [['resmi', 'Resmî'], ['yardim', 'Yardım'], ['dogrulanmis', 'Doğrulanmış'], ['dogrulanmamis', 'Doğrulanmamış']]
             .map(function (c) {
               return '<button class="chip" type="button" data-filter="' + c[0] + '" aria-pressed="' +
                 'false' + '">' + esc(c[1]) +
@@ -3652,16 +3669,12 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       yardim: all.filter(function (p) { return !!p.need && !p.resolved; }).length,
       dogrulanmis: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'verified'; }).length,
       dogrulanmamis: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'unverified'; }).length,
-      mine: all.filter(function (p) { return p.uid === 'me' && p.tag === 'yardim'; }).length
+      mine: all.filter(function (p) { return p.uid === 'me' && !!p.need; }).length,
+      myposts: all.filter(function (p) { return p.uid === 'me' && !p.need; }).length
     };
     if (M.shared) c = M.sharedView.counts;
+    if (M.syncNavCounts) M.syncNavCounts(c);
     $$('[data-count]').forEach(function (n) { n.textContent = c[n.dataset.count]; });
-    var mine = all.filter(function (p) { return p.uid === 'me' && p.tag === 'yardim'; });
-    var shortcut = $('#my-requests');
-    if (shortcut) {
-      shortcut.hidden = M.shared ? !M.sharedView.counts.mine : !mine.length;
-      shortcut.innerHTML = icon('clock', 'ic--sm') + '<span>' + (M.shared ? M.sharedView.counts.mine : mine.length) + ' yardım talebin var</span><b>Taleplerime git</b>';
-    }
   }
 
   /* FLIP filter re-flow */
@@ -3684,7 +3697,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       if (show) { n.style.setProperty('--i', Math.min(idx, 8)); idx++; }
     });
     if (M.applySearch) M.applySearch($('#feed-search-input').value);
-    var titles = { all: 'Bölgeden güncellemeler', resmi: 'Resmî kaynaklardan', yardim: 'Açık yardım talepleri', dogrulanmis: 'Doğrulanmış bilgiler', dogrulanmamis: 'Doğrulanmamış bilgiler', mine: 'Yardım taleplerim' };
+    var titles = { all: 'Bölgeden güncellemeler', resmi: 'Resmî kaynaklardan', yardim: 'Açık yardım talepleri', dogrulanmis: 'Doğrulanmış bilgiler', dogrulanmamis: 'Doğrulanmamış bilgiler', mine: 'Yardım taleplerim', myposts: 'Bilgi paylaşımlarım' };
     var heading = $('#panel-crisis .clist__h');
     if (heading) heading.textContent = titles[state.filter] || titles.all;
     if (M.renderSectionNote) M.renderSectionNote('crisis:' + (state.filter || 'all'));
@@ -3711,9 +3724,10 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   }
 
   function selectFilter(name, instant) {
-    if (name === 'mine') { var r = $('#crisis-region'), t = $('#crisis-topic'); if (r) r.value = ''; if (t) t.value = ''; if (M.applySearch) M.applySearch(''); }
+    if (name === 'mine' || name === 'myposts') { var r = $('#crisis-region'), t = $('#crisis-topic'); if (r) r.value = ''; if (t) t.value = ''; if (M.applySearch) M.applySearch(''); }
     $$('.chip[data-filter]').forEach(function (c) { c.setAttribute('aria-pressed', c.dataset.filter === name ? 'true' : 'false'); });
     state.filter = name;
+    if (M.syncTabs) M.syncTabs();
     if (M.shared) M.refreshShared(true); else applyFilter(!!instant);
   }
   M.setCrisisFilter = selectFilter;
@@ -3726,7 +3740,6 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     panel.addEventListener('click', function (e) {
       var edit = e.target.closest('[data-edit-request]');
       if (edit) { M.openImdat({ editId: edit.dataset.editRequest }); return; }
-      if (e.target.closest('#my-requests')) { selectFilter('mine', false); return; }
       if (e.target.closest('#close-ccomposer')) { $('#ccomposer').hidden = true; $('#crisis-write').focus(); return; }
       var resolved = e.target.closest('[data-resolve]');
       if (resolved && M.shared) {
@@ -3914,7 +3927,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   }
 
   function insertPinned() {
-    ['foryou', 'following'].forEach(function (fid) {
+    ['foryou'].forEach(function (fid) {
       var host = $('.pin-host[data-feed="' + fid + '"]');
       if (!host || host.firstChild) return;
       var isActive = (state.tab === fid);
@@ -4004,7 +4017,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var p = { id: id, uid: 'me', t: 'şimdi', text: text, likes: 0, reposts: 0, replies: 0, views: 1 };
     S.forYou.unshift(p);
     S.following.unshift(p);
-    ['foryou', 'following'].forEach(function (feedId) {
+    ['foryou'].forEach(function (feedId) {
       var list = M.panel(feedId).querySelector('.feed__list');
       if (!list) return;
       var node = el(M.postHTML(p));
@@ -5279,11 +5292,11 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     'tab-switch': { dur: 5.2, setup: function () { resetAll(); crisisNow(); }, build: function () {
       var s = new Seq();
       s.wait(sec(.35))
-       .move('.tab[data-tab="following"]', sec(.4)).click('.tab[data-tab="following"]')
+       .move('.tab[data-tab="crisis"]', sec(.4)).click('.tab[data-tab="crisis"]')
        .wait(sec(.95))
-       .move('.tab[data-tab="crisis"]', sec(.45)).click('.tab[data-tab="crisis"]')
+       .move('.tab[data-tab="foryou"]', sec(.45)).click('.tab[data-tab="foryou"]')
        .wait(sec(1.35))
-       .move('.tab[data-tab="foryou"]', sec(.5)).click('.tab[data-tab="foryou"]')
+       .move('.tab[data-tab="crisis"]', sec(.5)).click('.tab[data-tab="crisis"]')
        .wait(sec(.85));
       return s;
     } },

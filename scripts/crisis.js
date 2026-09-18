@@ -112,7 +112,8 @@
       case 'yardim': return !!p.need && !p.resolved;
       case 'dogrulanmis': return v === 'verified';
       case 'dogrulanmamis': return v === 'unverified';
-      case 'mine': return p.uid === 'me' && p.tag === 'yardim';
+      case 'mine': return p.uid === 'me' && !!p.need;
+      case 'myposts': return p.uid === 'me' && !p.need;
       default: return true;
     }
   }
@@ -132,7 +133,6 @@
           '<span>Yardım talebi oluştur</span></button>' +
         '<button class="btn btn--ghost" type="button" id="crisis-write">' + icon('quill') + 'Bilgi paylaş</button></div>' +
         '</div>' +
-        '<button class="my-requests" type="button" id="my-requests" hidden></button>' +
         '<div class="composer" id="ccomposer" hidden>' +
           '<span class="av">' + S.me.avatar + '</span>' +
           '<div class="composer__col">' +
@@ -158,7 +158,7 @@
           '</div>' +
         '</div>' +
         '<div class="chips" role="group" aria-label="Filtreler">' +
-          [['resmi', 'Resmî'], ['yardim', 'Yardım'], ['dogrulanmis', 'Doğrulanmış'], ['dogrulanmamis', 'Doğrulanmamış'], ['mine', 'Taleplerim']]
+          [['resmi', 'Resmî'], ['yardim', 'Yardım'], ['dogrulanmis', 'Doğrulanmış'], ['dogrulanmamis', 'Doğrulanmamış']]
             .map(function (c) {
               return '<button class="chip" type="button" data-filter="' + c[0] + '" aria-pressed="' +
                 'false' + '">' + esc(c[1]) +
@@ -249,16 +249,12 @@
       yardim: all.filter(function (p) { return !!p.need && !p.resolved; }).length,
       dogrulanmis: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'verified'; }).length,
       dogrulanmamis: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'unverified'; }).length,
-      mine: all.filter(function (p) { return p.uid === 'me' && p.tag === 'yardim'; }).length
+      mine: all.filter(function (p) { return p.uid === 'me' && !!p.need; }).length,
+      myposts: all.filter(function (p) { return p.uid === 'me' && !p.need; }).length
     };
     if (M.shared) c = M.sharedView.counts;
+    if (M.syncNavCounts) M.syncNavCounts(c);
     $$('[data-count]').forEach(function (n) { n.textContent = c[n.dataset.count]; });
-    var mine = all.filter(function (p) { return p.uid === 'me' && p.tag === 'yardim'; });
-    var shortcut = $('#my-requests');
-    if (shortcut) {
-      shortcut.hidden = M.shared ? !M.sharedView.counts.mine : !mine.length;
-      shortcut.innerHTML = icon('clock', 'ic--sm') + '<span>' + (M.shared ? M.sharedView.counts.mine : mine.length) + ' yardım talebin var</span><b>Taleplerime git</b>';
-    }
   }
 
   /* FLIP filter re-flow */
@@ -281,7 +277,7 @@
       if (show) { n.style.setProperty('--i', Math.min(idx, 8)); idx++; }
     });
     if (M.applySearch) M.applySearch($('#feed-search-input').value);
-    var titles = { all: 'Bölgeden güncellemeler', resmi: 'Resmî kaynaklardan', yardim: 'Açık yardım talepleri', dogrulanmis: 'Doğrulanmış bilgiler', dogrulanmamis: 'Doğrulanmamış bilgiler', mine: 'Yardım taleplerim' };
+    var titles = { all: 'Bölgeden güncellemeler', resmi: 'Resmî kaynaklardan', yardim: 'Açık yardım talepleri', dogrulanmis: 'Doğrulanmış bilgiler', dogrulanmamis: 'Doğrulanmamış bilgiler', mine: 'Yardım taleplerim', myposts: 'Bilgi paylaşımlarım' };
     var heading = $('#panel-crisis .clist__h');
     if (heading) heading.textContent = titles[state.filter] || titles.all;
     if (M.renderSectionNote) M.renderSectionNote('crisis:' + (state.filter || 'all'));
@@ -308,9 +304,10 @@
   }
 
   function selectFilter(name, instant) {
-    if (name === 'mine') { var r = $('#crisis-region'), t = $('#crisis-topic'); if (r) r.value = ''; if (t) t.value = ''; if (M.applySearch) M.applySearch(''); }
+    if (name === 'mine' || name === 'myposts') { var r = $('#crisis-region'), t = $('#crisis-topic'); if (r) r.value = ''; if (t) t.value = ''; if (M.applySearch) M.applySearch(''); }
     $$('.chip[data-filter]').forEach(function (c) { c.setAttribute('aria-pressed', c.dataset.filter === name ? 'true' : 'false'); });
     state.filter = name;
+    if (M.syncTabs) M.syncTabs();
     if (M.shared) M.refreshShared(true); else applyFilter(!!instant);
   }
   M.setCrisisFilter = selectFilter;
@@ -323,7 +320,6 @@
     panel.addEventListener('click', function (e) {
       var edit = e.target.closest('[data-edit-request]');
       if (edit) { M.openImdat({ editId: edit.dataset.editRequest }); return; }
-      if (e.target.closest('#my-requests')) { selectFilter('mine', false); return; }
       if (e.target.closest('#close-ccomposer')) { $('#ccomposer').hidden = true; $('#crisis-write').focus(); return; }
       var resolved = e.target.closest('[data-resolve]');
       if (resolved && M.shared) {
@@ -511,7 +507,7 @@
   }
 
   function insertPinned() {
-    ['foryou', 'following'].forEach(function (fid) {
+    ['foryou'].forEach(function (fid) {
       var host = $('.pin-host[data-feed="' + fid + '"]');
       if (!host || host.firstChild) return;
       var isActive = (state.tab === fid);
@@ -601,7 +597,7 @@
     var p = { id: id, uid: 'me', t: 'şimdi', text: text, likes: 0, reposts: 0, replies: 0, views: 1 };
     S.forYou.unshift(p);
     S.following.unshift(p);
-    ['foryou', 'following'].forEach(function (feedId) {
+    ['foryou'].forEach(function (feedId) {
       var list = M.panel(feedId).querySelector('.feed__list');
       if (!list) return;
       var node = el(M.postHTML(p));

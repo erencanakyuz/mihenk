@@ -42,7 +42,7 @@ export function projectView(service,session,query={}) {
   const actor=state.actors[actorId],policy=accessFor(actor);
   if(!permits(actor,'read_view'))reject('unauthorized','Bu görünüm için yetkiniz yok.');
   if(query.thread&&!permits(actor,'open_thread'))reject('unauthorized','Yanıtları açma yetkiniz yok.');
-  const filter=['all','resmi','yardim','dogrulanmis','dogrulanmamis','mine','following'].includes(query.filter)?query.filter:'all';
+  const filter=['all','resmi','yardim','dogrulanmis','dogrulanmamis','mine','myposts','following'].includes(query.filter)?query.filter:'all';
   const region=typeof query.region==='string'?query.region.slice(0,80):'';
   const topic=typeof query.topic==='string'?query.topic.slice(0,30):'';
   const search=typeof query.search==='string'?query.search.slice(0,200).toLocaleLowerCase('tr-TR'):'';
@@ -66,6 +66,7 @@ export function projectView(service,session,query={}) {
     if(topic&&p.tag!==topic)return false;
     if(search&&!p.text.toLocaleLowerCase('tr-TR').includes(search))return false;
     if(filter==='mine')return p.kind==='request'&&p.authorId===actorId&&!entry.originalId;
+    if(filter==='myposts')return p.kind==='post'&&p.authorId===actorId&&!entry.originalId;
     if(filter==='yardim')return p.kind==='request'&&p.status==='open';
     if(filter==='resmi')return p.verification==='official';
     if(filter==='dogrulanmis')return p.verification==='verified';
@@ -118,7 +119,7 @@ export function projectView(service,session,query={}) {
   const view={viewId:randomUUID(),runId:state.id,title:state.title,me:actorView(state.actors[actorId]),
     query:{filter,region,topic,search,authorId,context,offset,limit,channel,messageLimit,messageOffset,relatedLimit,updateLimit},items,relatedPosts,ownRequests,thread,updates,
     nextOffset:offset+limit<filtered.length?offset+limit:null,total:filtered.length,
-    counts:{all:posts.length,yardim:canonical.filter(p=>p.kind==='request'&&p.status==='open').length,mine:canonical.filter(p=>p.kind==='request'&&p.authorId===actorId).length,
+    counts:{all:posts.length,yardim:canonical.filter(p=>p.kind==='request'&&p.status==='open').length,mine:canonical.filter(p=>p.kind==='request'&&p.authorId===actorId).length,myposts:canonical.filter(p=>p.kind==='post'&&p.authorId===actorId).length,
       unknown:canonical.filter(p=>p.kind==='request'&&p.status==='open'&&!p.location.known).length,resmi:canonical.filter(p=>p.verification==='official').length,dogrulanmis:canonical.filter(p=>p.verification==='verified').length,dogrulanmamis:canonical.filter(p=>p.verification==='unverified').length},
     controlMode:!policy.operations.some(n=>!['read_view','open_thread','wait','post_remove','account_ban'].includes(n))?'moderation':'participant',
     accessRevision:actor.accessRevision||0,

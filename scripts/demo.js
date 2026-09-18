@@ -230,11 +230,11 @@
     'tab-switch': { dur: 5.2, setup: function () { resetAll(); crisisNow(); }, build: function () {
       var s = new Seq();
       s.wait(sec(.35))
-       .move('.tab[data-tab="following"]', sec(.4)).click('.tab[data-tab="following"]')
+       .move('.tab[data-tab="crisis"]', sec(.4)).click('.tab[data-tab="crisis"]')
        .wait(sec(.95))
-       .move('.tab[data-tab="crisis"]', sec(.45)).click('.tab[data-tab="crisis"]')
+       .move('.tab[data-tab="foryou"]', sec(.45)).click('.tab[data-tab="foryou"]')
        .wait(sec(1.35))
-       .move('.tab[data-tab="foryou"]', sec(.5)).click('.tab[data-tab="foryou"]')
+       .move('.tab[data-tab="crisis"]', sec(.5)).click('.tab[data-tab="crisis"]')
        .wait(sec(.85));
       return s;
     } },

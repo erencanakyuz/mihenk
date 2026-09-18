@@ -92,11 +92,10 @@
 
   var TABS = {
     foryou:    { id: 'foryou',    label: 'Akış',       path: '/' },
-    following: { id: 'following', label: 'Takip',     path: '/takip' },
     crisis:    { id: 'crisis',    label: 'Kriz Var',  path: '/kriz' }
   };
   M.TABS = TABS;
-  function order() { return state.crisis ? ['foryou', 'following', 'crisis'] : ['foryou', 'following']; }
+  function order() { return state.crisis ? ['foryou', 'crisis'] : ['foryou']; }
   M.order = order;
 
   /* ---------------------------------------------------------------- toast */
@@ -183,8 +182,8 @@
      yerine. Bkz. GORSEL_KIMLIK_SPEC.md §3. */
   var NAV = [
     ['home', 'Ana Akış', 'home'],
-    ['warn', 'Kriz Durumu', 'crisis'],
-    ['sos', 'İmdat', 'imdat'],
+    ['sos', 'Yardım taleplerim', 'mine'],
+    ['quill', 'Bilgi paylaşımlarım', 'myposts'],
     ['user', 'Profil']
   ];
 
@@ -197,7 +196,7 @@
   function buildShell() {
     var navHtml = NAV.filter(function(n){return !M.shared || n[2];}).map(function (n) {
       var active = n[2] === 'home';
-      var badge = n[2] === 'crisis' ? '<span class="nav__dot" data-crisis-dot aria-hidden="true"></span>' : '';
+      var badge = n[2] === 'mine' || n[2] === 'myposts' ? '<span class="nav__count" data-nav-count="' + n[2] + '"></span>' : '';
       return '<li><button class="nav__item" type="button" ' +
         (n[2] ? 'data-nav="' + n[2] + '" ' : 'disabled aria-disabled="true" title="Prototip kapsamı dışında" ') +
         (active ? 'aria-current="page"' : '') + '>' + icon(n[0], 'ic--lg') + '<span>' + n[1] + '</span>' + badge + '</button></li>';
@@ -291,9 +290,10 @@
   }
 
   function syncTabs() {
-    $$('[data-nav="home"], [data-nav="crisis"]').forEach(function (n) {
+    $$('[data-nav="home"], [data-nav="crisis"], [data-nav="mine"], [data-nav="myposts"]').forEach(function (n) {
       if (n.classList.contains('nav__brand')) return;
-      var selected = n.dataset.nav === (state.tab === 'crisis' ? 'crisis' : 'home');
+      var own = state.tab === 'crisis' && (state.filter === 'mine' || state.filter === 'myposts');
+      var selected = n.dataset.nav === 'home' ? state.tab !== 'crisis' : n.dataset.nav === 'crisis' ? state.tab === 'crisis' && !own : own && n.dataset.nav === state.filter;
       if (selected) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');
     });
     $$('.tab').forEach(function (t) {
@@ -498,14 +498,19 @@
     catch (e) { /* sandboxed host: navigation state is optional */ }
   }
   M.pushURL = pushURL;
+  M.syncTabs = function () { syncTabs(); };
+  /* Own-activity counts in the left navigation: hidden at zero. */
+  M.syncNavCounts = function (counts) {
+    $$('[data-nav-count]').forEach(function (n) { var v = counts && counts[n.dataset.navCount]; n.textContent = v ? String(v) : ''; });
+  };
 
   function routeFromLocation() {
     var p = location.pathname.replace(/\/+$/, '') || '/';
     if (/(^|\/)kriz$/.test(p)) return 'crisis';
-    if (/(^|\/)takip$/.test(p)) return 'following';
+    if (/(^|\/)takip$/.test(p)) return 'foryou';
     var t = new URLSearchParams(location.search).get('t');
     if (t === 'kriz') return 'crisis';
-    if (t === 'takip') return 'following';
+    if (t === 'takip') return 'foryou';
     return 'foryou';
   }
 
@@ -601,6 +606,12 @@
           if (state.crisis) setTab('crisis');
           else toast('Şu anda bölgenizde aktif bir kriz yok. Tespit edilirse burada görünür.', { muted: true, life: 2400 });
         }
+        if (nav.dataset.nav === 'mine' || nav.dataset.nav === 'myposts') {
+          if (!state.crisis) M.activateCrisis({ immediate: true });
+          if (state.tab !== 'crisis') setTab('crisis');
+          if (M.setCrisisFilter) M.setCrisisFilter(nav.dataset.nav, true);
+          window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' });
+        }
         if (nav.dataset.nav === 'imdat') {
           if (!state.crisis) M.activateCrisis({ immediate: true });
           M.openImdat();
@@ -647,7 +658,6 @@
     document.documentElement.dataset.tab = state.tab;
     if (!M.shared && M.transport && M.transport.initLocal) M.transport.initLocal();
     var initial = routeFromLocation();
-    if (initial === 'following') M.setTabInstant('following');
     if (M.shared || initial === 'crisis') { M.activateCrisis({ immediate: true }); M.setTabInstant(initial); }
 
     if (!M.shared && M.initDemo) M.initDemo();
