@@ -300,6 +300,8 @@
       var on = t.dataset.tab === state.tab;
       t.setAttribute('aria-selected', on ? 'true' : 'false');
       t.tabIndex = on ? 0 : -1;
+      // tapping the tab you are already on is the way back to the top
+      if (on) t.title = 'En üste çık ve güncelle'; else t.removeAttribute('title');
     });
     moveUnderline();
   }
@@ -444,16 +446,16 @@
     window.scrollTo(0, state.scroll[id] || 0);
   };
 
-  /* ---------------------------------------------------- header on scroll */
+  /* ---------------------------------------------------- header on scroll
+     The tab bar is the only way between the normal feed and the crisis feed,
+     so the sticky header never hides: in a crisis nobody should have to
+     scroll back up to find it. */
   var lastY = 0;
   function onScroll() {
     var y = window.scrollY;
     var bar = $('#topbar');
     if (!bar) return;
-    var d = y - lastY;
-    if (y < 60) bar.dataset.hidden = '';
-    else if (d > 4) bar.dataset.hidden = '1';
-    else if (d < -4) bar.dataset.hidden = '';
+    bar.dataset.hidden = '';
     lastY = y;
   }
 
@@ -642,7 +644,12 @@
 
     $('#tabs').addEventListener('click', function (e) {
       var t = e.target.closest('.tab');
-      if (t) setTab(t.dataset.tab);
+      if (!t) return;
+      if (t.dataset.tab !== state.tab) { setTab(t.dataset.tab); return; }
+      // already here: jump to the top of this feed and pull fresh items
+      window.scrollTo({ top: 0, behavior: motionOff() ? 'auto' : 'smooth' });
+      if (M.shared) { if (M.refreshShared) M.refreshShared(true); }
+      else if (state.tab === 'crisis' && M.renderCrisisList) M.renderCrisisList();
     });
     $('#tabs').addEventListener('keydown', function (e) {
       var ids = order();

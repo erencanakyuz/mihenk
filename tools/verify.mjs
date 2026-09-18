@@ -59,12 +59,12 @@ await page.waitForTimeout(1100);
 const y = await page.evaluate(()=>window.scrollY);
 ok('kaydırma konumu korunuyor', Math.abs(y-900) < 8 && yc === 0, 'foryou y=' + y + ', kriz y=' + yc);
 
-// header hides on scroll down and returns on scroll up
+// the header carries the only route between the feeds, so it never hides
 await page.evaluate(()=>window.scrollTo(0,1400)); await page.waitForTimeout(260);
-const hidden = await page.evaluate(()=>document.getElementById('topbar').dataset.hidden === '1');
-await page.evaluate(()=>window.scrollTo(0,1100)); await page.waitForTimeout(260);
-const shown = await page.evaluate(()=>document.getElementById('topbar').dataset.hidden !== '1');
-ok('başlık aşağı kaydırınca gizleniyor, yukarı kaydırınca dönüyor', hidden && shown);
+const barShown = await page.evaluate(()=>document.getElementById('topbar').dataset.hidden !== '1');
+const tabsTop = await page.evaluate(()=>document.getElementById('tabs').getBoundingClientRect().top);
+ok('başlık kaydırınca görünür kalıyor', barShown && tabsTop >= 0 && tabsTop < 120,
+   'gizli=' + !barShown + ', sekme çubuğu tepesi=' + Math.round(tabsTop));
 await page.evaluate(()=>window.scrollTo(0,0)); await page.waitForTimeout(200);
 
 // keyboard walk: reach the crisis tab, move between tabs with arrows,

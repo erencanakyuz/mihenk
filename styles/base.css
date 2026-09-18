@@ -133,7 +133,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   min-height: 100vh;
 }
 
-/* header hides on scroll down, reveals on scroll up */
+/* header stays put: the tab bar must be reachable at any scroll depth */
 .topbar {
   position: sticky; top: 0; z-index: 30;
   transition: transform 200ms var(--ease-out);
@@ -170,8 +170,10 @@ ul { list-style: none; margin: 0; padding: 0; }
 .tab:hover { background: rgba(255,255,255,.06); }
 .tab[aria-selected="true"] { color: var(--c-text); font-weight: 700; }
 .tab__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tab--crisis { color: var(--c-accent); }
-.tab--crisis[aria-selected="true"] { color: var(--c-accent); }
+/* the crisis tab carries its own warm identity, never the navigation blue */
+.tab--crisis { color: var(--c-text-2); }
+.tab--crisis[aria-selected="true"] { color: var(--c-crisis-ink); }
+.tab--crisis[aria-selected="true"] .ic { color: var(--c-crisis-ink); }
 .tab--crisis .ic { animation: warn-pulse var(--pulse-dur, 2s) ease-in-out infinite; transform-origin: 50% 60%; }
 @keyframes warn-pulse {
   0%, 100% { opacity: .65; transform: scale(1); }
@@ -198,6 +200,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   transition: transform 300ms var(--spring);
 }
 .tabs__underline[data-squash="1"] { transition: transform 150ms var(--ease-out); }
+/* on the crisis tab the sliding underline turns warm along with the label */
+:root[data-tab="crisis"] .tabs__underline { background: var(--c-crisis); }
 
 /* ---- right sidebar ----------------------------------------------------- */
 .side {

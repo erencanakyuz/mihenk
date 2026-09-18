@@ -226,7 +226,7 @@
    yarısı kadar boşluk bırakır; sol kenar çizgisi kaldırıldı. */
 .crisis-card {
   position: relative;
-  margin: 27px var(--pad-x) 12px;
+  margin: 14px var(--pad-x) 12px;
   border: 1px solid var(--c-border);
   border-radius: 16px;
   background: linear-gradient(180deg, var(--c-bg-3) 0%, var(--c-bg-2) 58%);
@@ -243,7 +243,7 @@
   padding: 15px 18px 18px;
 }
 @media (max-width: 700px) {
-  .crisis-card { margin: 25px 12px 12px; border-radius: 14px; }
+  .crisis-card { margin: 12px; border-radius: 14px; }
   .crisis-card .crisis-intro { padding: 16px 15px 0; }
   .crisis-card .crisis-intro h1 { font-size: 21px; }
   .crisis-card .crisis-actions { gap: 8px; padding: 14px 15px 15px; }
@@ -275,3 +275,28 @@
 :root[data-plain="1"] .nav__count { background: #fff; color: #000; }
 
 .nav__item > span:not(.nav__count) { white-space: nowrap; }
+
+/* ==========================================================================
+   Warm crisis identity. Blue stays the app's navigation accent; everything
+   that belongs to the crisis path - the "Kriz Var" tab, its underline, the
+   low-bandwidth switch - speaks amber, so the two never read as one thing.
+   Both values clear 4.5:1 on --c-bg (#1b1e27) and on plain-mode black.
+   ========================================================================== */
+:root {
+  --c-crisis:     #f2a154;   /* amber frame, underline, icons  (7.9:1 on --c-bg) */
+  --c-crisis-ink: #f6b678;   /* amber label text, small sizes  (9.4:1 on --c-bg) */
+}
+
+/* The low-bandwidth switch is the first control a thin connection needs, so
+   it wears the amber frame instead of blending into the card stack. The
+   selectors are id-scoped on purpose: this file loads before
+   styles/plain-toggle.css, so a bare .band-toggle would lose the cascade. */
+#band-row > .band-toggle {
+  border: 2px solid var(--c-crisis);
+  background: color-mix(in srgb, var(--c-crisis) 10%, var(--c-bg-2));
+}
+#band-row > .band-toggle:hover { background: color-mix(in srgb, var(--c-crisis) 16%, var(--c-bg-2)); }
+#band-row > .band-toggle > .ic { color: var(--c-crisis); }
+#band-row > .band-toggle[aria-pressed="false"] .band-toggle__state { border-color: var(--c-crisis); color: var(--c-crisis); }
+/* Plain mode keeps its flat black block; only the frame thickens. */
+:root[data-plain="1"] #band-row > .band-toggle { background: #000; border: 2px solid #fff; }
