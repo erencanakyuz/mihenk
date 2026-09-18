@@ -2,11 +2,13 @@ import { operations } from '../lab/operations.mjs';
 
 const names=operations.map(t=>t.function.name);
 const read=['read_view','open_thread','wait'];
-const moderation=['post_remove','account_ban','request_manage'];
+// Never granted to plain participants. A new moderation operation must be listed here,
+// otherwise the participant allowlist below (names.filter) would hand it to everyone.
+const moderation=['post_remove','account_ban','request_manage','post_verify'];
 export const roles=Object.freeze({
   participant:{role:'participant',operations:names.filter(n=>!moderation.includes(n)),scope:{posts:'public',regions:null}},
   moderator:{role:'moderator',operations:[...read,'post_remove','account_ban'],scope:{posts:'public',regions:null}},
-  request_moderator:{role:'request_moderator',operations:[...read,'request_manage','reply_create','request_close','request_reopen'],scope:{posts:'public',regions:null}},
+  request_moderator:{role:'request_moderator',operations:[...read,'request_manage','reply_create','request_close','request_reopen','message_endorse','post_verify'],scope:{posts:'public',regions:null}},
   observer:{role:'observer',operations:read,scope:{posts:'public',regions:null}}
 });
 const plain=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -46,6 +48,8 @@ export function canSeePost(state,actorId,entry){
 export function canTarget(state,actorId,id){
   if(Object.hasOwn(state.posts,id))return canSeePost(state,actorId,state.posts[id]);
   if(Object.hasOwn(state.offers,id))return canSeePost(state,actorId,state.posts[state.offers[id].targetId]);
+  // A readable reply is a target too: community endorsements point at messages.
+  if(Object.hasOwn(state.replies,id))return canReadMessage(state,actorId,state.replies[id]);
   // Removal changes feed visibility, not the scope of an already observed account.
   // The command service still requires this session to have seen the target.
   if(Object.hasOwn(state.actors,id))return Object.values(state.posts).some(p=>p.authorId===id&&canSeePost(state,actorId,p))||

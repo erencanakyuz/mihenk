@@ -971,3 +971,119 @@ page or card through `Bu talep hakkında bilgi paylaş`); the server validates t
 and projects a need summary only while the request stays readable. `Ben de gördüm` is
 removed from cards; corroboration lives in the community tab as endorsements. Endorsement
 weighting by account credibility is a later step; v1 counts one vote per account.
+## 27. Information posts get the discussion page (18 September 2026, later)
+
+Owner decision: `Yardım` stays structured requests only and the request page is unchanged.
+`Doğrulanmış` and `Doğrulanmamış` are information posts, and they get the same two-channel
+mechanic for a different purpose: the accuracy of the information is discussed. An
+information post may also be about a help request, like a quote post.
+
+### Two page kinds instead of "help calls"
+
+`helpPost` and the projected `helpCall` flag are gone. `server/request-policy.mjs` now
+exports `pageKind(p)`: `request` for `kind==='request'`, `info` for every other post whose
+`verification!=='official'`, and `null` for institutional announcements, which keep their
+closed comments and have no page. `threadPost(p)` is the predicate used by `views.mjs` for
+channel filtering and by the `updates` projection. `requestProjection` returns
+`pageKind:'request'|'info'`; an information post keeps `status:'open'`,
+`communityOpen:true`, `publicAccess:'public'`, `capabilities` and `messageCounts`.
+`world.mjs` allows the coordination channel on any information post and limits writing to
+its author and request moderators through the same `privateRequestAccess`; community stays
+public; official posts still reject `reply.create`.
+
+The page reads the same, with accuracy copy: title `Bilgi paylaşımı` and no state chip,
+statement label `Paylaşımın metni`, author role `Paylaşan`, tabs
+`Moderatörlerle doğrulama` / `Topluluk tartışması` on the unchanged channel ids and URL
+parameter, accuracy section strips and empty states, composer placeholders about sources,
+the helper line `Tartışma, bilgiyi doğrulanmış yapmaz.`, no private fields, no owner
+actions, no management and no support-offer kind. Cards: information posts open
+`Tartışmayı aç` (at the community tab, so the button and the destination agree) and count
+`Doğrulama: N · Tartışma: N`; request cards are unchanged. The card attribute `data-help`
+became `data-page="request|info"` and the old `Yanıtları aç` / `Yanıtlar` thread button is
+gone for crisis posts. `M.openThread` still serves the ordinary social feed, whose local
+posts have no `pageKind`.
+
+### `about`: quoting a help request
+
+`post.create` accepts an optional `about` post id, validated as an existing, non-removed,
+readable `kind==='request'` post (`İlgili talep bulunamadı.` otherwise) and stored on the
+post. `publicPost` projects `about` as `{id, need, people, status, author:{id,name}}` only
+while that request is still readable by the viewer, and `null` afterwards, so a restricted
+request disappears from every quoting card. The crisis composer takes a third argument and
+shows a removable `Talep hakkında: <author> · <needs>` chip that travels in the composer
+draft; entry points are `Bu talep hakkında bilgi paylaş` on the request page community tab
+and a quiet `Bilgi paylaş` next to `Destek öner` on help cards for non-owners who may
+`post.create`. The information page shows a reference card above the tabs with
+`Talebin topluluk desteğine git`, which opens the request page at `channel=community`.
+
+### Corroboration button removed
+
+The card action `Ben de gördüm` (`data-verify`) is gone from the crisis cards, with its CSS
+and the local toast. A single tap never described accuracy; the discussion now lives on the
+information page. The server operation `observation.create` is untouched for model
+participants, and `Gerekçe` stays. `tools/verify.mjs` now presses Enter on the first
+`.open-request` card button and asserts `#request-page .rp-tabs`.
+
+### Community endorsements and the pinned note
+
+New command `message.endorse` `{targetId:<reply id>, payload:{active}}`, permitted for the
+roles that may `reply.create`, stored in the existing `observations` collection as
+`actorId+':'+messageId` with `kind:'message'` so the store, the delta and replay are
+unchanged. The message must be readable (`canTarget` now accepts readable reply ids), the
+author cannot endorse their own message and private messages cannot be endorsed. Every
+projected thread message carries `endorsements` and `endorsed`, plus `canEndorse`; for an
+information post the community channel also returns `pinned`, the public community message
+with the most endorsements (earliest wins a tie), and that message travels even when it
+falls outside the loaded window. The page renders it as
+`Topluluk notu · En çok onaylanan yorum` above the list and gives every community message a
+`Katılıyorum · N` toggle; the author sees the count only. Request pages are unchanged: no
+note, no endorsements. Endorsements do not emit an SSE event, so another reader sees a new
+count on their next load.
+
+### Moderator verdict
+
+New command `post.verify` `{targetId, expectedVersion, payload:{verification, reason?}}`
+sets `verification`, bumps the version and records `verifiedBy`, `verifiedAt` and
+`verifyReason`. It is allowed for `request_moderator` only: `post_verify` is in the
+`moderation` list in `server/access.mjs`, so the participant allowlist (`names.filter`)
+cannot hand it out. Requests and official posts are rejected. `views.mjs` offers
+`post.verify` in `actions` on information posts, and the page shows a `Doğrulama sonucu`
+disclosure (select, optional reason, `Sonucu kaydet`) with the confirmation
+`Doğrulama sonucu kaydedilsin mi? Etiket herkese görünür.` After saving, the fact-row chip
+and the feed card pill both show the new label. The coordination strip for private readers
+reads `Bu sekmede gönüllü moderatörler değerlendirmelerini yazar; sonuç netleşince etiketi
+güncellerler.`
+
+### TODO: AI research summary on the coordination tab
+
+Not built. When an information post has no moderator assessment yet, an AI-generated
+research summary is planned at the top of the coordination tab: a short, clearly labelled
+machine reading of what public sources say, never a verification label and never mixed into
+the moderator messages. The server contract (who generates it, when it is refreshed, how it
+is stored and versioned) and the provenance rules (which sources are cited, how a reader
+tells it apart from a human message, what happens when a moderator disagrees) are to be
+designed later, together with the question of whether it is stored on the post or fetched
+per view.
+
+### Verification
+
+`npm run check:syntax` passes; `npm run contrast` reports ALL PASS;
+`node lab/request-access-check.mjs` passes 86 of 86 (adds information-post coordination by
+the author, outsider rejection, moderator reads, per-channel counts, the four `about`
+rejections, the `about` projection before and after restriction, the endorsement rules with
+the pinned id, and the verdict cases for participant, moderator, request and official
+posts); `npm run verify` reports 23 of 24 with only the pre-existing
+`bayt karşılaştırması ölçülmüş` failure. Playwright captures in local mode (information
+card with and without a reference, information page community and coordination tabs, pinned
+note, composer chip, request page community share button) and in rehearsal mode (community
+note with three accounts, endorse toggle, moderator verdict disclosure, its confirmation,
+the relabelled card) at 1440 and 390 px, with no console errors. `npm run bundle`
+regenerated `dist/`.
+
+### Known limits
+
+- The local adapter has one account, so it also lets that account endorse its own comment;
+  the server rejects that. Local mode cannot record a verdict at all.
+- `message.endorse` is accepted on a request's community message too; only the information
+  page renders the mechanic.
+- Section 20's `Yardım çağrısı` page title and its copy are superseded by this section.

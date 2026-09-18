@@ -2,11 +2,18 @@
   'use strict';
   var page=null,serial=0,esc=M.CATALOG.esc;
   var needs={kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'};
-  var labels={coordination:'Yetkililerle iletişim',community:'Topluluk desteği'};
-  function isHelp(p){return !!p&&(p.kind==='request'||(p.tag==='yardim'&&p.verification!=='official'));}
-  function pageTitle(p){return p.kind==='request'?'Yardım talebi':'Yardım çağrısı';}
-  function authorRole(p){return p.kind==='request'?'Talep sahibi':'Çağrıyı paylaşan';}
+  /* One mechanic, two purposes: a request coordinates aid, an information post discusses
+     whether the information is accurate. The channel ids stay the same. */
+  var labels={request:{coordination:'Yetkililerle iletişim',community:'Topluluk desteği'},
+    info:{coordination:'Moderatörlerle doğrulama',community:'Topluluk tartışması'}};
+  var titles={request:'Yardım talebi',info:'Bilgi paylaşımı'};
+  function kindOf(p){return !p?null:p.pageKind||(p.kind==='request'?'request':p.verification!=='official'?'info':null);}
+  function info(p){return kindOf(p)==='info';}
+  function pageTitle(p){return titles[kindOf(p)]||titles.request;}
+  function authorRole(p){return info(p)?'Paylaşan':'Talep sahibi';}
+  function channelLabel(p,channel){return (labels[kindOf(p)]||labels.request)[channel];}
   function isOwner(p){return p.authorId===(M.actorId||'me');}
+  function missingText(){return page&&page.kind==='info'?'Bu paylaşım şu anda görüntülenemiyor.':'Bu talep şu anda görüntülenemiyor.';}
   function glyph(name){
     var paths={lock:'M6 10h12v11H6zM8 10V7a4 4 0 0 1 8 0v3',globe:'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zM3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18',down:'m6 9 6 6 6-6',send:'m3 3 18 9-18 9 4-9-4-9zM7 12h14'};
     return paths[name]?'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="'+paths[name]+'"/></svg>':M.icon(name);
@@ -40,6 +47,18 @@
     if(c.canReopen)body+='<div><span>Talebi yeniden açmak diğer erişim ayarlarını değiştirmez.</span><button class="rp-button" data-manage="reopen">Talebi yeniden aç</button></div>';
     return detail('management',glyph('dots')+'<span>Talep işlemleri</span>',body+'</div>','rp-management');
   }
+  /* The moderator verdict on an information post: the label the whole feed will read.
+     It lives in a disclosure, like the request management actions. */
+  function verdict(p){
+    if(!info(p)||!(p.actions||[]).includes('post.verify'))return '';
+    var options=[['unverified','Doğrulanmamış'],['verified','Doğrulanmış'],['disputed','Çelişkili']].map(function(o){
+      return '<option value="'+o[0]+'"'+(p.verification===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('');
+    var body='<div class="rp-manage-body"><div><span><b>Bilginin doğruluğu</b><small>Etiket akışta herkese görünür. Sonucu daha sonra değiştirebilirsiniz.</small></span>'+
+      '<label>Sonuç<select id="rp-verify-result">'+options+'</select></label></div>'+
+      '<div><label>Gerekçe (isteğe bağlı)<input id="rp-verify-reason" type="text" maxlength="240" placeholder="Hangi kaynağa dayanıyor?"></label>'+
+      '<button class="rp-button" data-manage="verify">Sonucu kaydet</button></div></div>';
+    return detail('verdict',glyph('shield')+'<span>Doğrulama sonucu</span>',body,'rp-management');
+  }
   /* The requester keeps one visible action; rare and destructive controls stay in the disclosure. */
   function ownerActions(p){
     var c=p.capabilities;if(!isOwner(p)||(!c.canClose&&!c.canEditStatement))return '';
@@ -50,15 +69,16 @@
     var verification={unverified:'Beyan · Henüz doğrulanmadı',verified:'Doğrulanmış',official:'Resmî kaynak',disputed:'Çelişkili'};
     var summary=(p.need||[]).map(function(n){return needs[n]||n;}).join(', ');
     var chip='<span class="rp-verification" data-verification="'+esc(p.verification)+'">'+glyph('shield')+esc(verification[p.verification]||verification.unverified)+'</span>';
-    var title=summary?'<h2>'+esc(summary)+'</h2>':p.kind==='request'?'<h2>Yardım ihtiyacı</h2>':'';
-    /* A help call has no need summary, so the verification chip joins the fact row instead of sitting in an empty title row. */
-    var written=!!(p.details&&String(p.details).trim()),statementText=written?String(p.details):(p.kind==='request'?'':String(p.text||''));
+    var request=!info(p);
+    var title=summary?'<h2>'+esc(summary)+'</h2>':request?'<h2>Yardım ihtiyacı</h2>':'';
+    /* An information post has no need summary, so the verification chip joins the fact row instead of sitting in an empty title row. */
+    var written=!!(p.details&&String(p.details).trim()),statementText=written&&request?String(p.details):(request?'':String(p.text||''));
     var peek=statementText.replace(/\s+/g,' ').trim();
-    return '<section class="rp-overview" aria-label="'+(p.kind==='request'?'Talep özeti':'Çağrı özeti')+'">'+(title?'<div class="rp-overview-title">'+title+chip+'</div>':'')+
-      '<div class="rp-facts">'+(title?'':chip)+(p.kind==='request'?'<span>'+glyph('people')+(p.people==null?'Kişi sayısı henüz bilinmiyor':esc(p.people)+' kişi')+'</span>':'')+'<span>'+glyph('pin')+esc(p.kind==='request'?(p.publicLocationText||p.location.region||'Konum belirtilmedi'):([p.location.region,p.location.text].filter(Boolean).join(' · ')||'Konum belirtilmedi'))+'</span>'+(!p.location.known?'<span>'+glyph('questionc')+'Konum kesin değil</span>':'')+'</div>'+
+    return '<section class="rp-overview" aria-label="'+(request?'Talep özeti':'Paylaşım özeti')+'">'+(title?'<div class="rp-overview-title">'+title+chip+'</div>':'')+
+      '<div class="rp-facts">'+(title?'':chip)+(request?'<span>'+glyph('people')+(p.people==null?'Kişi sayısı henüz bilinmiyor':esc(p.people)+' kişi')+'</span>':'')+'<span>'+glyph('pin')+esc(request?(p.publicLocationText||p.location.region||'Konum belirtilmedi'):([p.location.region,p.location.text].filter(Boolean).join(' · ')||'Konum belirtilmedi'))+'</span>'+(!p.location.known?'<span>'+glyph('questionc')+'Konum kesin değil</span>':'')+'</div>'+
       /* Kartın kimliği üst kenarı kıran künye plakasında durur; özet satırında beyanın sahibi ve zamanı kalır. */
-      detail('statement','<span class="kunye">'+glyph('quill')+(p.kind==='request'?(written?'Talep sahibinin beyanı':'Beyan eklenmedi'):'Çağrı metni')+'</span><span class="rp-statement-author">'+avatar(p.author)+'<span><strong>'+esc(p.author.name)+'</strong><small>'+esc(date(p.updatedAt))+'</small></span></span>'+(peek?'<span class="rp-statement-peek">'+esc(peek)+'</span>':''),
-      '<div class="rp-statement-body">'+(peek?'<p>'+esc(statementText)+'</p>':'<p class="rp-hint">Talep sahibi ek bir açıklama yazmadı. İhtiyaç başlıkları yukarıda görünür.</p>')+fields(p)+'</div>','rp-statement')+ownerActions(p)+management(p)+'</section>';
+      detail('statement','<span class="kunye">'+glyph('quill')+(request?(written?'Talep sahibinin beyanı':'Beyan eklenmedi'):'Paylaşımın metni')+'</span><span class="rp-statement-author">'+avatar(p.author)+'<span><strong>'+esc(p.author.name)+'</strong><small>'+esc(date(p.updatedAt))+'</small></span></span>'+(peek?'<span class="rp-statement-peek">'+esc(peek)+'</span>':''),
+      '<div class="rp-statement-body">'+(peek?'<p>'+esc(statementText)+'</p>':'<p class="rp-hint">Talep sahibi ek bir açıklama yazmadı. İhtiyaç başlıkları yukarıda görünür.</p>')+(request?fields(p):'')+'</div>','rp-statement')+ownerActions(p)+management(p)+verdict(p)+'</section>';
   }
   function messageHTML(m,indented){
     var p=page.thread.post,par=allMessages().find(function(x){return x.id===m.parentId;}),role=m.authorId===p.authorId?authorRole(p):m.author.requestModerator?'Moderatör':'';
@@ -66,11 +86,37 @@
     return '<article class="rp-message'+(indented?' rp-message--reply':'')+'" id="rp-message-'+esc(m.id)+'">'+avatar(m.author)+'<div class="rp-message-content"><div class="rp-message-meta"><b>'+esc(m.author.name)+'</b>'+(role?'<span class="rp-role">'+role+'</span>':'')+'<time datetime="'+esc(m.createdAt)+'">'+esc(date(m.createdAt))+'</time>'+(page.channel==='coordination'?'<span class="rp-audience">'+glyph(m.visibility==='private'?'lock':'globe')+(m.visibility==='private'?'Özel':'Herkese açık')+'</span>':'')+'</div>'+
       (par?'<a class="rp-parent" href="#rp-message-'+esc(par.id)+'" data-parent-link="'+esc(par.id)+'">'+esc(par.author.name)+' kişisine yanıt</a>':'')+
       (m.kind==='offer'?'<span class="rp-offer">'+(m.withdrawn?'Geri çekilmiş destek önerisi':'Destek önerisi')+'</span>':'')+
-      '<p>'+esc(m.withdrawn?'Destek önerisi geri çekildi.':m.text)+'</p><div class="rp-message-actions">'+(writing()?'<button data-reply-to="'+esc(m.id)+'">'+glyph('reply')+'Yanıtla</button>':'')+(m.canWithdraw?'<button data-withdraw-offer="'+esc(m.id)+'">Önerimi geri çek</button>':'')+'</div></div></article>';
+      '<p>'+esc(m.withdrawn?'Destek önerisi geri çekildi.':m.text)+'</p><div class="rp-message-actions">'+(writing()?'<button data-reply-to="'+esc(m.id)+'">'+glyph('reply')+'Yanıtla</button>':'')+(m.canWithdraw?'<button data-withdraw-offer="'+esc(m.id)+'">Önerimi geri çek</button>':'')+endorseHTML(m)+'</div></div></article>';
+  }
+  /* Community endorsement: the reader says "I agree with this comment" and the most
+     endorsed comment becomes the pinned community note. The author only sees the count. */
+  function endorseHTML(m){
+    if(!info(page.thread.post)||page.channel!=='community'||m.kind==='offer')return '';
+    var count=m.endorsements||0;
+    if(!m.canEndorse)return count?'<span class="rp-endorsed">'+glyph('checkc')+esc(count)+' kişi katılıyor</span>':'';
+    return '<button class="rp-endorse" data-endorse="'+esc(m.id)+'" aria-pressed="'+(m.endorsed?'true':'false')+'">'+glyph('checkc')+'Katılıyorum'+(count?' · '+esc(count):'')+'</button>';
+  }
+  function pinnedHTML(){
+    var p=page.thread.post;
+    if(!info(p)||page.channel!=='community'||!page.thread.pinned)return '';
+    var m=allMessages().find(function(x){return x.id===page.thread.pinned;});
+    if(!m)return '';
+    return '<section class="rp-note" aria-label="Topluluk notu"><p class="rp-note-k">'+glyph('people')+'Topluluk notu · En çok onaylanan yorum</p>'+
+      '<p class="rp-note-b">'+esc(m.text)+'</p><p class="rp-note-m">'+esc(m.author.name)+' · '+esc(m.endorsements||0)+' kişi katılıyor</p></section>';
   }
   /* Empty states are addressed to the actual viewer and never invite an action the next screen refuses. */
   function emptyHTML(){
     var p=page.thread.post,c=p.capabilities||{},owner=isOwner(p),head,body;
+    if(info(p)){
+      if(page.channel==='coordination'){
+        if(!c.canReadPrivate){head='Henüz herkese açık bir doğrulama güncellemesi yok';body='Moderatörler bir sonuç paylaştığında burada görünür.';}
+        else{head='Henüz doğrulama mesajı yok';body=writing()?(owner?'Bilginin kaynağını veya bağlamını aşağıdan yazabilirsiniz.':'Paylaşan kişiye doğruluğu hakkında yazabilirsiniz.'):'Yeni bir mesaj geldiğinde burada görünür.';}
+      }else{
+        head='Henüz tartışma yok';
+        body='Bu bilgiyi gördüyseniz veya kaynağını biliyorsanız yazın.';
+      }
+      return '<div class="rp-empty">'+glyph(page.channel==='coordination'?'shield':'people')+'<h3>'+head+'</h3><p>'+body+'</p></div>';
+    }
     if(page.channel==='coordination'){
       if(!c.canReadPrivate){head='Henüz herkese açık bir güncelleme yok';body=c.canWriteCommunity?'Topluluk desteği sekmesinden bilgi veya destek paylaşabilirsiniz.':'Yeni bir güncelleme paylaşıldığında burada görünür.';}
       else if(owner){head='Henüz moderatör yanıtı yok';body=writing()?'Eklemek istediğiniz bilgiyi aşağıdan paylaşabilirsiniz.':'Yeni bir mesaj geldiğinde burada görünür.';}
@@ -89,15 +135,26 @@
     return html;
   }
   function composer(){
-    var p=page.thread.post,c=p.capabilities,d=draft(),par=parent();
-    if(!writing())return '<div class="rp-readonly">'+glyph('lock')+'<p>'+(p.status==='closed'?(p.kind==='request'?'Talep kapalı. Yeni mesaj yazılamaz.':'Çağrı kapalı. Yeni mesaj yazılamaz.'):page.channel==='community'&&p.communityOpen===false?'Topluluk mesajları moderatör tarafından durduruldu.':page.channel==='coordination'?(p.kind==='request'?'Buraya talep sahibi ve yetkili moderatörler yazabilir.':'Buraya çağrıyı paylaşan kişi ve yetkili moderatörler yazabilir.'):'Bu hesap bu konuşmada yalnızca okuyabilir.')+'</p></div>';
+    var p=page.thread.post,c=p.capabilities,d=draft(),par=parent(),isInfo=info(p);
+    if(!writing())return '<div class="rp-readonly">'+glyph('lock')+'<p>'+(p.status==='closed'?'Talep kapalı. Yeni mesaj yazılamaz.':page.channel==='community'&&p.communityOpen===false?'Topluluk mesajları moderatör tarafından durduruldu.':page.channel==='coordination'?(isInfo?'Buraya paylaşan kişi ve yetkili moderatörler yazabilir.':'Buraya talep sahibi ve yetkili moderatörler yazabilir.'):'Bu hesap bu konuşmada yalnızca okuyabilir.')+'</p></div>';
     if(par?.visibility==='private')d.visibility='private';
-    var canOffer=page.channel==='community'&&p.authorId!==(M.actorId||'me')&&(!M.shared||p.actions.includes('offer.create'));
-    return '<form class="rp-compose" aria-label="Mesaj yaz"><div class="rp-reply-target"'+(!par?' hidden':'')+'><span>'+glyph('reply')+esc(par?par.author.name+' kişisine yanıt':'')+'</span><button type="button" data-cancel-reply aria-label="Yanıtı iptal et">'+glyph('close')+'</button></div><label for="rp-text">'+(page.channel==='coordination'?'Mesajınız':'Bilgi veya destek öneriniz')+'</label>'+
-      '<textarea id="rp-text" name="text" rows="3" maxlength="1000" placeholder="'+(page.channel==='coordination'?'Moderatörlere bir mesaj yazın…':'Paylaşabileceğiniz bilgiyi veya desteği yazın…')+'"'+(d.pending?' readonly':'')+'>'+esc(d.text)+'</textarea><span class="rp-count" aria-live="polite" hidden></span>'+
+    var canOffer=!isInfo&&page.channel==='community'&&p.authorId!==(M.actorId||'me')&&(!M.shared||p.actions.includes('offer.create'));
+    return '<form class="rp-compose" aria-label="Mesaj yaz"><div class="rp-reply-target"'+(!par?' hidden':'')+'><span>'+glyph('reply')+esc(par?par.author.name+' kişisine yanıt':'')+'</span><button type="button" data-cancel-reply aria-label="Yanıtı iptal et">'+glyph('close')+'</button></div><label for="rp-text">'+(page.channel==='coordination'?'Mesajınız':isInfo?'Bildikleriniz':'Bilgi veya destek öneriniz')+'</label>'+
+      '<textarea id="rp-text" name="text" rows="3" maxlength="1000" placeholder="'+(isInfo?(page.channel==='coordination'?'Moderatörlere kaynak veya bağlam yazın…':'Bu bilgi hakkında ne biliyorsunuz? Kaynağınızı ekleyin…'):page.channel==='coordination'?'Moderatörlere bir mesaj yazın…':'Paylaşabileceğiniz bilgiyi veya desteği yazın…')+'"'+(d.pending?' readonly':'')+'>'+esc(d.text)+'</textarea><span class="rp-count" aria-live="polite" hidden></span>'+
       '<div class="rp-compose-footer">'+(page.channel!=='coordination'?'<span class="rp-public-note">'+glyph('globe')+'Herkese açık</span>':par?.visibility==='private'?'<span class="rp-public-note">'+glyph('lock')+'Özel · Yanıt özel kalır</span>':'<label class="rp-visibility">'+glyph(d.visibility==='private'?'lock':'globe')+'<span class="sr-only">Mesaj görünürlüğü</span><select name="visibility"'+(d.pending?' disabled':'')+'>'+options(d.visibility)+'</select></label>')+
       (canOffer?'<label class="rp-kind"><span>Mesaj türü</span><select name="kind"'+(d.pending?' disabled':'')+'><option value="reply">Bilgi veya yanıt</option><option value="offer"'+(d.kind==='offer'?' selected':'')+'>Destek önerisi</option></select></label>':'')+
-      '<button class="rp-send" type="submit">'+glyph('send')+(d.pending?'Gönderimi yeniden dene':'Gönder')+'</button></div><p class="rp-compose-hint">'+(par?.visibility==='private'?'Özel bir mesaja verdiğiniz yanıt da özel kalır.':page.channel==='coordination'?'Özel mesajları yalnızca talep sahibi ve yetkili moderatörler görür. Herkese açık seçerseniz mesaj, talebi görebilen herkese görünür.':'Destek önerisi, yardımın ulaştığı anlamına gelmez.'+(d.kind==='offer'?' Öneriler ayrı listelenir ve geri çekilebilir.':''))+'</p><p class="rp-error" role="alert" hidden></p></form>';
+      '<button class="rp-send" type="submit">'+glyph('send')+(d.pending?'Gönderimi yeniden dene':'Gönder')+'</button></div><p class="rp-compose-hint">'+(par?.visibility==='private'?'Özel bir mesaja verdiğiniz yanıt da özel kalır.':page.channel==='coordination'?(isInfo?'Özel mesajları yalnızca paylaşan kişi ve yetkili moderatörler görür. Herkese açık seçerseniz mesaj, gönderiyi görebilen herkese görünür.':'Özel mesajları yalnızca talep sahibi ve yetkili moderatörler görür. Herkese açık seçerseniz mesaj, talebi görebilen herkese görünür.'):isInfo?'Tartışma, bilgiyi doğrulanmış yapmaz.':'Destek önerisi, yardımın ulaştığı anlamına gelmez.'+(d.kind==='offer'?' Öneriler ayrı listelenir ve geri çekilebilir.':''))+'</p><p class="rp-error" role="alert" hidden></p></form>';
+  }
+  /* A quote-like reference: this information post is about a help request, and the reader
+     gets one step from the accuracy discussion to the aid the request needs. */
+  function aboutHTML(p){
+    var about=p.about&&typeof p.about==='object'?p.about:M.aboutRef?M.aboutRef(p.about):null;
+    if(!about||!info(p))return '';
+    var summary=(about.need||[]).map(function(n){return needs[n]||n;}).join(', ');
+    return '<section class="rp-about" aria-label="İlgili yardım talebi"><div><p class="rp-about-k">'+glyph('reply')+'Bu paylaşım bir yardım talebi hakkında</p>'+
+      (summary?'<p class="rp-about-n">'+esc(summary)+'</p>':'')+
+      '<p class="rp-about-m">'+esc(about.author&&about.author.name?about.author.name:'Talep sahibi')+' · '+(about.status==='closed'?'Talep kapalı':'Talep açık')+'</p></div>'+
+      '<button class="rp-primary" type="button" data-open-request="'+esc(about.id)+'" data-channel="community" data-page="request">'+glyph('people')+'Talebin topluluk desteğine git</button></section>';
   }
   /* Closure, pause and restriction can hold at the same time and none of them may hide in a disclosure. */
   function noticesHTML(p){
@@ -107,19 +164,34 @@
     if(p.publicAccess==='restricted')notices.push('Bu talep yalnızca size ve yetkili moderatörlere açık.');
     return notices.map(function(text){return '<p class="rp-notice">'+glyph('lock')+esc(text)+'</p>';}).join('');
   }
+  /* From the community support of a request straight to the feed composer, with the
+     request already referenced. */
+  function shareAboutHTML(p){
+    if(info(p)||page.channel!=='community'||!M.shareAboutRequest)return '';
+    if(M.shared&&!(M.sharedView.actions||[]).includes('post.create'))return '';
+    return '<button class="rp-text-button" type="button" data-share-about="'+esc(p.id)+'">'+glyph('quill')+'Bu talep hakkında bilgi paylaş</button>';
+  }
   function showRefresh(label){if(!page)return;var b=page.node.querySelector('[data-refresh-request]');if(b){if(label)b.textContent=label;b.hidden=false;}}
   function render(){
-    var p=page.thread.post,c=p.capabilities;
-    if(p.removed){unavailable('Bu talep kaldırıldı.');return;}
+    var p=page.thread.post,c=p.capabilities,isInfo=info(p);
+    page.kind=kindOf(p);
+    if(p.removed){unavailable(isInfo?'Bu paylaşım kaldırıldı.':'Bu talep kaldırıldı.');return;}
     document.title=pageTitle(p)+' · MİHENK';
     // A parent that is not in the loaded window only drops the reply target. A pending
     // command keeps its own frozen parentId so an uncertain retry reuses the same command ID.
     var d=draft();if(d.parentId&&!parent()){d.parentId=null;persist();}
-    page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back aria-label="Akışa dön">'+glyph('chevl')+'<span>Akışa dön</span></button><div><h1 tabindex="-1">'+pageTitle(p)+'</h1><span class="rp-id">#'+esc(p.id.slice(0,8))+'</span></div>'+(p.kind==='request'?'<span class="rp-state">'+glyph(p.status==='closed'?'lock':'clock')+(p.status==='closed'?'Talep kapalı':'Talep açık')+'</span>':'')+'</header>'+statement(p)+
-      noticesHTML(p)+
-      '<div class="rp-tabs" role="tablist" aria-label="Talep konuşmaları">'+Object.keys(labels).map(function(channel){return '<button role="tab" id="rp-tab-'+channel+'" aria-controls="rp-panel" aria-selected="'+(page.channel===channel)+'" tabindex="'+(page.channel===channel?'0':'-1')+'" data-request-channel="'+channel+'">'+glyph(channel==='coordination'?'shield':'people')+'<span>'+labels[channel]+'</span>'+(page.unread[channel]?'<span class="rp-new-dot" role="img" aria-label="Yeni mesaj"></span>':'')+'</button>';}).join('')+'</div>'+
-      '<section class="rp-conversation" id="rp-panel" role="tabpanel" aria-labelledby="rp-tab-'+page.channel+'">'+M.sectionNoteHTML('request:'+page.channel,(page.channel==='coordination'?(c.canReadPrivate?(p.kind==='request'?'Bu sekmede talep sahibi ve yetkili moderatörler yazışır.':'Bu sekmede çağrıyı paylaşan kişi ve yetkili moderatörler yazışır.'):'Herkese açık güncellemeler. Destek için Topluluk desteği sekmesini kullanın.'):'Yapabileceğiniz desteği ve güncel bilgileri paylaşın.'))+'<p class="rp-connection" role="status" hidden></p><button class="rp-updates" data-refresh-request hidden>Yeni mesajlar</button>'+
-      (page.thread.nextMessageOffset!=null?'<button class="rp-earlier" data-earlier>Önceki mesajları göster</button>':'')+'<div class="rp-messages">'+messagesHTML()+'</div>'+composer()+'</section>'+
+    var strip=isInfo
+      ? (page.channel==='coordination'
+        ? (c.canReadPrivate?'Bu sekmede gönüllü moderatörler değerlendirmelerini yazar; sonuç netleşince etiketi güncellerler.':'Herkese açık doğrulama güncellemeleri. Tartışmak için Topluluk tartışması sekmesini kullanın.')
+        : 'Bu bilginin doğru olup olmadığını tartışın. Gördüğünüzü ve kaynağınızı belirtin.')
+      : (page.channel==='coordination'
+        ? (c.canReadPrivate?'Bu sekmede talep sahibi ve yetkili moderatörler yazışır.':'Herkese açık güncellemeler. Destek için Topluluk desteği sekmesini kullanın.')
+        : 'Yapabileceğiniz desteği ve güncel bilgileri paylaşın.');
+    page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back aria-label="Akışa dön">'+glyph('chevl')+'<span>Akışa dön</span></button><div><h1 tabindex="-1">'+pageTitle(p)+'</h1><span class="rp-id">#'+esc(p.id.slice(0,8))+'</span></div>'+(!isInfo?'<span class="rp-state">'+glyph(p.status==='closed'?'lock':'clock')+(p.status==='closed'?'Talep kapalı':'Talep açık')+'</span>':'')+'</header>'+statement(p)+
+      noticesHTML(p)+aboutHTML(p)+
+      '<div class="rp-tabs" role="tablist" aria-label="'+(isInfo?'Paylaşım konuşmaları':'Talep konuşmaları')+'">'+['coordination','community'].map(function(channel){return '<button role="tab" id="rp-tab-'+channel+'" aria-controls="rp-panel" aria-selected="'+(page.channel===channel)+'" tabindex="'+(page.channel===channel?'0':'-1')+'" data-request-channel="'+channel+'">'+glyph(channel==='coordination'?'shield':'people')+'<span>'+channelLabel(p,channel)+'</span>'+(page.unread[channel]?'<span class="rp-new-dot" role="img" aria-label="Yeni mesaj"></span>':'')+'</button>';}).join('')+'</div>'+
+      '<section class="rp-conversation" id="rp-panel" role="tabpanel" aria-labelledby="rp-tab-'+page.channel+'">'+M.sectionNoteHTML('request:'+page.channel,strip)+shareAboutHTML(p)+'<p class="rp-connection" role="status" hidden></p><button class="rp-updates" data-refresh-request hidden>Yeni mesajlar</button>'+
+      (page.thread.nextMessageOffset!=null?'<button class="rp-earlier" data-earlier>Önceki mesajları göster</button>':'')+pinnedHTML()+'<div class="rp-messages">'+messagesHTML()+'</div>'+composer()+'</section>'+
       (!M.shared?'<footer class="rp-local">Tatbikat · Gerçek yardım iletilmez.</footer>':'');
     page.node.setAttribute('aria-label',pageTitle(p));
     page.node.querySelectorAll('details[data-section]').forEach(function(n){n.addEventListener('toggle',function(){if(page)page.expanded[n.dataset.section]=n.open;});});
@@ -144,10 +216,10 @@
       else{form.elements.text.readOnly=!!d.pending;button.disabled=false;button.textContent=d.pending?'Gönderimi yeniden dene':'Gönder';error.hidden=false;error.textContent=result.error.message;if(result.error.code==='conflict')showRefresh('Talep güncellendi · Yeniden yükle');}
     }}
   }
-  function shell(){return '<header class="rp-header"><button class="rp-back" data-request-back>'+glyph('chevl')+'Akışa dön</button><h1>Yardım talebi</h1></header>';}
+  function shell(){return '<header class="rp-header"><button class="rp-back" data-request-back>'+glyph('chevl')+'Akışa dön</button><h1>'+(titles[page&&page.kind]||titles.request)+'</h1></header>';}
   function unavailable(message){if(!page)return;page.node.innerHTML=shell()+'<div class="rp-empty">'+glyph('lock')+'<h2>'+esc(message)+'</h2><button class="rp-button" data-refresh-request>Yeniden dene</button></div>';}
   /* Loading is not an error: no padlock and no retry before the first attempt has finished. */
-  function loading(){if(!page)return;page.node.innerHTML=shell()+'<p class="rp-loading" role="status">Talep yükleniyor…</p>';}
+  function loading(){if(!page)return;page.node.innerHTML=shell()+'<p class="rp-loading" role="status">'+(page.kind==='info'?'Paylaşım yükleniyor…':'Talep yükleniyor…')+'</p>';}
   async function load(earlier,provided){
     if(!page)return;var current=page,run=++serial;capture();
     var anchor=current.node.querySelector('.rp-message'),anchorId=anchor?.id,anchorY=anchor?.getBoundingClientRect().top;
@@ -157,15 +229,15 @@
     try{
       var v=provided||await M.transport.getRequestView(current.id,current.channel,earlier?current.thread.nextMessageOffset:0);
       if(page!==current||run!==serial)return;
-      if(!v.thread||!isHelp(v.thread.post)){unavailable('Bu talep şu anda görüntülenemiyor.');return;}
+      if(!v.thread||!kindOf(v.thread.post)){unavailable(missingText());return;}
       if(earlier){v.thread.messages=v.thread.messages.concat(current.thread.messages);v.thread.parents=v.thread.parents.concat(current.thread.parents||[]);}
-      current.thread=v.thread;current.id=v.thread.post.id;current.unread[current.channel]=false;render();
+      current.thread=v.thread;current.id=v.thread.post.id;current.kind=kindOf(v.thread.post);current.unread[current.channel]=false;render();
       if(activeId){var back=document.getElementById(activeId);if(back){back.focus({preventScroll:true});if(caretStart!=null&&back.setSelectionRange)try{back.setSelectionRange(caretStart,caretEnd);}catch(_){}}}
       if(earlier&&anchorId){var restored=document.getElementById(anchorId);if(restored)window.scrollBy(0,restored.getBoundingClientRect().top-anchorY);}
     }catch(error){if(page!==current||run!==serial)return;
-      if(['unauthorized','not_found'].includes(error.code)){M.transport.clearRequestCache();current.thread=null;unavailable('Bu talep şu anda görüntülenemiyor.');}
+      if(['unauthorized','not_found'].includes(error.code)){M.transport.clearRequestCache();current.thread=null;unavailable(missingText());}
       else if(current.thread){var bar=current.node.querySelector('.rp-connection');if(bar){bar.hidden=false;bar.textContent='Bağlantı kurulamadı. Son bilgiler ve taslağınız korundu.';}showRefresh('Yeniden yükle');}
-      else unavailable('Talep yüklenemedi. Bağlantınızı kontrol edin.');
+      else unavailable(page.kind==='info'?'Paylaşım yüklenemedi. Bağlantınızı kontrol edin.':'Talep yüklenemedi. Bağlantınızı kontrol edin.');
     }
   }
   async function switchChannel(channel,focus){
@@ -181,13 +253,21 @@
   }
   function back(){
     if(history.state?.requestReturn){history.back();return;}
+    drop();
+  }
+  /* Leaving without waiting for a history round trip: the caller needs the feed now,
+     for example to open the composer with this request referenced. */
+  function drop(){
+    if(!page)return;
     var url=new URL(location.href);url.searchParams.delete('request');url.searchParams.delete('channel');history.replaceState(null,'',url);leave();
   }
+  M.leaveRequestPage=drop;
   M.openRequestPage=async function(id,opts){
     opts=opts||{};var first=!page||page.id!==id;
-    if(first){if(page)leave();var origin=document.activeElement,node=M.el('<section id="request-page" class="request-page" aria-label="Yardım talebi"></section>');
-      page={id:id,node:node,channel:opts.channel||(opts.offer?'community':'coordination'),drafts:{},expanded:{},unread:{},scroll:{},thread:null,returnScroll:window.scrollY,origin:origin,title:document.title};
-      M.$('#main').appendChild(node);M.requestPageActive=id;document.documentElement.dataset.requestPage='1';document.title='Yardım talebi · MİHENK';
+    if(first){if(page)leave();var origin=document.activeElement,kind=opts.kind==='info'?'info':'request';
+      var node=M.el('<section id="request-page" class="request-page" aria-label="'+titles[kind]+'"></section>');
+      page={id:id,node:node,kind:kind,channel:opts.channel||(opts.offer?'community':'coordination'),drafts:{},expanded:{},unread:{},scroll:{},thread:null,returnScroll:window.scrollY,origin:origin,title:document.title};
+      M.$('#main').appendChild(node);M.requestPageActive=id;document.documentElement.dataset.requestPage='1';document.title=titles[kind]+' · MİHENK';
       node.onclick=handleClick;node.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&e.target.closest('.rp-compose')){e.preventDefault();e.target.closest('form').requestSubmit();}});
       loading();window.scrollTo(0,0);
       var url=new URL(location.href);url.hash='';url.searchParams.set('request',id);url.searchParams.set('channel',page.channel);
@@ -212,6 +292,13 @@
       capture();if(draft().pending){M.toast('Bekleyen mesaj gönderilmeden yanıt hedefi değiştirilemez. Aşağıdan gönderimi yeniden deneyin.');return;}
       draft().parentId=button.dataset.replyTo||null;if(parent()?.visibility==='private')draft().visibility='private';persist();
       var form=page.node.querySelector('.rp-compose');if(form){var replacement=M.el(composer());form.replaceWith(replacement);replacement.addEventListener('input',capture);replacement.addEventListener('change',capture);replacement.onsubmit=send;replacement.querySelector('textarea')?.focus();}return;
+    }
+    if(button.dataset.endorse){
+      var target=allMessages().find(function(m){return m.id===button.dataset.endorse;});if(!target)return;
+      button.disabled=true;
+      var endorsed=await M.transport.send({type:'message.endorse',targetId:target.id,payload:{active:!target.endorsed}});
+      if(endorsed.ok)await load(false);else{button.disabled=false;M.toast(endorsed.error.message);}
+      return;
     }
     if(button.dataset.withdrawOffer){
       var msg=allMessages().find(function(m){return m.id===button.dataset.withdrawOffer;});if(!msg)return;
@@ -242,11 +329,17 @@
         done='Talep kapatıldı.';
       }
       if(action==='reopen'){type='request.reopen';ask={title:'Talep yeniden açılsın mı?',body:'Yeni mesaj yazılabilir. Herkese açık erişim ve topluluk ayarları değişmez.',confirm:'Talebi yeniden aç'};done='Talep yeniden açıldı.';}
+      if(action==='verify'){
+        type='post.verify';payload.verification=page.node.querySelector('#rp-verify-result').value;
+        payload.reason=page.node.querySelector('#rp-verify-reason').value.trim();
+        ask={title:'Doğrulama sonucu kaydedilsin mi?',body:'Etiket herkese görünür.',confirm:'Sonucu kaydet'};
+        done='Doğrulama sonucu kaydedildi.';
+      }
       if(!ask)return;
       var confirmManage=M.el('<div class="modal report-dialog"><h2 class="modal__h" id="manage-title">'+esc(ask.title)+'</h2><p class="modal__p">'+esc(ask.body)+'</p><p class="compose-error" role="alert" hidden></p><div class="modal__actions"><button class="btn btn--ghost" type="button" data-cancel>Vazgeç</button><button class="btn" type="button" data-confirm>'+esc(ask.confirm)+'</button></div></div>');
       M.openModal(confirmManage,{labelledBy:'manage-title'});confirmManage.querySelector('[data-cancel]').onclick=M.closeModal;
       confirmManage.querySelector('[data-confirm]').onclick=async function(){this.disabled=true;var result=await M.transport.send({type:type,targetId:p.id,expectedVersion:p.version,payload:payload});
-        if(result.ok){M.closeModal();M.toast(done);page.expanded.management=false;await load(false);}else{this.disabled=false;var err=confirmManage.querySelector('[role="alert"]');err.hidden=false;err.textContent=result.error.message;}};
+        if(result.ok){M.closeModal();M.toast(done);page.expanded.management=false;page.expanded.verdict=false;await load(false);}else{this.disabled=false;var err=confirmManage.querySelector('[role="alert"]');err.hidden=false;err.textContent=result.error.message;}};
       return;
     }
   }

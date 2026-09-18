@@ -70,6 +70,7 @@
 .rp-manage-body b { font-size:14px; }
 .rp-manage-body small { display:block; font-size:12px; color:var(--c-text-2); margin-top:4px; max-width:64ch; }
 .rp-manage-body label { display:grid; gap:5px; font-size:13px; }
+.rp-manage-body input[type="text"] { min-height:44px; min-width:220px; padding:0 10px; border:1px solid var(--c-border); border-radius:7px; background:var(--c-bg); color:var(--c-text); font:13px var(--ff); }
 .rp-button { padding:10px 14px; min-height:44px; border:1px solid var(--c-border); border-radius:8px; font-size:13px; flex-shrink:0; }
 .rp-button:hover { background:var(--c-bg-3); }
 .rp-tabs { display:flex; position:sticky; top:var(--rp-head); z-index:19; background:var(--c-bg); border-bottom:1px solid var(--c-border); margin-top:12px; }
@@ -95,6 +96,16 @@
 .rp-message-actions .ic { width:14px; height:14px; }
 .rp-parent { display:inline-block; font-size:12px; margin-top:5px; color:var(--c-text-2); text-decoration:underline; text-underline-offset:3px; }
 .rp-offer { display:block; color:var(--c-accent); font-size:12px; margin-top:6px; }
+/* Community note: the comment the community stands behind, read before the thread. */
+.rp-note { margin:16px 0 4px; padding:14px 16px; border:1px solid var(--c-border); border-left:3px solid var(--v-verified); border-radius:10px; background:var(--c-bg-2); }
+.rp-note-k { display:flex; align-items:center; gap:8px; margin:0; color:var(--v-verified); font-size:12px; font-weight:700; }
+.rp-note-b { margin:8px 0 0; font-size:15px; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
+.rp-note-m { margin:6px 0 0; color:var(--c-text-2); font-size:12px; }
+.rp-endorse { display:inline-flex; align-items:center; gap:6px; min-height:36px; color:var(--c-text-2); font-size:12px; }
+.rp-endorse:hover { color:var(--v-verified); }
+.rp-endorse[aria-pressed="true"] { color:var(--v-verified); font-weight:700; }
+.rp-endorse .ic,.rp-endorsed .ic { width:14px; height:14px; }
+.rp-endorsed { display:inline-flex; align-items:center; gap:6px; min-height:36px; color:var(--c-text-2); font-size:12px; }
 .rp-empty { padding:44px 24px; text-align:center; }
 .rp-empty>.ic { width:30px; height:30px; color:var(--c-text-2); margin:0 auto 14px; }
 .rp-empty h3,.rp-empty h2 { font-size:17px; font-weight:600; margin:0 0 8px; }
@@ -152,13 +163,23 @@
 @media(prefers-reduced-motion:reduce){.request-page summary>.ic { transition:none; }}
 :root[data-plain="1"] .request-page { --c-bg:#000; --c-bg-2:#000; --c-text:#fff; --c-text-2:#ddd; --c-border:#777; }
 
-/* Help request cards in the crisis feed: what is needed, then one clear way in. */
-/* The whole help card opens the request, so the whole card carries the affordance. */
-.cpost[data-help] { cursor:pointer; }
-.cpost[data-help]:hover { background:var(--c-bg-2); }
-.cpost[data-help] .cpost__body:hover { color:var(--c-accent-2); }
+/* The reference card: this information post is about a help request. */
+.rp-about { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 20px; margin-top:16px; padding:14px 16px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
+.rp-about-k { display:flex; align-items:center; gap:8px; margin:0; color:var(--c-text-2); font-size:12px; }
+.rp-about-n { margin:6px 0 0; font-size:15px; font-weight:600; }
+.rp-about-m { margin:4px 0 0; color:var(--c-text-2); font-size:12px; }
+
+/* Crisis cards in the feed: what is needed or claimed, then one clear way in. */
+/* The whole card opens its page, so the whole card carries the affordance. */
+.cpost[data-page] { cursor:pointer; }
+.cpost[data-page]:hover { background:var(--c-bg-2); }
+.cpost[data-page] .cpost__body:hover { color:var(--c-accent-2); }
 /* A written statement can be long: the card shows its opening, the page shows all of it. */
-.cpost[data-help] .cpost__body { display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+.cpost[data-page] .cpost__body { display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+.cpost__about { display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; margin-top:12px; padding:10px 12px; border:1px solid var(--c-border); border-radius:9px; }
+.cpost__about-t { display:flex; align-items:center; gap:7px; color:var(--c-text-2); font-size:13px; }
+.cpost__about-go { min-height:36px; padding:0 12px; border:1px solid var(--c-border); border-radius:999px; color:var(--c-accent); font-size:13px; font-weight:600; }
+.cpost__about-go:hover { background:var(--c-bg-3); }
 .cpost__state { display:inline-flex; align-items:center; gap:5px; margin-left:auto; padding-left:8px; color:var(--c-accent); font-size:12px; font-weight:700; white-space:nowrap; }
 .cpost__state[data-open=""] { color:var(--c-text-2); }
 .cpost__state .ic { width:14px; height:14px; }
@@ -172,11 +193,17 @@
 .request-actions--entry .open-request:hover { background:var(--c-accent-fill); filter:brightness(1.12); }
 .request-actions--entry .open-request:active { transform:scale(.97); }
 .request-actions--entry .offer-action { min-height:40px; padding:0 14px; border:1px solid var(--c-border); border-radius:999px; }
+/* Sharing information about a request is a quieter, secondary move. */
+.request-actions--entry .share-action { display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:0 8px; color:var(--c-text-2); font-size:13px; }
+.request-actions--entry .share-action:hover { color:var(--c-accent); }
 .request-actions .request-counts { color:var(--c-text-2); font-size:12px; line-height:1.5; }
 .request-actions--entry .report-action { margin-left:auto; }
 @media(max-width:700px){
   .cpost__state { width:100%; margin-left:0; padding-left:0; margin-top:4px; }
   .request-actions--entry .open-request { flex:1; min-width:140px; }
   .request-actions--entry .request-counts { width:100%; order:9; }
+  .cpost__about { gap:8px; }.cpost__about-t,.cpost__about-go { width:100%; }
+  .cpost__about-go { justify-content:center; display:inline-flex; align-items:center; min-height:40px; }
+  .rp-about { padding:12px; }.rp-about .rp-primary { width:100%; justify-content:center; }
 }
 :root[data-plain="1"] .request-actions--entry .open-request { border:1px solid #fff; }

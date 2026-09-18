@@ -52,13 +52,34 @@
   function statePill(p) {
     return '<span class="cpost__state" data-open="' + (p.resolved ? '' : '1') + '">' + icon(p.resolved ? 'lock' : 'clock', 'ic--sm') + '<span>' + (p.resolved ? 'Talep kapalı' : 'Talep açık') + '</span></span>';
   }
+  /* A structured request opens the request page; every other non-official crisis post
+     opens the same page in information mode, where its accuracy is discussed. */
+  function pageKind(p, v) {
+    return p.need ? 'request' : (v || p.v) !== 'official' ? 'info' : null;
+  }
+  M.crisisPageKind = pageKind;
+  function needSummary(need) {
+    return (need || []).map(function (n) { return NEEDLABEL[n] || n; }).join(', ');
+  }
+  M.needSummary = needSummary;
+  /* Quote-like reference: an information post about a help request carries the request's
+     need summary and one way into that request's community support. */
+  function aboutBlock(p) {
+    var about = M.aboutRef ? M.aboutRef(p.about) : null;
+    if (!about) return '';
+    return '<div class="cpost__about">' +
+      '<span class="cpost__about-t">' + icon('reply', 'ic--sm') + '<span>Talep hakkında: ' + esc(about.author && about.author.name ? about.author.name : 'Talep sahibi') +
+      (needSummary(about.need) ? ' · ' + esc(needSummary(about.need)) : '') + '</span></span>' +
+      '<button class="cpost__about-go" type="button" data-open-request="' + esc(about.id) + '" data-channel="community" data-page="request">Talebin topluluk desteğine git</button>' +
+      '</div>';
+  }
   function cpostHTML(p, opts) {
     opts = opts || {};
     var u = S.byId[p.uid] || S.me;
     var v = state.verified[p.id] || p.v;
     var vl = S.VER[v];
-    var help = !!p.need || (p.tag === 'yardim' && v !== 'official');
-    return '<article class="cpost" data-id="' + p.id + '" data-version="'+(p.version||1)+'" data-v="' + v + '" data-resolved="' + (p.resolved ? '1' : '') + '" data-tag="' + p.tag + '"' + (help ? ' data-help="1"' : '') + '>' +
+    var kind = pageKind(p, v), help = kind === 'request';
+    return '<article class="cpost" data-id="' + p.id + '" data-version="'+(p.version||1)+'" data-v="' + v + '" data-resolved="' + (p.resolved ? '1' : '') + '" data-tag="' + p.tag + '"' + (kind ? ' data-page="' + kind + '"' : '') + '>' +
       '<span class="av">' + u.avatar + '</span>' +
       '<div class="cpost__col">' +
         '<div class="cpost__head">' +
@@ -77,11 +98,9 @@
           '<span class="cpost__loc">' + icon('pin', 'ic--sm') + esc((p.region && p.region !== p.loc ? p.region + ' · ' : '') + p.loc) + '</span>' +
           '<span class="cpost__tag">' + esc(TAGLABEL[p.tag]) + '</span>' +          '<button class="cpost__why" type="button" data-why="' + p.id + '">' +
             icon('questionc', 'ic--sm') + '<span>Gerekçe</span></button>' +
-          (p.uid !== 'me' && (!M.shared||p.actions.includes('observation.create')) ? '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
-            (state.corroborations[p.id] ? ' data-done="1"' : '') + '>' +
-            icon('checkc', 'ic--sm') + '<span>' + (state.corroborations[p.id] ? 'Beyanınız alındı' : 'Ben de gördüm') + '</span></button>' : '') +
         '</div>' +
-      // The actions read the same effective verification as data-help, so the card body
+        (kind === 'info' ? aboutBlock(p) : '') +
+      // The actions read the same effective verification as data-page, so the card body
       // and the entry button never disagree after a local verification change.
       (M.cardActions ? M.cardActions(v === p.v ? p : Object.assign({}, p, { v: v })) : '') + '</div></article>';
   }
@@ -138,6 +157,8 @@
           '<div class="composer__col">' +
             '<label class="sr-only" for="cta">Kriz akışında paylaş</label>' +
             '<div class="composer__heading"><b>Bilgi paylaş</b><button type="button" id="close-ccomposer" aria-label="Paylaşım alanını kapat">' + icon('close') + '</button></div>' +
+            '<div class="compose-about" id="compose-about" hidden><span id="compose-about-t"></span>' +
+              '<button type="button" id="compose-about-x" aria-label="Talep bağlantısını kaldır">' + icon('close', 'ic--sm') + '</button></div>' +
             '<textarea class="composer__ta" id="cta" rows="2" maxlength="1000" placeholder="Ne oldu, nerede oldu? Bildiğin kadarını yaz."></textarea>' +
             '<div class="tagsel" id="ctagsel">' +
               '<div class="tagsel__h">Bu paylaşımı etiketle</div>' +
@@ -321,6 +342,7 @@
       var edit = e.target.closest('[data-edit-request]');
       if (edit) { M.openImdat({ editId: edit.dataset.editRequest }); return; }
       if (e.target.closest('#close-ccomposer')) { $('#ccomposer').hidden = true; $('#crisis-write').focus(); return; }
+      if (e.target.closest('#compose-about-x')) { M.setComposeAbout(null); $('#cta').focus(); return; }
       var resolved = e.target.closest('[data-resolve]');
       if (resolved && M.shared) {
         var target = M.getPost(resolved.dataset.resolve),shown=resolved.closest('.cpost');
@@ -349,15 +371,6 @@
         }
         // Chips toggle: pressing the active chip returns to the full list.
         selectFilter(chip.getAttribute('aria-pressed') === 'true' ? 'all' : chip.dataset.filter, false);
-        return;
-      }
-      var vb = e.target.closest('[data-verify]');
-      if (vb && M.shared) { vb.disabled=true; M.transport.send({type:'observation.create',targetId:vb.dataset.verify,payload:{}}).then(function(r){if(!r.ok){vb.disabled=false;M.toast(r.error.message);}else M.refreshShared(true);});return; }
-      if (vb) {
-        state.corroborations[vb.dataset.verify] = true;
-        vb.dataset.done = '1';
-        vb.querySelector('span').textContent = 'Beyanın alındı';
-        M.toast('Beyanın kaydedildi. Tek bir beyan doğrulama durumunu değiştirmez.', { muted: true });
         return;
       }
       var why = e.target.closest('[data-why]');
@@ -399,8 +412,6 @@
     pill.innerHTML = icon('checkc') + '<span class="vpill__t">Doğrulanmış</span>';
     pill.dataset.upgrade = '1';
     setTimeout(function () { pill.dataset.upgrade = ''; }, 460);
-    var vb = node.querySelector('[data-verify]');
-    if (vb) { vb.dataset.done = '1'; vb.querySelector('span').textContent = 'Doğrulandı'; }
     updateCounts();
     if (!silent) M.toast('Doğrulama kaydedildi', { muted: true, life: 1600 });
   }
@@ -450,11 +461,13 @@
     var tag = picked ? picked.dataset.tag : 'durum';
     var id = 'x' + (state.extraCrisis.length + 1);
     var region = $('#post-region').value;
+    var about = M.crisisAbout && M.crisisAbout.id ? M.crisisAbout.id : null;
     var post = { id: id, uid: 'me', t: 'şimdi', text: text, v: 'unverified', tag: tag,
       loc: region || 'Konum belirtilmedi', region: region, source: source, sourceUrl: source === 'link' ? sourceUrl : '' };
+    if (about) post.about = about;
     if(M.shared){
       var button=$('#cpostbtn');if(button.dataset.sending)return;button.dataset.sending='1';button.disabled=true;
-      var pending=M.crisisPending || {commandId:crypto.randomUUID(),type:'post.create',payload:{text:text,tag:tag,location:{known:!!region,region:region||null,text:''},source:{kind:source||null,url:source==='link'?sourceUrl:null}}};M.crisisPending=pending;if(M.saveComposeDraft)M.saveComposeDraft();if(M.lockCompose)M.lockCompose(true);
+      var pending=M.crisisPending || {commandId:crypto.randomUUID(),type:'post.create',payload:{text:text,tag:tag,location:{known:!!region,region:region||null,text:''},source:{kind:source||null,url:source==='link'?sourceUrl:null},about:about}};M.crisisPending=pending;if(M.saveComposeDraft)M.saveComposeDraft();if(M.lockCompose)M.lockCompose(true);
       var result=await M.transport.send(pending);delete button.dataset.sending;
       if(!result.ok){error.hidden=false;error.textContent=result.error.message;button.disabled=false;if((result.error.code!=='unavailable'||result.error.retryable===false)){M.crisisPending=null;if(M.lockCompose)M.lockCompose(false);}button.textContent=M.crisisPending?'Gönderimi yeniden dene':'Paylaş';if(M.saveComposeDraft)M.saveComposeDraft();return;}id=result.entityId;M.crisisPending=null;if(M.lockCompose)M.lockCompose(false);button.textContent='Paylaş';
     } else state.extraCrisis.unshift(post);
@@ -465,6 +478,7 @@
     cta.value = ''; cta.style.height = 'auto';
     $('#post-region').value = ''; $('#post-source').value = ''; $('#post-link').value = '';
     $('#post-link-field').hidden = true; $('#compose-count').textContent = '0 / 1000';
+    M.setComposeAbout(null);
     $('#cpostbtn').disabled = true;
     $('#ccomposer').hidden = true;
     $$('#ctagsel .chip').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
@@ -479,10 +493,45 @@
   }
   M.publishCrisis = publishCrisis;
 
-  M.openCrisisComposer = function (text, tag) {
+  /* The composer keeps one optional request reference. It is a chip, not a hidden field,
+     so the writer can see and remove the link before sharing. */
+  function renderComposeAbout() {
+    var chip = $('#compose-about');
+    if (!chip) return;
+    var about = M.crisisAbout;
+    chip.hidden = !about;
+    $('#compose-about-t').textContent = about ? 'Talep hakkında: ' + (about.name || 'Talep sahibi') + (about.needs ? ' · ' + about.needs : '') : '';
+  }
+  M.setComposeAbout = function (about) {
+    M.crisisAbout = about || null;
+    renderComposeAbout();
+    if (M.saveComposeDraft) M.saveComposeDraft();
+  };
+  M.renderComposeAbout = renderComposeAbout;
+  function aboutRefFor(id) {
+    var p = M.getPost(id);
+    if (!p) return { id: id, name: '', needs: '' };
+    return { id: id, name: (p.author && p.author.name) || (S.byId[p.uid] || S.me).name, needs: needSummary(p.need) };
+  }
+  /* One entry point for "share information about this request", used by the help card
+     and by the request page (which leaves the page first so the composer is visible). */
+  M.shareAboutRequest = function (id, ref) {
+    var about = ref || aboutRefFor(id);
+    var open = function () {
+      M.openCrisisComposer('', null, about);
+      var cta = $('#cta');
+      if (cta) { cta.focus(); cta.scrollIntoView({ block: 'center', behavior: M.motionOff() ? 'auto' : 'smooth' }); }
+    };
+    if (state.tab !== 'crisis' && state.crisis && M.setTab) { M.setTab('crisis'); setTimeout(open, M.motionOff() ? 0 : 420); }
+    else open();
+  };
+
+  M.openCrisisComposer = function (text, tag, about) {
     buildCrisisPanel();
     var c = $('#ccomposer');
     c.hidden = false;
+    if (about !== undefined) M.setComposeAbout(about);
+    else renderComposeAbout();
     var cta = $('#cta');
     if (typeof text === 'string') cta.value = text.slice(0, 1000);
     cta.style.height = 'auto';

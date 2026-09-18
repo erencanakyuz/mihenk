@@ -1,7 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { reject } from './world.mjs';
 import { accessFor, permits, canSeePost, canReadMessage, messageChannel, requestModerator } from './access.mjs';
-import { requestProjection, helpPost, commentsClosed } from './request-policy.mjs';
+import { requestProjection, aboutProjection, threadPost, pageKind, commentsClosed } from './request-policy.mjs';
+// Community endorsements live in the observations collection with kind 'message'.
+const endorsers=(state,id)=>Object.values(state.observations).filter(o=>o.kind==='message'&&o.targetId===id&&o.active!==false);
 const readOnlyRun=state=>['stopped','replay'].includes(state.status);
 const actorView=a=>({id:a.id,name:a.name,handle:a.handle,org:!!a.org,requestModerator:requestModerator(a)});
 function authorActions(state,actorId,authorId) {
@@ -24,13 +26,15 @@ export function publicPost(state,entry,actorId) {
     repostedBy:entry.originalId?actorView(state.actors[entry.authorId]):null,
     kind:p.kind,text:p.text,tag:p.tag,removed:!!p.removed,version:p.version,createdAt:p.createdAt,updatedAt:p.updatedAt,
     source:p.source,verification:p.verification,location:p.location,corrects:p.corrects??null,
-    ...(helpPost(p)?requestProjection(state,actorId,p):{}),
+    about:aboutProjection(state,actorId,p),
+    ...(threadPost(p)?requestProjection(state,actorId,p):{}),
     likes:count('reactions',x=>x.targetId===p.id&&x.active),liked:!!state.reactions[actorId+':'+p.id]?.active,
     replies:count('replies',x=>x.targetId===p.id&&canReadMessage(state,actorId,x)),offers:count('offers',x=>x.targetId===p.id&&!x.withdrawn),
     reposts:count('posts',x=>x.originalId===p.id),reposted,
     observed:!!state.observations[actorId+':'+p.id],following:!!state.follows[actorId+':'+p.authorId]?.active,
     actions: readOnly?[]:[...(visibleAuthorActions.includes('account.ban')?['account.ban']:[]),
       ...(!p.removed?['post.remove',...(!commentsClosed(p)&&(p.kind!=='request'||p.status==='open')?['reply.create']:[]),'post.react',...(!reposted?['post.repost']:[]),'report.create',...(!mine?['observation.create','account.follow']:[]),
+      ...(pageKind(p)==='info'?['post.verify']:[]),
       ...(p.kind==='request'&&requestModerator(actor)?['request.manage',p.status==='open'?'request.close':'request.reopen']:[]),
       ...(p.kind==='request'?(mine?['request.update',p.status==='open'?'request.close':'request.reopen']:p.status==='open'&&p.communityOpen!==false&&!openOffer?['offer.create']:[]):[])]:[])].filter(type=>permits(actor,type))
   };
@@ -80,21 +84,29 @@ export function projectView(service,session,query={}) {
     if(!entry||!canSeePost(state,actorId,entry))reject('not_found','Gönderi bulunamadı.');
     const p=entry.originalId?state.posts[entry.originalId]:entry;
     const messages=[...Object.values(state.replies).map(x=>({...x,kind:'reply'})),...Object.values(state.offers).filter(x=>!x.withdrawn).map(x=>({...x,kind:'offer'}))]
-      .filter(x=>x.targetId===p.id&&canReadMessage(state,actorId,x)&&(!helpPost(p)||messageChannel(x)===channel)).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
+      .filter(x=>x.targetId===p.id&&canReadMessage(state,actorId,x)&&(!threadPost(p)||messageChannel(x)===channel)).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
     const end=Math.max(0,messages.length-messageOffset),start=Math.max(0,end-messageLimit);
     const projectMessage=x=>({id:x.id,targetId:x.targetId,authorId:x.authorId,kind:x.kind,text:x.withdrawn?'Destek önerisi geri çekildi.':x.text,
       version:x.version,createdAt:x.createdAt,updatedAt:x.updatedAt,channel:messageChannel(x),visibility:x.visibility||'public',parentId:x.parentId||null,
       withdrawn:!!x.withdrawn,author:actorView(state.actors[x.authorId]),authorActions:authorActions(state,actorId,x.authorId),
+      endorsements:endorsers(state,x.id).length,endorsed:endorsers(state,x.id).some(o=>o.authorId===actorId),
+      canEndorse:x.kind!=='offer'&&(x.visibility||'public')==='public'&&x.authorId!==actorId&&permits(actor,'message.endorse')&&!readOnlyRun(state),
       canWithdraw:x.kind==='offer'&&x.authorId===actorId&&!x.withdrawn&&permits(actor,'offer.withdraw')&&!readOnlyRun(state)});
     const selected=messages.slice(start,end),selectedIds=new Set(selected.map(m=>m.id));
-    const parents=messages.filter(m=>!selectedIds.has(m.id)&&selected.some(c=>c.parentId===m.id)).map(projectMessage);
-    thread=p.removed?{post:{...publicPost(state,p,actorId),text:'Bu gönderi kaldırıldı.',location:{known:false,region:null,text:''},source:{kind:null,url:null},need:undefined,people:undefined},messages:[],parents:[],earlierCount:0}:
-      {post:publicPost(state,p,actorId),channel,messages:selected.map(projectMessage),parents,earlierCount:start,newerCount:messages.length-end,nextMessageOffset:start?messageOffset+messageLimit:null};
+    // Community note: the public community message with the most endorsements, earliest wins a tie.
+    const pinned=pageKind(p)==='info'&&channel==='community'
+      ? messages.filter(m=>m.kind!=='offer'&&(m.visibility||'public')==='public'&&endorsers(state,m.id).length>0)
+        .sort((a,b)=>endorsers(state,b.id).length-endorsers(state,a.id).length||a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id))[0]||null
+      : null;
+    // A pinned message outside the loaded window still travels, so the note is never empty.
+    const parents=messages.filter(m=>!selectedIds.has(m.id)&&(selected.some(c=>c.parentId===m.id)||(!!pinned&&m.id===pinned.id))).map(projectMessage);
+    thread=p.removed?{post:{...publicPost(state,p,actorId),text:'Bu gönderi kaldırıldı.',location:{known:false,region:null,text:''},source:{kind:null,url:null},need:undefined,people:undefined},messages:[],parents:[],earlierCount:0,pinned:null}:
+      {post:publicPost(state,p,actorId),channel,messages:selected.map(projectMessage),parents,pinned:pinned?pinned.id:null,earlierCount:start,newerCount:messages.length-end,nextMessageOffset:start?messageOffset+messageLimit:null};
   }
   const ownPosts=new Set(canonical.filter(p=>p.authorId===actorId).map(p=>p.id));
   const involved=new Set([...ownPosts,...Object.values(state.replies).filter(r=>r.authorId===actorId).map(r=>r.targetId),...Object.values(state.offers).filter(r=>r.authorId===actorId).map(r=>r.targetId)]);
   const updates=[...Object.values(state.replies).map(x=>({...x,kind:'reply'})),...Object.values(state.offers).filter(x=>!x.withdrawn).map(x=>({...x,kind:'offer'}))]
-    .filter(x=>involved.has(x.targetId)&&x.authorId!==actorId&&!state.posts[x.targetId]?.removed&&canReadMessage(state,actorId,x)&&(!helpPost(state.posts[x.targetId])||state.posts[x.targetId].authorId!==actorId||messageChannel(x)==='coordination'))
+    .filter(x=>involved.has(x.targetId)&&x.authorId!==actorId&&!state.posts[x.targetId]?.removed&&canReadMessage(state,actorId,x)&&(!threadPost(state.posts[x.targetId])||state.posts[x.targetId].authorId!==actorId||messageChannel(x)==='coordination'))
     .sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).slice(0,updateLimit)
     .map(x=>({id:x.id,targetId:x.targetId,kind:x.kind,channel:messageChannel(x),at:x.updatedAt,text:x.withdrawn?'Destek önerisi geri çekildi.':x.text,author:actorView(state.actors[x.authorId]),authorActions:authorActions(state,actorId,x.authorId)}));
   const items=filtered.slice(offset,offset+limit).map(p=>publicPost(state,p,actorId));

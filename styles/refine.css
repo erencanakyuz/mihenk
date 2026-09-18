@@ -50,7 +50,7 @@
 .cpost__head { flex-wrap: wrap; }
 .cpost__body { line-height: 24px; }
 .cpost__tag { text-transform: none; letter-spacing: 0; font-weight: 500; }
-.cpost__why, .cpost__verify { min-height: 36px; }
+.cpost__why { min-height: 36px; }
 .vpill { height: 25px; font-size: 11px; font-weight: 650; letter-spacing: 0; padding: 0 9px; }
 .vpill .ic { width: 14px; height: 14px; }
 .pin { margin: 29px 0 16px; padding: 20px; }
@@ -186,6 +186,12 @@
 .compose-context label { display: grid; gap: 5px; min-width: 0; font-size: 12px; color: var(--c-text-2); }
 .compose-context select, .field select { background: var(--c-bg-2); border: 1px solid var(--c-border); border-radius: 9px; min-height: 44px; width: 100%; min-width: 0; padding: 0 10px; color: var(--c-text); font-size: 13px; }
 .compose-error { font-size: 13px; color: #ffadb9; }
+/* The composer's request reference is visible and removable before sharing. */
+.compose-about { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 8px 10px; border: 1px solid var(--c-border); border-radius: 999px; background: var(--c-bg-2); color: var(--c-text-2); font-size: 12px; }
+.compose-about > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.compose-about button { display: grid; place-items: center; min-width: 32px; min-height: 32px; border-radius: 50%; color: var(--c-text-2); }
+.compose-about button:hover { background: var(--c-bg-3); color: var(--c-text); }
+:root[data-plain="1"] .compose-about { background: #000; border-color: #777; color: #fff; }
 .compose-count { font-size: 12px; color: var(--c-text-2); margin-right: auto; }
 .stepper input { width: 130px; min-width: 0; background: transparent; border: 1px solid var(--c-border); border-radius: 12px; text-align: center; color: var(--c-text); font: 700 48px/1.2 var(--ff-display); padding: 12px 0; appearance: textfield; }
 .stepper input::-webkit-inner-spin-button { appearance: none; }

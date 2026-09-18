@@ -61,10 +61,12 @@
     M.saveComposeDraft=function(){
       var ta=M.$('#cta');if(!ta)return;
       var picked=M.$('#ctagsel [aria-pressed="true"]');
-      try{localStorage.setItem(draftKey,JSON.stringify({text:ta.value,region:M.$('#post-region').value,source:M.$('#post-source').value,url:M.$('#post-link').value,tag:picked?picked.dataset.tag:null,pending:M.crisisPending||null}));}catch(_){}
+      try{localStorage.setItem(draftKey,JSON.stringify({text:ta.value,region:M.$('#post-region').value,source:M.$('#post-source').value,url:M.$('#post-link').value,tag:picked?picked.dataset.tag:null,about:M.crisisAbout||null,pending:M.crisisPending||null}));}catch(_){}
     };
     try{var saved=JSON.parse(localStorage.getItem(draftKey));if(saved&&saved.text){
       M.$('#cta').value=saved.text;M.$('#post-region').value=saved.region||'';M.$('#post-source').value=saved.source||'';M.$('#post-link').value=saved.url||'';M.$('#post-link-field').hidden=saved.source!=='link';
+      // The request reference is part of the draft: one chip, restored once, never duplicated.
+      M.crisisAbout=saved.about&&saved.about.id?saved.about:null;if(M.renderComposeAbout)M.renderComposeAbout();
       M.crisisPending=saved.pending||null;M.$('#cpostbtn').disabled=false;M.$('#compose-count').textContent=saved.text.length+' / 1000';M.lockCompose(!!M.crisisPending);if(M.crisisPending)M.$('#cpostbtn').textContent='Gönderimi yeniden dene';
       if(saved.tag){var tag=M.$('#ctagsel [data-tag="'+saved.tag+'"]');if(tag)tag.setAttribute('aria-pressed','true');}
     }}catch(_){}
