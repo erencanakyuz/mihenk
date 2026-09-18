@@ -1,13 +1,13 @@
 (function(M){
   'use strict';
-  var listeners=[], cache=new Map(), currentQuery={}, currentView=null, offlineMessages=[], offlineOffers=[], generation=0;
+  var listeners=[], cache=new Map(), currentQuery={}, currentView=null, offlineMessages=[], offlineOffers=[], offlineEndorsed={}, generation=0;
   function account(a){return Object.assign({},a,{avatar:M.CATALOG.avatar(a.name)});}
   function converted(p){
     var me=currentView.me.id;
     return Object.assign({},p,{uid:p.authorId===me?'me':p.authorId,v:p.verification,t:time(p.updatedAt),
       loc:p.publicLocationText||p.location.region||p.location.text||'Konum henüz belirtilmedi',region:p.location.region||'',
       source:p.source.kind,sourceUrl:p.source.url||'',resolved:p.status==='closed',views:0,
-      replies:p.replies||0,reposts:p.reposts||0,likes:p.likes||0,help:p.kind==='request'||(p.tag==='yardim'&&p.verification!=='official'),updates:(p.messageCounts&&p.messageCounts.coordination)||0,support:(p.messageCounts&&p.messageCounts.community)||0});
+      replies:p.replies||0,reposts:p.reposts||0,likes:p.likes||0,page:p.pageKind||null,updates:(p.messageCounts&&p.messageCounts.coordination)||0,support:(p.messageCounts&&p.messageCounts.community)||0});
   }
   function time(at){var date=new Date(at);return date.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
   function hydrate(view){
@@ -34,19 +34,31 @@
   var localLoaded=false,localReceipts={};
   function loadLocal(){
     if(localLoaded||!M.state)return;localLoaded=true;
-    try{var saved=JSON.parse(sessionStorage.getItem('mihenk:requests:v1'));if(saved){M.state.extraCrisis=saved.posts||[];offlineMessages=saved.messages||[];offlineOffers=saved.offers||[];localReceipts=saved.receipts||{};}}catch(_){}
+    try{var saved=JSON.parse(sessionStorage.getItem('mihenk:requests:v1'));if(saved){M.state.extraCrisis=saved.posts||[];offlineMessages=saved.messages||[];offlineOffers=saved.offers||[];offlineEndorsed=saved.endorsed||{};localReceipts=saved.receipts||{};}}catch(_){}
     // Seed posts are rebuilt on every load, so their counters are restored from the saved messages.
     offlineMessages.concat(offlineOffers).forEach(function(m){var p=offlinePost(m.targetId);if(!p||M.state.extraCrisis.indexOf(p)>=0)return;if(m.kind==='offer'){if(!m.withdrawn)p.offers=(p.offers||0)+1;}else p.replies=(p.replies||0)+1;if(m.channel==='coordination')p.updates=(p.updates||0)+1;else if(m.kind!=='offer'||!m.withdrawn)p.support=(p.support||0)+1;});
   }
-  function persistLocal(){try{sessionStorage.setItem('mihenk:requests:v1',JSON.stringify({posts:M.state.extraCrisis,messages:offlineMessages,offers:offlineOffers,receipts:localReceipts}));}catch(_){}}
+  function persistLocal(){try{sessionStorage.setItem('mihenk:requests:v1',JSON.stringify({posts:M.state.extraCrisis,messages:offlineMessages,offers:offlineOffers,endorsed:offlineEndorsed,receipts:localReceipts}));}catch(_){}}
   function offlinePost(id){loadLocal();return (M.state?M.state.extraCrisis:[]).concat(M.SEED.crisis,M.SEED.forYou,M.SEED.following).find(function(p){return p.id===id;});}
+  // Local mode: a crisis card carries a tag, an ordinary social post does not, so only
+  // crisis content gets a page kind and the old modal keeps the social feed.
+  function offlinePageKind(p){return !p?null:p.need?'request':(p.tag&&p.v!=='official')?'info':null;}
+  function offlineAbout(value){
+    if(!value)return null;
+    if(typeof value==='object')return value;
+    var p=offlinePost(value);if(!p||!p.need)return null;
+    var author=M.SEED.byId[p.uid]||M.SEED.me;
+    return {id:p.id,need:p.need,people:p.people==null?null:p.people,status:p.resolved?'closed':'open',author:{id:p.uid,name:author.name}};
+  }
+  // A card may hold either the server's projected reference or a local request id.
+  M.aboutRef=function(value){return !value?null:typeof value==='object'?value:offlineAbout(value);};
   function publicOffline(p){
     if(!p)return null;
-    var author=M.SEED.byId[p.uid]||M.SEED.me;
+    var author=M.SEED.byId[p.uid]||M.SEED.me,kind=offlinePageKind(p);
     return Object.assign({},p,{authorId:p.uid,author:author,kind:p.need?'request':'post',version:p.version||1,status:p.resolved?'closed':'open',
       source:{kind:p.source||null,url:p.sourceUrl||null},verification:p.v||'unverified',createdAt:p.createdAt||new Date().toISOString(),updatedAt:p.updatedAt||new Date().toISOString(),
-      location:p.location||{known:!!p.loc,region:p.region||null,text:p.loc||''},
-      helpCall:!p.need&&p.tag==='yardim'&&p.v!=='official',messageCounts:{coordination:p.updates||0,community:p.support||0},capabilities:{canReadPrivate:p.uid==='me',canEditStatement:p.uid==='me'&&!!p.need,canWriteCoordination:p.uid==='me'&&(!!p.need||p.tag==='yardim')&&!p.resolved,canWriteCommunity:!p.resolved&&p.communityOpen!==false&&!(!p.need&&p.v==='official'),canManagePublicAccess:false,canClose:p.uid==='me'&&!!p.need&&!p.resolved,canReopen:p.uid==='me'&&!!p.need&&!!p.resolved}});
+      location:p.location||{known:!!p.loc,region:p.region||null,text:p.loc||''},about:offlineAbout(p.about),
+      pageKind:kind,messageCounts:{coordination:p.updates||0,community:p.support||0},capabilities:{canReadPrivate:p.uid==='me',canEditStatement:p.uid==='me'&&!!p.need,canWriteCoordination:p.uid==='me'&&!!kind&&!p.resolved,canWriteCommunity:!p.resolved&&p.communityOpen!==false&&!!kind,canManagePublicAccess:false,canClose:p.uid==='me'&&!!p.need&&!p.resolved,canReopen:p.uid==='me'&&!!p.need&&!!p.resolved}});
   }
   function offlineSend(cmd){
     var p=offlinePost(cmd.targetId), payload=cmd.payload||{}, id=crypto.randomUUID(), version=1;
@@ -69,6 +81,15 @@
       var m={channel:payload.channel||'community',visibility:(payload.channel==='coordination'?payload.visibility:'public')||'public',parentId:payload.parentId||null,id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
       (m.kind==='offer'?offlineOffers:offlineMessages).push(m);p[m.kind==='offer'?'offers':'replies']=(p[m.kind==='offer'?'offers':'replies']||0)+1;if(m.channel==='coordination')p.updates=(p.updates||0)+1;else p.support=(p.support||0)+1;
       return {ok:true,entityId:id,entityVersion:1};
+    } else if(cmd.type==='message.endorse'){
+      var message=offlineMessages.find(function(x){return x.id===cmd.targetId;});
+      if(!message)return {ok:false,error:{code:'not_found',message:'Mesaj bulunamadı.'}};
+      if((message.visibility||'public')!=='public')return {ok:false,error:{code:'validation',message:'Özel mesajlar onaylanamaz.'}};
+      offlineEndorsed[message.id]=!!payload.active;persistLocal();
+      return {ok:true,entityId:'me:'+message.id,entityVersion:1};
+    } else if(cmd.type==='post.verify'){
+      if(!p)return {ok:false,error:{code:'not_found',message:'Gönderi bulunamadı.'}};
+      return {ok:false,error:{code:'unauthorized',message:'Doğrulama sonucu yalnızca tatbikat moderatörleri tarafından kaydedilir.'}};
     } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});
       if(!offer)return {ok:false,error:{code:'not_found',message:'Destek önerisi bulunamadı.'}};
       offer.withdrawn=true;offer.canWithdraw=false;var host=offlinePost(offer.targetId);if(host){host.offers=Math.max(0,(host.offers||0)-1);host.support=Math.max(0,(host.support||0)-1);}return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
@@ -108,12 +129,16 @@
     getView:async function(query){
       if(!M.shared){
         var p=query&&query.thread?offlinePost(query.thread):null,channel=query?.channel||'community';
-        // Same help test as the server: an official announcement has no channels.
-        var help=!!p&&(!!p.need||(p.tag==='yardim'&&p.v!=='official'));
+        // Same page test as the server: an official announcement has no channels.
+        var help=!!offlinePageKind(p);
         var messages=offlineMessages.concat(offlineOffers.filter(function(o){return !o.withdrawn;})).filter(function(m){return p&&m.targetId===p.id&&(!help||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
         var end=Math.max(0,messages.length-(query?.messageOffset||0)),start=Math.max(0,end-40);
+        // Endorsement parity: one local account, so the local adapter also lets it endorse
+        // its own comment. The server rejects that.
+        messages=messages.map(function(m){return Object.assign({},m,{endorsements:offlineEndorsed[m.id]?1:0,endorsed:!!offlineEndorsed[m.id],canEndorse:m.kind!=='offer'&&(m.visibility||'public')==='public'});});
         var slice=messages.slice(start,end),shown={};slice.forEach(function(m){shown[m.id]=1;});
-        return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:slice,parents:messages.filter(function(m){return !shown[m.id]&&slice.some(function(c){return c.parentId===m.id;});}),earlierCount:start,newerCount:messages.length-end,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
+        var pinned=offlinePageKind(p)==='info'&&channel==='community'?messages.filter(function(m){return m.endorsements>0;})[0]:null;
+        return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:slice,pinned:pinned?pinned.id:null,parents:messages.filter(function(m){return !shown[m.id]&&(slice.some(function(c){return c.parentId===m.id;})||(!!pinned&&m.id===pinned.id));}),earlierCount:start,newerCount:messages.length-end,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
       }
       query=Object.assign({},currentQuery,query||{});
       if(!query.thread)currentQuery=Object.assign({},query);

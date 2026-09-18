@@ -4,39 +4,51 @@
   function key(id){return 'mihenk:reply:'+(M.sharedView?M.sharedView.runId+':'+M.actorId:'offline')+':'+id;}
   function read(id){try{return JSON.parse(localStorage.getItem(key(id)))||{text:'',kind:'reply'};}catch(_){return {text:'',kind:'reply'};}}
   function save(id,value){try{localStorage.setItem(key(id),JSON.stringify(value));}catch(_){}}
+  /* Shared moderation and reaction controls, identical on both card kinds. */
+  function sharedActions(p,id,repost){
+    if(!M.shared)return '';
+    return (p.actions.includes('post.remove')?'<button type="button" data-remove-post="'+esc(id)+'" data-version="'+p.version+'">'+M.icon('close','ic--sm')+'Kaldır</button>':'')+
+      (p.actions.includes('account.ban')?'<button type="button" data-ban-account="'+esc(p.authorId)+'">Hesabı engelle</button>':'')+
+      (p.actions.includes('post.react')?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button>':'')+
+      (repost&&p.actions.includes('post.repost')?'<button type="button" data-repost="'+esc(id)+'" aria-label="Yeniden paylaş" '+(p.reposted?'disabled':'')+'>'+M.icon('repost','ic--sm')+'</button>':'');
+  }
+  var canShare=function(){return !M.shared||M.sharedView.actions.includes('post.create');};
   function helpActions(p,id){
-    var mine=p.uid==='me',request=!!p.need,offer=request&&!mine&&!p.resolved&&(!M.shared||p.actions.includes('offer.create'));
+    var mine=p.uid==='me',offer=!mine&&!p.resolved&&(!M.shared||p.actions.includes('offer.create'));
     /* Counts are named after the tabs they open, so the card and the page use one vocabulary. */
     var counts=[];if(p.updates)counts.push('Yetkililerle iletişim: '+p.updates);if(p.support)counts.push('Topluluk desteği: '+p.support);
-    return '<div class="request-actions request-actions--entry"><button class="open-request" type="button" data-open-request="'+esc(id)+'">'+(request?'Talebi aç':'Çağrıyı aç')+'</button>'+
+    return '<div class="request-actions request-actions--entry"><button class="open-request" type="button" data-open-request="'+esc(id)+'" data-page="request">Talebi aç</button>'+
       (offer?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':
-        mine?'':'<button class="offer-action" type="button" data-open-request="'+esc(id)+'" data-channel="community">'+M.icon('people','ic--sm')+'Topluluk desteği</button>')+
+        mine?'':'<button class="offer-action" type="button" data-open-request="'+esc(id)+'" data-channel="community" data-page="request">'+M.icon('people','ic--sm')+'Topluluk desteği</button>')+
+      (!mine&&canShare()?'<button class="share-action" type="button" data-share-about="'+esc(id)+'">'+M.icon('quill','ic--sm')+'Bilgi paylaş</button>':'')+
       '<span class="request-counts">'+esc(counts.length?counts.join(' · '):p.resolved?'Mesaj yok':'Henüz mesaj yok')+'</span>'+
-      (M.shared?(p.actions.includes('post.remove')?'<button type="button" data-remove-post="'+esc(id)+'" data-version="'+p.version+'">'+M.icon('close','ic--sm')+'Kaldır</button>':'')+
-        (p.actions.includes('account.ban')?'<button type="button" data-ban-account="'+esc(p.authorId)+'">Hesabı engelle</button>':'')+
-        (p.actions.includes('post.react')?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button>':''):'')+
+      sharedActions(p,id,false)+
+      '<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button></div>';
+  }
+  /* An information post discusses accuracy, so its counts and its entry button are named
+     after the two accuracy channels. No support offer belongs here. */
+  function infoActions(p,id){
+    var counts=[];if(p.updates)counts.push('Doğrulama: '+p.updates);if(p.support)counts.push('Tartışma: '+p.support);
+    return '<div class="request-actions request-actions--entry"><button class="open-request" type="button" data-open-request="'+esc(id)+'" data-channel="community" data-page="info">Tartışmayı aç</button>'+
+      '<span class="request-counts">'+esc(counts.length?counts.join(' · '):'Henüz tartışma yok')+'</span>'+
+      sharedActions(p,id,true)+
       '<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button></div>';
   }
   M.cardActions=function(p){
     var id=p.originalId||p.id;
-    if(p.need||(p.tag==='yardim'&&p.v!=='official'))return helpActions(p,id);
-    if(M.shared)return '<div class="request-actions">'+(p.v==='official'?'<span class="request-counts">Kurumsal duyuru · Yorumlar kapalı</span>':M.sharedView.operations.includes('open_thread')?'<button type="button" data-thread="'+esc(id)+'">'+M.icon('reply','ic--sm')+'Yanıtları aç</button>':'')+
-      (p.actions.includes('post.remove')?'<button type="button" data-remove-post="'+esc(id)+'" data-version="'+p.version+'">'+M.icon('close','ic--sm')+'Kaldır</button>':'')+
-      (p.actions.includes('account.ban')?'<button type="button" data-ban-account="'+esc(p.authorId)+'">Hesabı engelle</button>':'')+
-      (p.actions.includes('offer.create')?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':'')+
-      (p.actions.includes('post.react')?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button>':'')+
-      (p.actions.includes('post.repost')?'<button type="button" data-repost="'+esc(id)+'" aria-label="Yeniden paylaş" '+(p.reposted?'disabled':'')+'>'+M.icon('repost','ic--sm')+'</button>':'')+
-      (p.actions.includes('report.create')?'<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button>':'')+'</div>';
-    return '<div class="request-actions">'+(p.v==='official'?'<span class="request-counts">Kurumsal duyuru · Yorumlar kapalı</span>':'<button type="button" data-thread="'+esc(id)+'">'+M.icon('reply','ic--sm')+'<span>Yanıtlar'+(p.replies?' · '+p.replies:'')+'</span></button>')+
-      (p.need&&p.uid!=='me'&&!p.resolved?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':'')+
-      (M.shared?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button><button type="button" data-repost="'+esc(id)+'" aria-label="Yeniden paylaş" '+(p.reposted?'disabled':'')+'>'+M.icon('repost','ic--sm')+'</button>':'')+
-      '<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button></div>';
+    if(p.need)return helpActions(p,id);
+    if(p.v!=='official')return infoActions(p,id);
+    /* Institutional announcements take no comments and keep only moderation controls. */
+    return '<div class="request-actions"><span class="request-counts">Kurumsal duyuru · Yorumlar kapalı</span>'+sharedActions(p,id,true)+
+      (!M.shared||p.actions.includes('report.create')?'<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button>':'')+'</div>';
   };
   M.openThread=async function(id,offer){
     try{
       var view=await M.transport.getView({thread:id,channel:'coordination'}), thread=view.thread;
       if(!thread)return;
-      if((thread.post.kind==='request'||(thread.post.tag==='yardim'&&thread.post.verification!=='official'))&&M.openRequestPage){await M.openRequestPage(id,{view:view,offer:!!offer});return;}
+      /* Structured requests and information posts both live on the page; the modal below
+         stays for ordinary social posts and reports. */
+      if(thread.post.pageKind&&M.openRequestPage){await M.openRequestPage(id,{view:view,offer:!!offer,kind:thread.post.pageKind,channel:thread.post.pageKind==='info'&&!offer?'community':'coordination'});return;}
       var p=thread.post, draft=read(id), mine=p.authorId===(M.actorId||'me');
       var canReply=p.verification!=='official'&&(!M.shared||p.actions.includes('reply.create')),canOffer=p.kind==='request'&&!mine&&p.status==='open'&&(!M.shared||p.actions.includes('offer.create'));
       if(offer&&!draft.pending)draft.kind='offer';
@@ -128,13 +140,17 @@
       M.openModal(confirm,{labelledBy:'action-title'});confirm.querySelector('[data-cancel]').onclick=M.closeModal;
       confirm.querySelector('[data-confirm]').onclick=async function(){this.disabled=true;var result=await M.transport.send({type:remove?'post.remove':'account.ban',targetId:targetId,...(remove?{expectedVersion:Number(remove.dataset.version)}:{}),payload:{}});if(result.ok){M.closeModal();M.refreshShared(true);if(remove)M.openThread(targetId);M.toast(remove?'Paylaşım kaldırıldı.':'Hesabın yeni paylaşım yapması engellendi.');}else{this.disabled=false;var error=confirm.querySelector('[role="alert"]');error.hidden=false;error.textContent=result.error.message;}};return;
     }
-    var open=e.target.closest('[data-open-request]');if(open){M.openRequestPage(open.dataset.openRequest,{channel:open.dataset.channel==='community'?'community':'coordination'});return;}
-    var card=e.target.closest('.cpost[data-help]');
+    var open=e.target.closest('[data-open-request]');if(open){M.openRequestPage(open.dataset.openRequest,{channel:open.dataset.channel==='community'?'community':'coordination',kind:open.dataset.page||null});return;}
+    /* Sharing information about a request always happens in the feed composer, so leave
+       the request page first when the action was pressed there. */
+    var share=e.target.closest('[data-share-about]');
+    if(share&&M.shareAboutRequest){var about=share.dataset.shareAbout;if(M.requestPageActive&&M.leaveRequestPage)M.leaveRequestPage();M.shareAboutRequest(about);return;}
+    var card=e.target.closest('.cpost[data-page]');
     // Only a live selection inside this card blocks the body click; a leftover selection
     // elsewhere on the page must not make the card unopenable.
     var picked=window.getSelection?window.getSelection():null;
     var selecting=!!card&&!!picked&&!picked.isCollapsed&&!!picked.anchorNode&&card.contains(picked.anchorNode);
-    if(card&&!e.target.closest('button,a,select,input,textarea,details')&&!selecting){M.openRequestPage(card.dataset.id);return;}
+    if(card&&!e.target.closest('button,a,select,input,textarea,details')&&!selecting){M.openRequestPage(card.dataset.id,{kind:card.dataset.page,channel:card.dataset.page==='info'?'community':'coordination'});return;}
     var thread=e.target.closest('[data-thread]'),offer=e.target.closest('[data-offer]'),report=e.target.closest('[data-report]'),react=e.target.closest('[data-react]'),repost=e.target.closest('[data-repost]');
     if(thread){M.openThread(thread.dataset.thread);return;}if(offer){M.openThread(offer.dataset.offer,true);return;}if(report){M.openReport(report.dataset.report,Number(report.closest('[data-version]')?.dataset.version)||undefined);return;}
     var control=react||repost;if(!control)return;

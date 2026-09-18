@@ -93,9 +93,12 @@ await page.waitForTimeout(500);
 ok('klavye: İmdat akışı Enter ile açılıyor', await page.locator('#modal').isVisible());
 await page.keyboard.press('Escape'); await page.waitForTimeout(400);
 ok('klavye: modal Escape ile kapanıyor', await page.locator('#modal').isHidden());
-const vbtn = page.locator('[data-verify]').nth(2);
-await vbtn.focus(); await page.keyboard.press('Enter'); await page.waitForTimeout(500);
-ok('klavye: Doğrula Enter ile çalışıyor', await vbtn.getAttribute('data-done') === '1');
+// the card entry button opens the request/information page from the keyboard
+const entry = page.locator('.open-request').first();
+await entry.focus(); await page.keyboard.press('Enter'); await page.waitForTimeout(700);
+ok('klavye: kart girişi Enter ile sayfayı açıyor', await page.locator('#request-page .rp-tabs').count() === 1);
+await page.evaluate(() => window.MIHENK.leaveRequestPage && window.MIHENK.leaveRequestPage());
+await page.waitForTimeout(400);
 
 // url routing
 await page.click('.tab[data-tab="crisis"]');

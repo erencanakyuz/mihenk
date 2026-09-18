@@ -196,24 +196,90 @@ try{
   const legacy=(await neighbor.thread('need-water','community')).thread;
   ok('legacy request without privacy fields stays public and open',!!legacy&&legacy.post.communityOpen===true&&legacy.post.publicAccess==='public'&&'text' in legacy.post.location);
 
-  // 10. Ordinary posts tagged 'yardim' follow the same channel rules; other posts have no coordination channel.
+  // 10. Every non-official post is an information post with the same two channels.
   const passerby=new Client(await operator('/sessions',{runId,name:'Yoldan Geçen'}));
   const call=await neighbor.send({type:'post.create',payload:{text:'Mahallede battaniye lazım, kim getirebilir?',tag:'yardim'}});
-  ok('participant creates a plain help call',call.ok,code(call));
+  ok('participant creates an information post',call.ok,code(call));
   const C=call.entityId;
   const callCard=(await passerby.view({filter:'all'})).items.find(p=>p.id===C);
-  ok('help call carries capabilities and readable counts',!!callCard&&callCard.helpCall===true&&callCard.capabilities.canWriteCoordination===false&&callCard.capabilities.canWriteCommunity===true&&callCard.messageCounts.coordination===0);
+  ok('information post carries the info page kind and readable counts',!!callCard&&callCard.pageKind==='info'&&callCard.capabilities.canWriteCoordination===false&&callCard.capabilities.canWriteCommunity===true&&callCard.messageCounts.coordination===0);
   const callPrivate=await neighbor.send({type:'reply.create',targetId:C,payload:{text:'Numaram '+PRIVATE_PHONE,channel:'coordination',visibility:'private',parentId:null}});
-  ok('help call author writes a private coordination message',callPrivate.ok,code(callPrivate));
+  ok('information post author writes a private coordination message',callPrivate.ok,code(callPrivate));
   const outsiderOnCall=await passerby.thread(C);
-  ok('outsider sees no coordination message on the help call',outsiderOnCall.thread?.messages.length===0&&leaks(outsiderOnCall).length===0,outsiderOnCall.error?JSON.stringify(outsiderOnCall.error):'messages='+outsiderOnCall.thread?.messages.length+' leaks='+leaks(outsiderOnCall).join(','));
+  ok('outsider sees no coordination message on the information post',outsiderOnCall.thread?.messages.length===0&&leaks(outsiderOnCall).length===0,outsiderOnCall.error?JSON.stringify(outsiderOnCall.error):'messages='+outsiderOnCall.thread?.messages.length+' leaks='+leaks(outsiderOnCall).join(','));
   const outsiderCallWrite=await passerby.send({type:'reply.create',targetId:C,payload:{text:'Ben de yazayım',channel:'coordination',visibility:'public',parentId:null}});
-  ok('outsider coordination write on a help call is rejected',!outsiderCallWrite.ok&&outsiderCallWrite.error.code==='unauthorized',code(outsiderCallWrite));
+  ok('outsider coordination write on an information post is rejected',!outsiderCallWrite.ok&&outsiderCallWrite.error.code==='unauthorized',code(outsiderCallWrite));
   const modOnCall=await moderator.thread(C);
-  ok('request moderator reads the help call coordination message',modOnCall.thread?.messages.length===1&&modOnCall.thread.post.messageCounts.coordination===1);
-  const plain=await neighbor.send({type:'post.create',payload:{text:'Yol açıldı.',tag:'durum'}});
-  const plainCoordination=await neighbor.send({type:'reply.create',targetId:plain.entityId,payload:{text:'Deneme',channel:'coordination',visibility:'private',parentId:null}});
-  ok('ordinary posts have no coordination channel',!plainCoordination.ok&&plainCoordination.error.code==='validation',code(plainCoordination));
+  ok('request moderator reads the information post coordination message',modOnCall.thread?.messages.length===1&&modOnCall.thread.post.messageCounts.coordination===1);
+  // An ordinary status post is an information post too, whatever its tag.
+  const plain=await neighbor.send({type:'post.create',payload:{text:'Yol açıldı, tek şerit.',tag:'durum'}});
+  const P=plain.entityId;
+  const plainCoordination=await neighbor.send({type:'reply.create',targetId:P,payload:{text:'Kaynağım belediye duyurusu.',channel:'coordination',visibility:'private',parentId:null}});
+  ok('any tag gets the coordination channel for its author',plainCoordination.ok,code(plainCoordination));
+  // The outsider must open the post first; the command service requires an observed target.
+  ok('outsider opens the information post',!!(await passerby.thread(P)).thread);
+  const plainOutsider=await passerby.send({type:'reply.create',targetId:P,payload:{text:'Ben de yazayım',channel:'coordination',visibility:'private',parentId:null}});
+  ok('coordination on an information post rejects outsiders',!plainOutsider.ok&&plainOutsider.error.code==='unauthorized',code(plainOutsider));
+  const plainModerator=await moderator.thread(P);
+  ok('moderator reads the private information message and its counts',plainModerator.thread?.messages.length===1&&plainModerator.thread.post.messageCounts.coordination===1&&plainModerator.thread.post.pageKind==='info');
+  const plainCommunity=await passerby.send({type:'reply.create',targetId:P,payload:{text:'Ben de tek şerit gördüm.',channel:'community',visibility:'public',parentId:null}});
+  const plainCounts=(await passerby.thread(P,'community')).thread;
+  ok('information post counts separate verification from discussion',plainCommunity.ok&&plainCounts.post.messageCounts.community===1&&plainCounts.post.messageCounts.coordination===0,code(plainCommunity));
+
+  // 10c. Quote-like reference to a help request.
+  const R2=(await owner.send({type:'request.create',payload:{need:['gida'],people:2,location:{known:true,region:'Pazarcık',text:PRIVATE_ADDRESS},details:'Su ve gıda gerekiyor.',phone:PRIVATE_PHONE,publicLocationText:'Okul bahçesi',privacy:{address:'private',phone:'private'}}})).entityId;
+  const quoting=await neighbor.send({type:'post.create',payload:{text:'Bu talep için su dağıtımı yapılıyor.',tag:'durum',about:R2}});
+  ok('an information post may reference a readable help request',quoting.ok,code(quoting));
+  const Q=quoting.entityId;
+  const quotedCard=(await passerby.view({filter:'all'})).items.find(p=>p.id===Q);
+  ok('the reference carries the need summary only',!!quotedCard&&quotedCard.about?.id===R2&&Array.isArray(quotedCard.about.need)&&quotedCard.about.status==='open'&&!!quotedCard.about.author.name&&!('phone' in quotedCard.about)&&!('location' in quotedCard.about));
+  const missingAbout=await neighbor.send({type:'post.create',payload:{text:'Olmayan talep.',tag:'durum',about:'00000000-0000-4000-8000-000000000000'}});
+  ok('a reference to a missing request is rejected',!missingAbout.ok&&missingAbout.error.code==='validation'&&/İlgili talep/.test(missingAbout.error.message),code(missingAbout));
+  const postAbout=await neighbor.send({type:'post.create',payload:{text:'Gönderiye referans.',tag:'durum',about:Q}});
+  ok('a reference to a non-request post is rejected',!postAbout.ok&&postAbout.error.code==='validation',code(postAbout));
+  let r2Version=(await moderator.thread(R2)).thread.post.version;
+  const hideR2=await moderator.send({type:'request.manage',targetId:R2,expectedVersion:r2Version,payload:{publicAccess:'restricted'}});
+  const hiddenAbout=await neighbor.send({type:'post.create',payload:{text:'Kapalı talebe referans.',tag:'durum',about:R2}});
+  ok('a reference to a request this account cannot see is rejected',hideR2.ok&&!hiddenAbout.ok&&hiddenAbout.error.code==='validation',code(hiddenAbout));
+  const afterRestrict=(await passerby.view({filter:'all'})).items.find(p=>p.id===Q);
+  ok('the reference disappears once the request is restricted',!!afterRestrict&&afterRestrict.about===null&&leaks(afterRestrict).length===0);
+  const ownerSeesAbout=(await owner.thread(Q)).thread.post;
+  ok('the requester still sees the reference to their restricted request',ownerSeesAbout.about?.id===R2);
+
+  // 10d. Community endorsements and the pinned community note.
+  const note1=await neighbor.send({type:'reply.create',targetId:C,payload:{text:'Dağıtım noktası parkın girişinde, kendim gördüm.',channel:'community',visibility:'public',parentId:null}});
+  const note2=await passerby.send({type:'reply.create',targetId:C,payload:{text:'Battaniye stoğu bitmiş, ikinci kaynak da doğruladı.',channel:'community',visibility:'public',parentId:null}});
+  ok('community messages land on the information post',note1.ok&&note2.ok,code(note1)+'/'+code(note2));
+  // Endorsing needs the message in view first, like every other command target.
+  for(const reader of [passerby,neighbor,owner])await reader.thread(C,'community');
+  const selfEndorse=await neighbor.send({type:'message.endorse',targetId:note1.entityId,payload:{active:true}});
+  ok('endorsing your own message is rejected',!selfEndorse.ok&&selfEndorse.error.code==='validation',code(selfEndorse));
+  const endorse1=await passerby.send({type:'message.endorse',targetId:note1.entityId,payload:{active:true}});
+  const endorseAgain=await passerby.send({type:'message.endorse',targetId:note1.entityId,payload:{active:true}});
+  const afterEndorse=(await passerby.thread(C,'community')).thread;
+  const endorsedMessage=afterEndorse.messages.find(m=>m.id===note1.entityId);
+  ok('an endorsement counts once per account and is reported back',endorse1.ok&&endorseAgain.ok&&endorsedMessage.endorsements===1&&endorsedMessage.endorsed===true&&afterEndorse.pinned===note1.entityId,code(endorse1)+'/'+code(endorseAgain));
+  const privateEndorse=await moderator.send({type:'message.endorse',targetId:callPrivate.entityId,payload:{active:true}});
+  ok('a private message cannot be endorsed',!privateEndorse.ok&&privateEndorse.error.code==='validation',code(privateEndorse));
+  const endorse2a=await neighbor.send({type:'message.endorse',targetId:note2.entityId,payload:{active:true}});
+  const endorse2b=await owner.send({type:'message.endorse',targetId:note2.entityId,payload:{active:true}});
+  const pinnedNow=(await passerby.thread(C,'community')).thread;
+  ok('the most endorsed community message becomes the note',endorse2a.ok&&endorse2b.ok&&pinnedNow.pinned===note2.entityId&&pinnedNow.messages.find(m=>m.id===note2.entityId).endorsements===2,code(endorse2a)+'/'+code(endorse2b));
+  const withdrawnEndorse=await neighbor.send({type:'message.endorse',targetId:note2.entityId,payload:{active:false}});
+  const pinnedBack=(await passerby.thread(C,'community')).thread;
+  ok('withdrawing an endorsement moves the note back',withdrawnEndorse.ok&&pinnedBack.pinned===note1.entityId,code(withdrawnEndorse));
+  const requestCommunity=(await owner.thread(R,'community')).thread;
+  ok('a request page has no community note',requestCommunity.pinned===null||requestCommunity.pinned===undefined,String(requestCommunity.pinned));
+
+  // 10e. Moderator verdict on an information post.
+  const participantVerify=await neighbor.send({type:'post.verify',targetId:C,expectedVersion:1,payload:{verification:'verified'}});
+  ok('a participant cannot record a verification result',!participantVerify.ok&&participantVerify.error.code==='unauthorized',code(participantVerify));
+  const infoVersion=(await moderator.thread(C)).thread.post.version;
+  const verdict=await moderator.send({type:'post.verify',targetId:C,expectedVersion:infoVersion,payload:{verification:'disputed',reason:'İki bildirim çelişiyor.'}});
+  const verdictCard=(await passerby.view({filter:'all'})).items.find(p=>p.id===C);
+  ok('a moderator records the verification result and the feed shows it',verdict.ok&&verdictCard.verification==='disputed'&&verdictCard.version===infoVersion+1,code(verdict));
+  const requestVerify=await moderator.send({type:'post.verify',targetId:R,expectedVersion:(await moderator.thread(R)).thread.post.version,payload:{verification:'verified'}});
+  ok('a help request takes no verification label',!requestVerify.ok&&requestVerify.error.code==='validation',code(requestVerify));
   // 10a. A public landmark alone makes the location known, without a private address.
   const landmarkOnly=await neighbor.send({type:'request.create',payload:{need:['gida'],people:null,location:{known:true,region:null,text:''},details:'',phone:'',publicLocationText:'Çınar Parkı girişi',privacy:{address:'private',phone:'private'}}});
   ok('a request with only a public landmark is accepted as a known location',landmarkOnly.ok&&(await neighbor.thread(landmarkOnly.entityId)).thread.post.location.known===true,code(landmarkOnly));
@@ -232,6 +298,10 @@ try{
   ok('replying to an official announcement is rejected',!officialReply.ok&&officialReply.error.code==='validation',code(officialReply));
   const unverifiedFilter=await passerby.view({filter:'dogrulanmamis'});
   ok('unverified filter lists only unverified posts',unverifiedFilter.items.length>0&&unverifiedFilter.items.every(p=>p.verification==='unverified')&&unverifiedFilter.counts.dogrulanmamis===unverifiedFilter.total);
+  const officialForModerator=official?(await moderator.view({filter:'resmi'})).items.find(p=>p.id===official.id):null;
+  const officialVerify=officialForModerator?await moderator.send({type:'post.verify',targetId:officialForModerator.id,expectedVersion:officialForModerator.version,payload:{verification:'disputed'}}):{ok:false,error:{code:'skipped'}};
+  ok('an institutional announcement keeps its label',!officialVerify.ok&&officialVerify.error.code==='validation',code(officialVerify));
+  ok('an institutional announcement has no page kind and no verify action',!!official&&!official.pageKind&&!official.actions.includes('post.verify'));
 }catch(error){ok('exercise completed without exceptions',false,error.stack||String(error));}
 finally{
   await server.close();

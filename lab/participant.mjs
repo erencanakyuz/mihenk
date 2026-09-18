@@ -15,14 +15,14 @@ export function observation(view){
   const posts=unique(view.items),relatedPosts=unique(view.relatedPosts||[]),ownRequests=unique(view.ownRequests||[]);
   const messageIds=new Set((view.thread?.messages||[]).map(m=>m.id));
   return {title:view.title,account:view.me,query:view.query,posts,relatedPosts,ownRequests,ownRequestIds:(view.ownRequests||[]).map(p=>p.id),
-    thread:view.thread?{post:postView(view.thread.post),channel:view.thread.channel||'community',messages:view.thread.messages.map(({id,author,authorActions,text,kind,createdAt,withdrawn,canWithdraw,channel,visibility,parentId})=>({id,author,authorActions:(authorActions||[]).map(t=>t.replace('.','_')),text,kind,targetKind:kind==='offer'?'offer':'message',createdAt,withdrawn,canWithdraw,channel:channel||'community',visibility:visibility||'public',parentId:parentId||null})),earlierCount:view.thread.earlierCount,newerCount:view.thread.newerCount,nextMessageOffset:view.thread.nextMessageOffset}:null,
+    thread:view.thread?{post:postView(view.thread.post),channel:view.thread.channel||'community',pinned:view.thread.pinned??null,messages:view.thread.messages.map(({id,author,authorActions,text,kind,createdAt,withdrawn,canWithdraw,canEndorse,endorsements,endorsed,channel,visibility,parentId})=>({id,author,authorActions:(authorActions||[]).map(t=>t.replace('.','_')),text,kind,targetKind:kind==='offer'?'offer':'message',createdAt,withdrawn,canWithdraw,canEndorse:!!canEndorse,endorsements:endorsements||0,endorsed:!!endorsed,channel:channel||'community',visibility:visibility||'public',parentId:parentId||null})),earlierCount:view.thread.earlierCount,newerCount:view.thread.newerCount,nextMessageOffset:view.thread.nextMessageOffset}:null,
     updates:(view.updates||[]).filter(u=>!messageIds.has(u.id)).map(update=>({...update,authorActions:(update.authorActions||[]).map(t=>t.replace('.','_'))})),nextOffset:view.nextOffset,total:view.total,counts:view.counts,actions:(view.actions||[]).map(t=>t.replace('.','_'))};
 }
 
 const targetKinds=Object.freeze({
   post_remove:'posts', account_ban:'accounts', request_manage:'posts', request_update:'posts', request_close:'posts', request_reopen:'posts',
   reply_create:'posts', offer_create:'posts', offer_withdraw:'offers', post_react:'posts', post_repost:'posts',
-  account_follow:'accounts', observation_create:'posts', report_create:'posts'
+  account_follow:'accounts', observation_create:'posts', report_create:'posts', post_verify:'posts', message_endorse:'messages'
 });
 const navigationPostKinds=new Set(['post','request','repost']);
 const maxNavigationTargets=64;
@@ -50,7 +50,7 @@ export class Participant {
     while(this.navigationPosts.size>maxNavigationTargets)this.navigationPosts.delete(this.navigationPosts.keys().next().value);
     // Keep the old snapshot name for resumability; it now contains navigation IDs only.
     this.known=this.navigationPosts;
-    this.targets={posts:new Map(),accounts:new Map(),offers:new Map()};
+    this.targets={posts:new Map(),accounts:new Map(),offers:new Map(),messages:new Map()};
     this.rebuildTargets(this.view);
   }
   snapshot(){return {pageSize:this.pageSize,viewLimits:this.viewLimits,contextMode:this.contextMode,query:this.query,view:this.view,navigationPosts:[...this.navigationPosts],known:[...this.navigationPosts],pending:this.pending};}
@@ -84,7 +84,7 @@ export class Participant {
     while(this.navigationPosts.size>maxNavigationTargets)this.navigationPosts.delete(this.navigationPosts.keys().next().value);
   }
   rebuildTargets(view){
-    this.targets={posts:new Map(),accounts:new Map(),offers:new Map()};
+    this.targets={posts:new Map(),accounts:new Map(),offers:new Map(),messages:new Map()};
     if(!view)return;
     const addAccount=(id,meta,actions=[])=>{
       if(!id)return;
@@ -112,6 +112,8 @@ export class Participant {
       if(message.kind==='offer'&&message.canWithdraw&&!message.withdrawn&&message.id){
         this.targets.offers.set(message.id,{id:message.id,targetId:message.targetId||null,version:message.version??null,actions:new Set(['offer.withdraw'])});
       }
+      // A readable public community message can be endorsed; the endorsement carries no version.
+      if(message.canEndorse&&message.id)this.targets.messages.set(message.id,{id:message.id,targetId:message.targetId||null,version:null,actions:new Set(['message.endorse'])});
     }
     for(const update of view.updates||[]){
       if(update.targetId)this.rememberNavigation({id:update.targetId,kind:'post'});

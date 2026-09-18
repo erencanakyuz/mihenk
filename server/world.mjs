@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { hash } from './store.mjs';
 import { permits, canSeePost, canTarget, privateRequestAccess, requestModerator, canReadMessage, messageChannel } from './access.mjs';
+import { pageKind } from './request-policy.mjs';
 export const NEEDS = {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'};
 export const TAGS = ['yardim','enkaz','kayip','nokta','resmi','durum'];
 const collections = ['actors','posts','replies','offers','reports','reactions','follows','observations'];
@@ -111,15 +112,34 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
     entity={...stamp,id:randomUUID(),kind:'request',tag:'yardim',...props,status:'open',verification:'unverified',source:{kind:'firsthand',url:null}};
     entity.text=needsText(entity); state.posts[entity.id]=entity;
   } else if(cmd.type==='post.create') {
-    fields(p,['text','tag','location','source']);
+    fields(p,['text','tag','location','source','about']);
     if(!TAGS.includes(p.tag)) reject('validation','Bir konu seçin.','tag');
-    entity={...stamp,id:randomUUID(),kind:'post',text:text(p.text,1000,true),tag:p.tag,location:location(p.location??{known:false,region:null,text:''}),source:source(p.source),verification:'unverified'};
+    // An information post may quote a help request. The reference is only stored when the
+    // request exists, is readable by this account and is still a help request.
+    let about=null;
+    if(p.about!=null&&p.about!==''){
+      const referenced=typeof p.about==='string'&&p.about.length<=100&&Object.hasOwn(state.posts,p.about)?state.posts[p.about]:null;
+      if(!referenced||referenced.removed||referenced.kind!=='request'||!canSeePost(state,actorId,referenced))reject('validation','İlgili talep bulunamadı.','about');
+      about=referenced.id;
+    }
+    entity={...stamp,id:randomUUID(),kind:'post',text:text(p.text,1000,true),tag:p.tag,location:location(p.location??{known:false,region:null,text:''}),source:source(p.source),verification:'unverified',...(about?{about}:{})};
     state.posts[entity.id]=entity;
   } else if(cmd.type==='account.follow') {
     fields(p,['active']);
     if(typeof p.active!=='boolean'||!Object.hasOwn(state.actors,cmd.targetId)||cmd.targetId===actorId) reject('validation','Takip işlemini kontrol edin.');
     entity={...stamp,id:actorId+':'+cmd.targetId,targetId:cmd.targetId,active:p.active};
     state.follows[entity.id]=entity;
+  } else if(cmd.type==='message.endorse') {
+    // Community endorsement: "I agree with this comment". Stored in the observations
+    // collection so the store, the delta and replay stay unchanged.
+    fields(p,['active']);
+    if(typeof p.active!=='boolean')reject('validation','Onay işlemini kontrol edin.');
+    const message=Object.hasOwn(state.replies,cmd.targetId)?state.replies[cmd.targetId]:null;
+    if(!message||!canReadMessage(state,actorId,message))reject('not_found','Mesaj bulunamadı.');
+    if(message.authorId===actorId)reject('validation','Kendi mesajınızı onaylayamazsınız.');
+    if((message.visibility||'public')!=='public')reject('validation','Özel mesajlar onaylanamaz.');
+    entity={...stamp,id:actorId+':'+message.id,targetId:message.id,kind:'message',active:p.active};
+    state.observations[entity.id]=entity;
   } else if(cmd.type==='offer.withdraw') {
     fields(p,[]);
     entity=Object.hasOwn(state.offers,cmd.targetId)?state.offers[cmd.targetId]:null;
@@ -165,8 +185,10 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
       if(target.kind==='request'){
         if(target.status!=='open')reject('conflict','Bu talep kapalı. Yeni mesaj yazılamaz.');
         if(channel==='community'&&target.communityOpen===false)reject('conflict','Topluluk mesajları durduruldu.');
-      }else if(channel!=='community'&&target.tag!=='yardim')reject('validation','Bu gönderide koordinasyon kanalı yok.');
-      if(channel==='coordination'&&!privateRequestAccess(state,actorId,target))reject('unauthorized','Bu alana yalnızca talep sahibi ve moderatörler yazabilir.');
+      }else if(channel!=='community'&&pageKind(target)!=='info')reject('validation','Bu gönderide koordinasyon kanalı yok.');
+      // Coordination on an information post belongs to its author and the request moderators:
+      // that is where the accuracy of the information is discussed with the authorities.
+      if(channel==='coordination'&&!privateRequestAccess(state,actorId,target))reject('unauthorized',target.kind==='request'?'Bu alana yalnızca talep sahibi ve moderatörler yazabilir.':'Bu alana yalnızca paylaşan kişi ve moderatörler yazabilir.');
       if(channel==='community'&&visibility!=='public')reject('validation','Topluluk mesajları herkese açıktır.');
       let parentId=null;
       if(p.parentId){
@@ -184,6 +206,16 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
       }
       entity={...stamp,id:randomUUID(),targetId:target.id,text:text(p.text,1000,true),channel,visibility,parentId,withdrawn:false};
       state[cmd.type==='offer.create'?'offers':'replies'][entity.id]=entity;
+    } else if(cmd.type==='post.verify') {
+      // A moderator verdict on an information post. The label is public; requests carry no
+      // verification label and institutional announcements are not re-labelled here.
+      fields(p,['verification','reason']);
+      if(target.kind==='request')reject('validation','Yardım talepleri doğrulama etiketi almaz.');
+      if(target.verification==='official')reject('validation','Kurumsal duyuruların etiketi değiştirilemez.');
+      if(!['verified','unverified','disputed'].includes(p.verification))reject('validation','Doğrulama sonucunu seçin.','verification');
+      version(target,cmd);
+      target.verification=p.verification;target.verifiedBy=actorId;target.verifiedAt=now;target.verifyReason=text(p.reason??'',240);
+      target.version++;target.updatedAt=now;entity=target;
     } else if(cmd.type==='post.react') {
       fields(p,['active']);
       if(typeof p.active!=='boolean') reject('validation','Beğeni işlemini kontrol edin.');

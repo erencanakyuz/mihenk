@@ -1,9 +1,10 @@
 import { permits, canSeePost, privateRequestAccess, requestModerator, canReadMessage, messageChannel } from './access.mjs';
 
-// A help post is a structured request or an ordinary post tagged 'yardim'.
-// Both open the request page and use the same channel rules.
-export const helpPost=p=>!!p&&(p.kind==='request'||(p.tag==='yardim'&&p.verification!=='official'));
-// Institutional announcements (official verification) take no comments.
+// Two page kinds share one mechanic with different purposes: a structured help request
+// coordinates aid, an information post discusses whether the information is accurate.
+// Institutional announcements (official verification) have neither a page nor comments.
+export const pageKind=p=>!p?null:p.kind==='request'?'request':p.kind==='post'&&p.verification!=='official'?'info':null;
+export const threadPost=p=>!!pageKind(p);
 export const commentsClosed=p=>!!p&&p.kind!=='request'&&p.verification==='official';
 
 export function requestCapabilities(state,actorId,p){
@@ -33,11 +34,12 @@ export function messageCounts(state,actorId,p){
 export function requestProjection(state,actorId,p){
   const capabilities=requestCapabilities(state,actorId,p);
   const counts=messageCounts(state,actorId,p);
-  if(p.kind!=='request')return {helpCall:true,status:'open',communityOpen:true,publicAccess:'public',capabilities,messageCounts:counts};
+  // An information post has no lifecycle of its own: its discussion stays open.
+  if(p.kind!=='request')return {pageKind:'info',status:'open',communityOpen:true,publicAccess:'public',capabilities,messageCounts:counts};
   const privacy={address:p.privacy?.address||'public',phone:p.privacy?.phone||'private'};
   const location={known:!!p.location?.known,region:p.location?.region||null};
   if(capabilities.canReadPrivate||privacy.address==='public')location.text=p.location?.text||'';
-  const value={need:p.need,people:p.people,status:p.status,details:p.details||'',
+  const value={pageKind:'request',need:p.need,people:p.people,status:p.status,details:p.details||'',
     publicLocationText:p.publicLocationText||'',location,capabilities,messageCounts:counts,
     communityOpen:p.communityOpen!==false,publicAccess:p.publicAccess||'public',
     closeReason:p.closeReason||null,closedAt:p.closedAt||null};
@@ -45,4 +47,14 @@ export function requestProjection(state,actorId,p){
   if(capabilities.canReadPrivate||privacy.phone==='public')value.phone=p.phone||'';
   if(p.removed){value.details='';value.location={known:false,region:null};delete value.phone;delete value.privacy;}
   return value;
+}
+
+// A quote-like reference from an information post to a help request. Only the need
+// summary travels, never a private field, and only while the referenced request is
+// still readable by this viewer.
+export function aboutProjection(state,actorId,p){
+  const ref=p.about?state.posts[p.about]:null;
+  if(!ref||ref.removed||ref.kind!=='request'||!canSeePost(state,actorId,ref))return null;
+  return {id:ref.id,need:ref.need,people:ref.people,status:ref.status,
+    author:{id:ref.authorId,name:state.actors[ref.authorId]?.name||''}};
 }
