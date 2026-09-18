@@ -4,16 +4,28 @@
   function key(id){return 'mihenk:reply:'+(M.sharedView?M.sharedView.runId+':'+M.actorId:'offline')+':'+id;}
   function read(id){try{return JSON.parse(localStorage.getItem(key(id)))||{text:'',kind:'reply'};}catch(_){return {text:'',kind:'reply'};}}
   function save(id,value){try{localStorage.setItem(key(id),JSON.stringify(value));}catch(_){}}
+  function helpActions(p,id){
+    var mine=p.uid==='me',request=!!p.need,offer=request&&!mine&&!p.resolved&&(!M.shared||p.actions.includes('offer.create'));
+    var counts=[];if(p.updates)counts.push(p.updates+' güncelleme');if(p.support)counts.push(p.support+' topluluk mesajı');
+    return '<div class="request-actions request-actions--entry"><button class="open-request" type="button" data-open-request="'+esc(id)+'">'+(request?'Talebi aç':'Çağrıyı aç')+'</button>'+
+      (offer?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':'')+
+      '<span class="request-counts">'+esc(counts.length?counts.join(' · '):'Henüz mesaj yok')+'</span>'+
+      (M.shared?(p.actions.includes('post.remove')?'<button type="button" data-remove-post="'+esc(id)+'" data-version="'+p.version+'">'+M.icon('close','ic--sm')+'Kaldır</button>':'')+
+        (p.actions.includes('account.ban')?'<button type="button" data-ban-account="'+esc(p.authorId)+'">Hesabı engelle</button>':'')+
+        (p.actions.includes('post.react')?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button>':''):'')+
+      '<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button></div>';
+  }
   M.cardActions=function(p){
     var id=p.originalId||p.id;
-    if(M.shared)return '<div class="request-actions">'+(M.sharedView.operations.includes('open_thread')?'<button type="button" data-thread="'+esc(id)+'">'+M.icon('reply','ic--sm')+'Yanıtları aç</button>':'')+
+    if(p.need||(p.tag==='yardim'&&p.v!=='official'))return helpActions(p,id);
+    if(M.shared)return '<div class="request-actions">'+(p.v==='official'?'<span class="request-counts">Kurumsal duyuru · Yorumlar kapalı</span>':M.sharedView.operations.includes('open_thread')?'<button type="button" data-thread="'+esc(id)+'">'+M.icon('reply','ic--sm')+'Yanıtları aç</button>':'')+
       (p.actions.includes('post.remove')?'<button type="button" data-remove-post="'+esc(id)+'" data-version="'+p.version+'">'+M.icon('close','ic--sm')+'Kaldır</button>':'')+
       (p.actions.includes('account.ban')?'<button type="button" data-ban-account="'+esc(p.authorId)+'">Hesabı engelle</button>':'')+
       (p.actions.includes('offer.create')?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':'')+
       (p.actions.includes('post.react')?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button>':'')+
       (p.actions.includes('post.repost')?'<button type="button" data-repost="'+esc(id)+'" aria-label="Yeniden paylaş" '+(p.reposted?'disabled':'')+'>'+M.icon('repost','ic--sm')+'</button>':'')+
       (p.actions.includes('report.create')?'<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button>':'')+'</div>';
-    return '<div class="request-actions"><button type="button" data-thread="'+esc(id)+'">'+M.icon('reply','ic--sm')+'<span>Yanıtlar'+(p.replies?' · '+p.replies:'')+'</span></button>'+
+    return '<div class="request-actions">'+(p.v==='official'?'<span class="request-counts">Kurumsal duyuru · Yorumlar kapalı</span>':'<button type="button" data-thread="'+esc(id)+'">'+M.icon('reply','ic--sm')+'<span>Yanıtlar'+(p.replies?' · '+p.replies:'')+'</span></button>')+
       (p.need&&p.uid!=='me'&&!p.resolved?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':'')+
       (M.shared?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button><button type="button" data-repost="'+esc(id)+'" aria-label="Yeniden paylaş" '+(p.reposted?'disabled':'')+'>'+M.icon('repost','ic--sm')+'</button>':'')+
       '<button class="report-action" type="button" data-report="'+esc(id)+'" aria-label="Gönderiyi bildir">'+M.icon('flag','ic--sm')+'</button></div>';
@@ -22,9 +34,9 @@
     try{
       var view=await M.transport.getView({thread:id,channel:'coordination'}), thread=view.thread;
       if(!thread)return;
-      if(thread.post.kind==='request'&&M.openRequestPage){await M.openRequestPage(id,{view:view,offer:!!offer});return;}
+      if((thread.post.kind==='request'||(thread.post.tag==='yardim'&&thread.post.verification!=='official'))&&M.openRequestPage){await M.openRequestPage(id,{view:view,offer:!!offer});return;}
       var p=thread.post, draft=read(id), mine=p.authorId===(M.actorId||'me');
-      var canReply=!M.shared||p.actions.includes('reply.create'),canOffer=p.kind==='request'&&!mine&&p.status==='open'&&(!M.shared||p.actions.includes('offer.create'));
+      var canReply=p.verification!=='official'&&(!M.shared||p.actions.includes('reply.create')),canOffer=p.kind==='request'&&!mine&&p.status==='open'&&(!M.shared||p.actions.includes('offer.create'));
       if(offer&&!draft.pending)draft.kind='offer';
       if(p.status==='closed')draft.kind='reply';
       var node=M.el('<div class="modal thread-dialog"><div class="thread-top"><h2 class="modal__h" id="thread-title">'+(p.kind==='request'?'Talebin yanıtları':'Gönderinin yanıtları')+'</h2><button type="button" data-thread-close aria-label="Yanıtları kapat">'+M.icon('close')+'</button></div>'+
@@ -39,7 +51,7 @@
         '<div class="thread-messages" aria-label="Yanıtlar">'+(thread.earlierCount?'<p class="thread-time">Son 100 yanıt gösteriliyor.</p>':'')+
         (thread.messages.length?thread.messages.map(function(m){return '<article class="thread-message" data-message-id="'+esc(m.id)+'"><div><b>'+esc(m.author.name)+'</b><span>'+esc(new Date(m.createdAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}))+'</span></div>'+
           (m.kind==='offer'?'<strong class="offer-label">'+(m.withdrawn?'Geri çekilmiş destek önerisi':'Destek önerisi')+'</strong>':'')+'<p>'+esc(m.text)+'</p>'+
-          (m.canWithdraw?'<button type="button" class="text-action" data-withdraw="'+esc(m.id)+'" data-version="'+m.version+'">Önerimi geri çek</button>':'')+'</article>';}).join(''):'<p class="thread-empty">Henüz yanıt yok.'+(canReply?' Bildiklerinizi paylaşabilir veya bir ayrıntıyı sorabilirsiniz.':canOffer?' Sunabileceğiniz desteği belirtebilirsiniz.':'')+'</p>')+'</div>'+
+          (m.canWithdraw?'<button type="button" class="text-action" data-withdraw="'+esc(m.id)+'" data-version="'+m.version+'">Önerimi geri çek</button>':'')+'</article>';}).join(''):'<p class="thread-empty">'+(p.verification==='official'?'Kurumsal duyurulara yorum kapalı.':'Henüz yanıt yok.')+(canReply?' Bildiklerinizi paylaşabilir veya bir ayrıntıyı sorabilirsiniz.':canOffer?' Sunabileceğiniz desteği belirtebilirsiniz.':'')+'</p>')+'</div>'+
         '<form class="thread-form"><label for="thread-kind">İşlem<select id="thread-kind">'+(canReply?'<option value="reply">Yanıt yaz</option>':'')+
         (canOffer?'<option value="offer">Destek öner</option>':'')+'</select></label>'+
         '<label for="thread-text">Mesajınız<textarea id="thread-text" rows="3" maxlength="1000" placeholder="Kısa ve açık bir mesaj yazın."></textarea></label>'+
@@ -114,6 +126,9 @@
       M.openModal(confirm,{labelledBy:'action-title'});confirm.querySelector('[data-cancel]').onclick=M.closeModal;
       confirm.querySelector('[data-confirm]').onclick=async function(){this.disabled=true;var result=await M.transport.send({type:remove?'post.remove':'account.ban',targetId:targetId,...(remove?{expectedVersion:Number(remove.dataset.version)}:{}),payload:{}});if(result.ok){M.closeModal();M.refreshShared(true);if(remove)M.openThread(targetId);M.toast(remove?'Paylaşım kaldırıldı.':'Hesabın yeni paylaşım yapması engellendi.');}else{this.disabled=false;var error=confirm.querySelector('[role="alert"]');error.hidden=false;error.textContent=result.error.message;}};return;
     }
+    var open=e.target.closest('[data-open-request]');if(open){M.openRequestPage(open.dataset.openRequest);return;}
+    var card=e.target.closest('.cpost[data-help]');
+    if(card&&!e.target.closest('button,a,select,input,textarea,details')&&!String(window.getSelection?window.getSelection():'')){M.openRequestPage(card.dataset.id);return;}
     var thread=e.target.closest('[data-thread]'),offer=e.target.closest('[data-offer]'),report=e.target.closest('[data-report]'),react=e.target.closest('[data-react]'),repost=e.target.closest('[data-repost]');
     if(thread){M.openThread(thread.dataset.thread);return;}if(offer){M.openThread(offer.dataset.offer,true);return;}if(report){M.openReport(report.dataset.report,Number(report.closest('[data-version]')?.dataset.version)||undefined);return;}
     var control=react||repost;if(!control)return;

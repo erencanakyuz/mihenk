@@ -255,7 +255,7 @@
        .wait(sec(.9))
        .move('.chip[data-filter="dogrulanmis"]', sec(.4)).click('.chip[data-filter="dogrulanmis"]')
        .wait(sec(.9))
-       .move('.chip[data-filter="all"]', sec(.4)).click('.chip[data-filter="all"]')
+       .move('.chip[data-filter="dogrulanmis"]', sec(.4)).click('.chip[data-filter="dogrulanmis"]')
        .wait(sec(.7));
       return s;
     } },

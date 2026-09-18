@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { reject } from './world.mjs';
 import { accessFor, permits, canSeePost, canReadMessage, messageChannel, requestModerator } from './access.mjs';
-import { requestProjection } from './request-policy.mjs';
+import { requestProjection, helpPost, commentsClosed } from './request-policy.mjs';
 const readOnlyRun=state=>['stopped','replay'].includes(state.status);
 const actorView=a=>({id:a.id,name:a.name,handle:a.handle,org:!!a.org,requestModerator:requestModerator(a)});
 function authorActions(state,actorId,authorId) {
@@ -24,13 +24,13 @@ export function publicPost(state,entry,actorId) {
     repostedBy:entry.originalId?actorView(state.actors[entry.authorId]):null,
     kind:p.kind,text:p.text,tag:p.tag,removed:!!p.removed,version:p.version,createdAt:p.createdAt,updatedAt:p.updatedAt,
     source:p.source,verification:p.verification,location:p.location,corrects:p.corrects??null,
-    ...(p.kind==='request'?requestProjection(state,actorId,p):{}),
+    ...(helpPost(p)?requestProjection(state,actorId,p):{}),
     likes:count('reactions',x=>x.targetId===p.id&&x.active),liked:!!state.reactions[actorId+':'+p.id]?.active,
     replies:count('replies',x=>x.targetId===p.id&&canReadMessage(state,actorId,x)),offers:count('offers',x=>x.targetId===p.id&&!x.withdrawn),
     reposts:count('posts',x=>x.originalId===p.id),reposted,
     observed:!!state.observations[actorId+':'+p.id],following:!!state.follows[actorId+':'+p.authorId]?.active,
     actions: readOnly?[]:[...(visibleAuthorActions.includes('account.ban')?['account.ban']:[]),
-      ...(!p.removed?['post.remove',...(p.kind!=='request'||p.status==='open'?['reply.create']:[]),'post.react',...(!reposted?['post.repost']:[]),'report.create',...(!mine?['observation.create','account.follow']:[]),
+      ...(!p.removed?['post.remove',...(!commentsClosed(p)&&(p.kind!=='request'||p.status==='open')?['reply.create']:[]),'post.react',...(!reposted?['post.repost']:[]),'report.create',...(!mine?['observation.create','account.follow']:[]),
       ...(p.kind==='request'&&requestModerator(actor)?['request.manage',p.status==='open'?'request.close':'request.reopen']:[]),
       ...(p.kind==='request'?(mine?['request.update',p.status==='open'?'request.close':'request.reopen']:p.status==='open'&&p.communityOpen!==false&&!openOffer?['offer.create']:[]):[])]:[])].filter(type=>permits(actor,type))
   };
@@ -42,7 +42,7 @@ export function projectView(service,session,query={}) {
   const actor=state.actors[actorId],policy=accessFor(actor);
   if(!permits(actor,'read_view'))reject('unauthorized','Bu görünüm için yetkiniz yok.');
   if(query.thread&&!permits(actor,'open_thread'))reject('unauthorized','Yanıtları açma yetkiniz yok.');
-  const filter=['all','resmi','yardim','dogrulanmis','mine','following'].includes(query.filter)?query.filter:'all';
+  const filter=['all','resmi','yardim','dogrulanmis','dogrulanmamis','mine','following'].includes(query.filter)?query.filter:'all';
   const region=typeof query.region==='string'?query.region.slice(0,80):'';
   const topic=typeof query.topic==='string'?query.topic.slice(0,30):'';
   const search=typeof query.search==='string'?query.search.slice(0,200).toLocaleLowerCase('tr-TR'):'';
@@ -69,6 +69,7 @@ export function projectView(service,session,query={}) {
     if(filter==='yardim')return p.kind==='request'&&p.status==='open';
     if(filter==='resmi')return p.verification==='official';
     if(filter==='dogrulanmis')return p.verification==='verified';
+    if(filter==='dogrulanmamis')return p.verification==='unverified';
     if(filter==='following')return !!state.follows[actorId+':'+entry.authorId]?.active;
     return true;
   });
@@ -77,8 +78,8 @@ export function projectView(service,session,query={}) {
     const entry=Object.hasOwn(state.posts,query.thread)?state.posts[query.thread]:null;
     if(!entry||!canSeePost(state,actorId,entry))reject('not_found','Gönderi bulunamadı.');
     const p=entry.originalId?state.posts[entry.originalId]:entry;
-    const messages=[...Object.values(state.replies).map(x=>({...x,kind:'reply'})),...Object.values(state.offers).map(x=>({...x,kind:'offer'}))]
-      .filter(x=>x.targetId===p.id&&canReadMessage(state,actorId,x)&&(p.kind!=='request'||messageChannel(x)===channel)).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
+    const messages=[...Object.values(state.replies).map(x=>({...x,kind:'reply'})),...Object.values(state.offers).filter(x=>!x.withdrawn).map(x=>({...x,kind:'offer'}))]
+      .filter(x=>x.targetId===p.id&&canReadMessage(state,actorId,x)&&(!helpPost(p)||messageChannel(x)===channel)).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
     const end=Math.max(0,messages.length-messageOffset),start=Math.max(0,end-messageLimit);
     const projectMessage=x=>({id:x.id,targetId:x.targetId,authorId:x.authorId,kind:x.kind,text:x.withdrawn?'Destek önerisi geri çekildi.':x.text,
       version:x.version,createdAt:x.createdAt,updatedAt:x.updatedAt,channel:messageChannel(x),visibility:x.visibility||'public',parentId:x.parentId||null,
@@ -91,8 +92,8 @@ export function projectView(service,session,query={}) {
   }
   const ownPosts=new Set(canonical.filter(p=>p.authorId===actorId).map(p=>p.id));
   const involved=new Set([...ownPosts,...Object.values(state.replies).filter(r=>r.authorId===actorId).map(r=>r.targetId),...Object.values(state.offers).filter(r=>r.authorId===actorId).map(r=>r.targetId)]);
-  const updates=[...Object.values(state.replies).map(x=>({...x,kind:'reply'})),...Object.values(state.offers).map(x=>({...x,kind:'offer'}))]
-    .filter(x=>involved.has(x.targetId)&&x.authorId!==actorId&&!state.posts[x.targetId]?.removed&&canReadMessage(state,actorId,x)&&(state.posts[x.targetId].kind!=='request'||state.posts[x.targetId].authorId!==actorId||messageChannel(x)==='coordination'))
+  const updates=[...Object.values(state.replies).map(x=>({...x,kind:'reply'})),...Object.values(state.offers).filter(x=>!x.withdrawn).map(x=>({...x,kind:'offer'}))]
+    .filter(x=>involved.has(x.targetId)&&x.authorId!==actorId&&!state.posts[x.targetId]?.removed&&canReadMessage(state,actorId,x)&&(!helpPost(state.posts[x.targetId])||state.posts[x.targetId].authorId!==actorId||messageChannel(x)==='coordination'))
     .sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).slice(0,updateLimit)
     .map(x=>({id:x.id,targetId:x.targetId,kind:x.kind,channel:messageChannel(x),at:x.updatedAt,text:x.withdrawn?'Destek önerisi geri çekildi.':x.text,author:actorView(state.actors[x.authorId]),authorActions:authorActions(state,actorId,x.authorId)}));
   const items=filtered.slice(offset,offset+limit).map(p=>publicPost(state,p,actorId));
@@ -118,7 +119,7 @@ export function projectView(service,session,query={}) {
     query:{filter,region,topic,search,authorId,context,offset,limit,channel,messageLimit,messageOffset,relatedLimit,updateLimit},items,relatedPosts,ownRequests,thread,updates,
     nextOffset:offset+limit<filtered.length?offset+limit:null,total:filtered.length,
     counts:{all:posts.length,yardim:canonical.filter(p=>p.kind==='request'&&p.status==='open').length,mine:canonical.filter(p=>p.kind==='request'&&p.authorId===actorId).length,
-      unknown:canonical.filter(p=>p.kind==='request'&&p.status==='open'&&!p.location.known).length,resmi:canonical.filter(p=>p.verification==='official').length,dogrulanmis:canonical.filter(p=>p.verification==='verified').length},
+      unknown:canonical.filter(p=>p.kind==='request'&&p.status==='open'&&!p.location.known).length,resmi:canonical.filter(p=>p.verification==='official').length,dogrulanmis:canonical.filter(p=>p.verification==='verified').length,dogrulanmamis:canonical.filter(p=>p.verification==='unverified').length},
     controlMode:!policy.operations.some(n=>!['read_view','open_thread','wait','post_remove','account_ban'].includes(n))?'moderation':'participant',
     accessRevision:actor.accessRevision||0,
     operations:policy.operations.filter(n=>!['stopped','replay'].includes(state.status)||['read_view','open_thread','wait'].includes(n)),

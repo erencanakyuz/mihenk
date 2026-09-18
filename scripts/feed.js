@@ -70,7 +70,7 @@
         '<div class="post__body">' + esc(p.text) + '</div>' +
         (p.media ? '<div class="post__media">' + S.media(p.media) + '</div>' : '') +
         (M.shared?M.cardActions(p):'<div class="acts">' +
-          act('reply', '', 'Yanıtla', p.replies + (state.replies && state.replies[p.id] || 0)) +
+          (p.v === 'official' ? '' : act('reply', '', 'Yanıtla', p.replies + (state.replies && state.replies[p.id] || 0))) +
           act('repost', '', 'Yeniden gönder', p.reposts + (!M.shared && rep ? 1 : 0), rep) +
           act('like', '', 'Beğen', p.likes + (!M.shared && liked ? 1 : 0), liked) +
           (M.shared ? '' : act('views', '', 'Görüntülenme', p.views)) +

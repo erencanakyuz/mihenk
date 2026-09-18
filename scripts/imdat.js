@@ -205,7 +205,7 @@
       if (f.dataset.flow === 'requests') {
         if(st.savedId){M.closeModal();M.openRequestPage(st.savedId);return;}
         M.closeModal(); M.setTabInstant('crisis');
-        $('.chip[data-filter="mine"]').click();
+        M.setCrisisFilter('mine', true);
         return;
       }
       if (f.dataset.flow === 'prev') { st.step = Math.max(0, st.step - 1); render(-1); return; }

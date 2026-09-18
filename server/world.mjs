@@ -149,13 +149,14 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
       target.version++;target.updatedAt=now;entity=target;
     } else if(cmd.type==='reply.create'||cmd.type==='offer.create') {
       fields(p,['text','channel','visibility','parentId']);
+      if(target.kind!=='request'&&target.verification==='official')reject('validation','Kurumsal duyurulara yorum yazılamaz.');
       const channel=p.channel||'community',visibility=p.visibility||'public';
       if(!['coordination','community'].includes(channel)||!['private','public'].includes(visibility))reject('validation','Mesaj kanalını ve görünürlüğünü kontrol edin.');
       if(target.kind==='request'){
         if(target.status!=='open')reject('conflict','Bu talep kapalı. Yeni mesaj yazılamaz.');
-        if(channel==='coordination'&&!privateRequestAccess(state,actorId,target))reject('unauthorized','Bu alana yalnızca talep sahibi ve moderatörler yazabilir.');
         if(channel==='community'&&target.communityOpen===false)reject('conflict','Topluluk mesajları durduruldu.');
-      }else if(channel!=='community')reject('validation','Bu gönderide koordinasyon kanalı yok.');
+      }else if(channel!=='community'&&target.tag!=='yardim')reject('validation','Bu gönderide koordinasyon kanalı yok.');
+      if(channel==='coordination'&&!privateRequestAccess(state,actorId,target))reject('unauthorized','Bu alana yalnızca talep sahibi ve moderatörler yazabilir.');
       if(channel==='community'&&visibility!=='public')reject('validation','Topluluk mesajları herkese açıktır.');
       let parentId=null;
       if(p.parentId){

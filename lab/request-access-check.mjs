@@ -116,6 +116,9 @@ try{
   ok('community reply to a private coordination parent is rejected',!privateParentInCommunity.ok&&privateParentInCommunity.error.code==='validation',code(privateParentInCommunity));
   const neighborCommunity=(await neighbor.thread(R,'community')).thread;
   ok('community view lists community messages only',neighborCommunity.messages.length===2&&neighborCommunity.messages.every(m=>m.channel==='community')&&leaks(neighborCommunity).length===0);
+  const withdrawn=await neighbor.send({type:'offer.withdraw',targetId:offer.entityId,expectedVersion:1,payload:{}});
+  const afterWithdraw=(await neighbor.thread(R,'community')).thread;
+  ok('withdrawn offer disappears from the thread and counts',withdrawn.ok&&!afterWithdraw.messages.some(m=>m.id===offer.entityId)&&afterWithdraw.post.messageCounts.community===1&&afterWithdraw.post.offers===0,code(withdrawn));
   const ownerCoordination=(await owner.thread(R,'coordination')).thread;
   ok('owner coordination view excludes community messages',ownerCoordination.messages.length===4&&ownerCoordination.messages.every(m=>m.channel==='coordination'));
   const ownerFeed=await owner.view({});
@@ -180,6 +183,33 @@ try{
   // 9. Legacy records keep their public behaviour.
   const legacy=(await neighbor.thread('need-water','community')).thread;
   ok('legacy request without privacy fields stays public and open',!!legacy&&legacy.post.communityOpen===true&&legacy.post.publicAccess==='public'&&'text' in legacy.post.location);
+
+  // 10. Ordinary posts tagged 'yardim' follow the same channel rules; other posts have no coordination channel.
+  const passerby=new Client(await operator('/sessions',{runId,name:'Yoldan Geçen'}));
+  const call=await neighbor.send({type:'post.create',payload:{text:'Mahallede battaniye lazım, kim getirebilir?',tag:'yardim'}});
+  ok('participant creates a plain help call',call.ok,code(call));
+  const C=call.entityId;
+  const callCard=(await passerby.view({filter:'all'})).items.find(p=>p.id===C);
+  ok('help call carries capabilities and readable counts',!!callCard&&callCard.helpCall===true&&callCard.capabilities.canWriteCoordination===false&&callCard.capabilities.canWriteCommunity===true&&callCard.messageCounts.coordination===0);
+  const callPrivate=await neighbor.send({type:'reply.create',targetId:C,payload:{text:'Numaram '+PRIVATE_PHONE,channel:'coordination',visibility:'private',parentId:null}});
+  ok('help call author writes a private coordination message',callPrivate.ok,code(callPrivate));
+  const outsiderOnCall=await passerby.thread(C);
+  ok('outsider sees no coordination message on the help call',outsiderOnCall.thread?.messages.length===0&&leaks(outsiderOnCall).length===0,outsiderOnCall.error?JSON.stringify(outsiderOnCall.error):'messages='+outsiderOnCall.thread?.messages.length+' leaks='+leaks(outsiderOnCall).join(','));
+  const outsiderCallWrite=await passerby.send({type:'reply.create',targetId:C,payload:{text:'Ben de yazayım',channel:'coordination',visibility:'public',parentId:null}});
+  ok('outsider coordination write on a help call is rejected',!outsiderCallWrite.ok&&outsiderCallWrite.error.code==='unauthorized',code(outsiderCallWrite));
+  const modOnCall=await moderator.thread(C);
+  ok('request moderator reads the help call coordination message',modOnCall.thread?.messages.length===1&&modOnCall.thread.post.messageCounts.coordination===1);
+  const plain=await neighbor.send({type:'post.create',payload:{text:'Yol açıldı.',tag:'durum'}});
+  const plainCoordination=await neighbor.send({type:'reply.create',targetId:plain.entityId,payload:{text:'Deneme',channel:'coordination',visibility:'private',parentId:null}});
+  ok('ordinary posts have no coordination channel',!plainCoordination.ok&&plainCoordination.error.code==='validation',code(plainCoordination));
+  // 11. Institutional announcements take no comments; the unverified filter works.
+  for(let i=0;i<4;i++)await operator('/control',{runId,action:'tick'});
+  const official=(await passerby.view({filter:'resmi'})).items.find(p=>p.verification==='official');
+  ok('official announcement is listed without a reply action',!!official&&!official.actions.includes('reply.create'));
+  const officialReply=official?await passerby.send({type:'reply.create',targetId:official.id,payload:{text:'Yorum',channel:'community',visibility:'public',parentId:null}}):{ok:false,error:{code:'skipped'}};
+  ok('replying to an official announcement is rejected',!officialReply.ok&&officialReply.error.code==='validation',code(officialReply));
+  const unverifiedFilter=await passerby.view({filter:'dogrulanmamis'});
+  ok('unverified filter lists only unverified posts',unverifiedFilter.items.length>0&&unverifiedFilter.items.every(p=>p.verification==='unverified')&&unverifiedFilter.counts.dogrulanmamis===unverifiedFilter.total);
 }catch(error){ok('exercise completed without exceptions',false,error.stack||String(error));}
 finally{
   await server.close();

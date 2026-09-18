@@ -3,6 +3,8 @@
   var page=null,serial=0,esc=M.CATALOG.esc;
   var needs={kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'};
   var labels={coordination:'Yetkililerle iletişim',community:'Topluluk desteği'};
+  function isHelp(p){return !!p&&(p.kind==='request'||(p.tag==='yardim'&&p.verification!=='official'));}
+  function pageTitle(p){return p.kind==='request'?'Yardım talebi':'Yardım çağrısı';}
   function glyph(name){
     var paths={lock:'M6 10h12v11H6zM8 10V7a4 4 0 0 1 8 0v3',globe:'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zM3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18',down:'m6 9 6 6 6-6',send:'m3 3 18 9-18 9 4-9-4-9zM7 12h14'};
     return paths[name]?'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="'+paths[name]+'"/></svg>':M.icon(name);
@@ -35,8 +37,8 @@
   function statement(p){
     var verification={unverified:'Beyan · Henüz doğrulanmadı',verified:'Doğrulanmış',official:'Resmî kaynak',disputed:'Çelişkili'};
     var summary=(p.need||[]).map(function(n){return needs[n]||n;}).join(', ');
-    return '<section class="rp-overview" aria-label="Talep özeti"><div class="rp-overview-title"><h2>'+esc(summary||'Yardım ihtiyacı')+'</h2><span class="rp-verification" data-verification="'+esc(p.verification)+'">'+glyph('shield')+esc(verification[p.verification]||verification.unverified)+'</span></div>'+
-      '<div class="rp-facts"><span>'+glyph('people')+(p.people==null?'Kişi sayısı bilinmiyor':esc(p.people)+' kişi')+'</span><span>'+glyph('pin')+esc(p.publicLocationText||p.location.region||'Konum belirtilmedi')+'</span>'+(!p.location.known?'<span>Konum kesin değil</span>':'')+'</div>'+
+    return '<section class="rp-overview" aria-label="Talep özeti"><div class="rp-overview-title">'+(summary?'<h2>'+esc(summary)+'</h2>':p.kind==='request'?'<h2>Yardım ihtiyacı</h2>':'')+'<span class="rp-verification" data-verification="'+esc(p.verification)+'">'+glyph('shield')+esc(verification[p.verification]||verification.unverified)+'</span></div>'+
+      '<div class="rp-facts">'+(p.kind==='request'?'<span>'+glyph('people')+(p.people==null?'Kişi sayısı bilinmiyor':esc(p.people)+' kişi')+'</span>':'')+'<span>'+glyph('pin')+esc(p.kind==='request'?(p.publicLocationText||p.location.region||'Konum belirtilmedi'):([p.location.region,p.location.text].filter(Boolean).join(' · ')||'Konum belirtilmedi'))+'</span>'+(!p.location.known?'<span>Konum kesin değil</span>':'')+'</div>'+
       detail('statement','<span class="rp-statement-author">'+avatar(p.author)+'<span><strong>Talep sahibinin beyanı</strong><small>'+esc(p.author.name)+' · '+esc(date(p.updatedAt))+'</small></span></span>',
       '<div class="rp-statement-body"><p>'+esc(p.details||p.text)+'</p>'+fields(p)+(p.capabilities.canEditStatement?'<button class="rp-text-button" data-edit-statement>'+glyph('quill')+'Beyanı ve bilgileri düzenle</button>':'')+'</div>','rp-statement')+management(p)+'</section>';
   }
@@ -68,8 +70,9 @@
   function render(){
     var p=page.thread.post,c=p.capabilities;
     if(p.removed){unavailable('Bu talep kaldırıldı.');return;}
+    document.title=pageTitle(p)+' · MİHENK';
     var d=draft();if(d.parentId&&!parent()){d.parentId=null;delete d.pending;persist();}
-    page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back aria-label="Akışa dön">'+glyph('chevl')+'<span>Akışa dön</span></button><div><h1 tabindex="-1">Yardım talebi</h1><span class="rp-id">#'+esc(p.id.slice(0,8))+'</span></div><span class="rp-state">'+glyph(p.status==='closed'?'lock':'clock')+(p.status==='closed'?'Talep kapalı'+({resolved:' · İhtiyaç karşılandı',withdrawn:' · Geri çekildi',duplicate:' · Mükerrer'}[p.closeReason]||''):'Talep açık')+'</span></header>'+statement(p)+
+    page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back aria-label="Akışa dön">'+glyph('chevl')+'<span>Akışa dön</span></button><div><h1 tabindex="-1">'+pageTitle(p)+'</h1><span class="rp-id">#'+esc(p.id.slice(0,8))+'</span></div>'+(p.kind==='request'?'<span class="rp-state">'+glyph(p.status==='closed'?'lock':'clock')+(p.status==='closed'?'Talep kapalı'+({resolved:' · İhtiyaç karşılandı',withdrawn:' · Geri çekildi',duplicate:' · Mükerrer'}[p.closeReason]||''):'Talep açık')+'</span>':'')+'</header>'+statement(p)+
       (p.publicAccess==='restricted'?'<p class="rp-notice">'+glyph('lock')+'Bu talep yalnızca size ve yetkili moderatörlere açık.</p>':'')+
       '<div class="rp-tabs" role="tablist" aria-label="Talep konuşmaları">'+Object.keys(labels).map(function(channel){return '<button role="tab" id="rp-tab-'+channel+'" aria-controls="rp-panel" aria-selected="'+(page.channel===channel)+'" tabindex="'+(page.channel===channel?'0':'-1')+'" data-request-channel="'+channel+'">'+glyph(channel==='coordination'?'shield':'people')+'<span>'+labels[channel]+'</span>'+(page.unread[channel]?'<span class="rp-new-dot" aria-label="Yeni mesaj"></span>':'')+'</button>';}).join('')+'</div>'+
       '<section class="rp-conversation" id="rp-panel" role="tabpanel" aria-labelledby="rp-tab-'+page.channel+'"><div class="rp-channel-note">'+(page.channel==='coordination'?(c.canReadPrivate?'Talep sahibi ve yetkili moderatörler arasında iletişim':'Herkese açık güncellemeler. Destek için Topluluk desteği sekmesini kullanın.'):'Yapabileceğiniz desteği ve güncel bilgileri paylaşın.')+'</div><p class="rp-connection" role="status" hidden></p><button class="rp-updates" data-refresh-request hidden>Yeni mesajlar · Güncelle</button>'+
@@ -102,7 +105,7 @@
     try{
       var v=provided||await M.transport.getRequestView(current.id,current.channel,earlier?current.thread.nextMessageOffset:0);
       if(page!==current||run!==serial)return;
-      if(!v.thread||v.thread.post.kind!=='request'){unavailable('Bu talep şu anda görüntülenemiyor.');return;}
+      if(!v.thread||!isHelp(v.thread.post)){unavailable('Bu talep şu anda görüntülenemiyor.');return;}
       if(earlier){v.thread.messages=v.thread.messages.concat(current.thread.messages);v.thread.parents=v.thread.parents.concat(current.thread.parents||[]);}
       current.thread=v.thread;current.id=v.thread.post.id;current.unread[current.channel]=false;render();
       if(earlier&&anchorId){var restored=document.getElementById(anchorId);if(restored)window.scrollBy(0,restored.getBoundingClientRect().top-anchorY);}
@@ -155,8 +158,12 @@
       var form=page.node.querySelector('.rp-compose');if(form){var replacement=M.el(composer());form.replaceWith(replacement);replacement.addEventListener('input',capture);replacement.addEventListener('change',capture);replacement.onsubmit=send;replacement.querySelector('textarea').focus();}return;
     }
     if(button.dataset.withdrawOffer){
-      var msg=allMessages().find(function(m){return m.id===button.dataset.withdrawOffer;});button.disabled=true;
-      var r=await M.transport.send({type:'offer.withdraw',targetId:msg.id,expectedVersion:msg.version,payload:{}});if(r.ok)await load(false);else{button.disabled=false;M.toast(r.error.message);}return;
+      var msg=allMessages().find(function(m){return m.id===button.dataset.withdrawOffer;});if(!msg)return;
+      var confirm=M.el('<div class="modal report-dialog"><h2 class="modal__h" id="withdraw-title">Destek önerisi geri çekilsin mi?</h2><p class="modal__p">Öneriniz konuşmadan kaldırılır. Gerekirse yeni bir öneri yazabilirsiniz.</p><p class="compose-error" role="alert" hidden></p><div class="modal__actions"><button class="btn btn--ghost" type="button" data-cancel>Vazgeç</button><button class="btn" type="button" data-confirm>Geri çek</button></div></div>');
+      M.openModal(confirm,{labelledBy:'withdraw-title'});confirm.querySelector('[data-cancel]').onclick=M.closeModal;
+      confirm.querySelector('[data-confirm]').onclick=async function(){this.disabled=true;var r=await M.transport.send({type:'offer.withdraw',targetId:msg.id,expectedVersion:msg.version,payload:{}});
+        if(r.ok){M.closeModal();M.toast('Destek önerisi geri çekildi.');await load(false);}else{this.disabled=false;var err=confirm.querySelector('[role="alert"]');err.hidden=false;err.textContent=r.error.message;}};
+      return;
     }
     if(button.dataset.manage){
       var p=page.thread.post,action=button.dataset.manage,payload={},type='request.manage';
@@ -173,8 +180,10 @@
     if(!change||change.accessChanged||change.posts?.includes(page.id)){M.transport.clearRequestCache();load(false);return;}
     var channels=change.channels?.[page.id]||[];
     if(channels.includes(page.channel)){var b=page.node.querySelector('[data-refresh-request]');if(b)b.hidden=false;}
-    if(page.thread?.post.capabilities.canManagePublicAccess&&channels.includes('community')&&page.channel!=='community'){
-      page.unread.community=true;var tab=page.node.querySelector('[data-request-channel="community"]');if(tab&&!tab.querySelector('.rp-new-dot'))tab.insertAdjacentHTML('beforeend','<span class="rp-new-dot" aria-label="Yeni mesaj"></span>');
+    // The requester always learns about coordination; only moderators get a community dot.
+    var other=page.channel==='coordination'?'community':'coordination';
+    if(channels.includes(other)&&(other==='coordination'||page.thread?.post.capabilities.canManagePublicAccess)){
+      page.unread[other]=true;var tab=page.node.querySelector('[data-request-channel="'+other+'"]');if(tab&&!tab.querySelector('.rp-new-dot'))tab.insertAdjacentHTML('beforeend','<span class="rp-new-dot" aria-label="Yeni mesaj"></span>');
     }
   };
   M.refreshRequestPage=function(){if(page)load(false);};

@@ -126,3 +126,28 @@
 }
 @media(prefers-reduced-motion:reduce){.request-page summary>.ic { transition:none; }}
 :root[data-plain="1"] .request-page { --c-bg:#000; --c-bg-2:#000; --c-text:#fff; --c-text-2:#ddd; --c-border:#777; }
+
+/* Help request cards in the crisis feed: what is needed, then one clear way in. */
+.cpost[data-help] .cpost__body { cursor:pointer; }
+.cpost[data-help] .cpost__body:hover { color:var(--c-accent-2); }
+.cpost__state { display:inline-flex; align-items:center; gap:5px; margin-left:auto; padding-left:8px; color:var(--c-accent); font-size:12px; font-weight:700; white-space:nowrap; }
+.cpost__state[data-open=""] { color:var(--c-text-2); }
+.cpost__state .ic { width:14px; height:14px; }
+.cpost__request { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; margin-top:12px; }
+.cpost__needs { display:flex; flex-wrap:wrap; gap:6px; }
+.cpost__need { display:inline-flex; align-items:center; min-height:28px; padding:0 11px; border-radius:7px; background:var(--c-bg-3); color:var(--c-text); font-size:13px; font-weight:600; }
+.cpost__facts { display:flex; flex-wrap:wrap; gap:6px 14px; color:var(--c-text-2); font-size:13px; }
+.cpost__facts>span { display:inline-flex; align-items:center; gap:5px; }
+.request-actions--entry { gap:8px 12px; }
+.request-actions--entry .open-request { min-height:40px; padding:0 18px; border-radius:999px; background:var(--c-accent-fill); color:var(--c-accent-ink); font-size:14px; font-weight:700; }
+.request-actions--entry .open-request:hover { background:var(--c-accent-fill); filter:brightness(1.12); }
+.request-actions--entry .open-request:active { transform:scale(.97); }
+.request-actions--entry .offer-action { min-height:40px; padding:0 14px; border:1px solid var(--c-border); border-radius:999px; }
+.request-actions--entry .request-counts { color:var(--c-text-2); font-size:12px; line-height:1.5; }
+.request-actions--entry .report-action { margin-left:auto; }
+@media(max-width:700px){
+  .cpost__state { width:100%; margin-left:0; padding-left:0; margin-top:4px; }
+  .request-actions--entry .open-request { flex:1; min-width:140px; }
+  .request-actions--entry .request-counts { width:100%; order:9; }
+}
+:root[data-plain="1"] .request-actions--entry .open-request { border:1px solid #fff; }

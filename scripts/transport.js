@@ -7,7 +7,7 @@
     return Object.assign({},p,{uid:p.authorId===me?'me':p.authorId,v:p.verification,t:time(p.updatedAt),
       loc:p.publicLocationText||p.location.region||p.location.text||'Konum henüz belirtilmedi',region:p.location.region||'',
       source:p.source.kind,sourceUrl:p.source.url||'',resolved:p.status==='closed',views:0,
-      replies:p.replies||0,reposts:p.reposts||0,likes:p.likes||0});
+      replies:p.replies||0,reposts:p.reposts||0,likes:p.likes||0,help:p.kind==='request'||(p.tag==='yardim'&&p.verification!=='official'),updates:(p.messageCounts&&p.messageCounts.coordination)||0,support:(p.messageCounts&&p.messageCounts.community)||0});
   }
   function time(at){var date=new Date(at);return date.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
   function hydrate(view){
@@ -35,6 +35,8 @@
   function loadLocal(){
     if(localLoaded||!M.state)return;localLoaded=true;
     try{var saved=JSON.parse(sessionStorage.getItem('mihenk:requests:v1'));if(saved){M.state.extraCrisis=saved.posts||[];offlineMessages=saved.messages||[];offlineOffers=saved.offers||[];localReceipts=saved.receipts||{};}}catch(_){}
+    // Seed posts are rebuilt on every load, so their counters are restored from the saved messages.
+    offlineMessages.concat(offlineOffers).forEach(function(m){var p=offlinePost(m.targetId);if(!p||M.state.extraCrisis.indexOf(p)>=0)return;if(m.kind==='offer'){if(!m.withdrawn)p.offers=(p.offers||0)+1;}else p.replies=(p.replies||0)+1;if(m.channel==='coordination')p.updates=(p.updates||0)+1;else if(m.kind!=='offer'||!m.withdrawn)p.support=(p.support||0)+1;});
   }
   function persistLocal(){try{sessionStorage.setItem('mihenk:requests:v1',JSON.stringify({posts:M.state.extraCrisis,messages:offlineMessages,offers:offlineOffers,receipts:localReceipts}));}catch(_){}}
   function offlinePost(id){loadLocal();return (M.state?M.state.extraCrisis:[]).concat(M.SEED.crisis,M.SEED.forYou,M.SEED.following).find(function(p){return p.id===id;});}
@@ -44,7 +46,7 @@
     return Object.assign({},p,{authorId:p.uid,author:author,kind:p.need?'request':'post',version:p.version||1,status:p.resolved?'closed':'open',
       source:{kind:p.source||null,url:p.sourceUrl||null},verification:p.v||'unverified',createdAt:p.createdAt||new Date().toISOString(),updatedAt:p.updatedAt||new Date().toISOString(),
       location:p.location||{known:!!p.loc,region:p.region||null,text:p.loc||''},
-      capabilities:{canReadPrivate:p.uid==='me',canEditStatement:p.uid==='me',canWriteCoordination:p.uid==='me'&&!p.resolved,canWriteCommunity:!p.resolved&&p.communityOpen!==false,canManagePublicAccess:false,canClose:p.uid==='me'&&!p.resolved,canReopen:p.uid==='me'&&!!p.resolved}});
+      helpCall:!p.need&&p.tag==='yardim'&&p.v!=='official',messageCounts:{coordination:p.updates||0,community:p.support||0},capabilities:{canReadPrivate:p.uid==='me',canEditStatement:p.uid==='me'&&!!p.need,canWriteCoordination:p.uid==='me'&&(!!p.need||p.tag==='yardim')&&!p.resolved,canWriteCommunity:!p.resolved&&p.communityOpen!==false&&!(!p.need&&p.v==='official'),canManagePublicAccess:false,canClose:p.uid==='me'&&!!p.need&&!p.resolved,canReopen:p.uid==='me'&&!!p.need&&!!p.resolved}});
   }
   function offlineSend(cmd){
     var p=offlinePost(cmd.targetId), payload=cmd.payload||{}, id=crypto.randomUUID(), version=1;
@@ -55,12 +57,12 @@
       p.text=p.need.map(function(n){return {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'}[n];}).join(', ')+' ihtiyacı var. '+(p.people===null?'Kişi sayısı bilinmiyor.':p.people+' kişi.');
     } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){p.resolved=cmd.type==='request.close';p.closeReason=p.resolved?(payload.reason||'other'):null;}
     else if(cmd.type==='reply.create'||cmd.type==='offer.create'){
-      if(!p||p.resolved)return {ok:false,error:{code:'conflict',message:'Bu talep kapalı.'}};
+      if(!p||p.resolved)return {ok:false,error:{code:'conflict',message:'Bu talep kapalı.'}};if(!p.need&&p.v==='official')return {ok:false,error:{code:'validation',message:'Kurumsal duyurulara yorum yazılamaz.'}};
       if(payload.channel==='coordination'&&p.uid!=='me')return {ok:false,error:{code:'unauthorized',message:'Bu alana yalnızca talep sahibi ve moderatörler yazabilir.'}};
       var m={channel:payload.channel||'community',visibility:payload.visibility||'public',parentId:payload.parentId||null,id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
-      (m.kind==='offer'?offlineOffers:offlineMessages).push(m);p[m.kind==='offer'?'offers':'replies']=(p[m.kind==='offer'?'offers':'replies']||0)+1;
+      (m.kind==='offer'?offlineOffers:offlineMessages).push(m);p[m.kind==='offer'?'offers':'replies']=(p[m.kind==='offer'?'offers':'replies']||0)+1;if(m.channel==='coordination')p.updates=(p.updates||0)+1;else p.support=(p.support||0)+1;
       return {ok:true,entityId:id,entityVersion:1};
-    } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});offer.withdrawn=true;offer.canWithdraw=false;return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
+    } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});offer.withdrawn=true;offer.canWithdraw=false;var host=offlinePost(offer.targetId);if(host){host.offers=Math.max(0,(host.offers||0)-1);host.support=Math.max(0,(host.support||0)-1);}return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
     else if(cmd.type==='report.create'){
       try { var reports=JSON.parse(localStorage.getItem('mihenk:offline-reports')||'[]');reports.push({id:id,targetId:p.id,reason:payload.reason,details:payload.details,at:new Date().toISOString()});localStorage.setItem('mihenk:offline-reports',JSON.stringify(reports)); }
       catch(_){return {ok:false,error:{code:'unavailable',message:'Bildirim bu cihazda kaydedilemedi. Yeniden deneyin.'}};}
@@ -97,7 +99,7 @@
     getView:async function(query){
       if(!M.shared){
         var p=query&&query.thread?offlinePost(query.thread):null,channel=query?.channel||'community';
-        var messages=offlineMessages.concat(offlineOffers).filter(function(m){return p&&m.targetId===p.id&&(!p.need||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
+        var messages=offlineMessages.concat(offlineOffers.filter(function(o){return !o.withdrawn;})).filter(function(m){return p&&m.targetId===p.id&&(!(p.need||p.tag==='yardim')||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
         var end=Math.max(0,messages.length-(query?.messageOffset||0)),start=Math.max(0,end-40);
         return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:messages.slice(start,end),parents:messages.filter(function(m){return messages.slice(start,end).some(function(c){return c.parentId===m.id;});}),earlierCount:start,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
       }

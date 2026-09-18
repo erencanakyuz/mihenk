@@ -197,3 +197,14 @@
   .flow__foot .btn { min-height: 44px; }
   .my-requests { margin-left: 12px; margin-right: 12px; width: calc(100% - 24px); }
 }
+
+/* Crisis filters: five toggle chips that wrap instead of scrolling; none is pressed by default. */
+.chips { flex-wrap: wrap; }
+@media (max-width: 700px) { .chips { gap: 6px; } .chip { min-height: 36px; padding: 0 10px; font-size: 13px; } }
+
+/* "Bilgi paylaş" mirrors the red request button in green: same shape, weight and size. */
+.crisis-actions #crisis-write { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: auto; min-height: 50px; border: 0; border-radius: 12px; background: #1f7f57; color: #fff; font-size: 14px; font-weight: 650; letter-spacing: 0; transition: filter 160ms var(--ease-out), transform 120ms var(--ease-out); }
+.crisis-actions #crisis-write:hover { background: #1f7f57; filter: brightness(1.06); }
+.crisis-actions #crisis-write:active { transform: scale(.985); }
+.crisis-actions #crisis-write .ic { width: 22px; height: 22px; }
+:root[data-plain="1"] .crisis-actions #crisis-write { background: none; border: 2px solid var(--c-accent); color: var(--c-accent); }

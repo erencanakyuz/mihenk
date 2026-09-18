@@ -35,32 +35,44 @@
   }
 
   /* ------------------------------------------------------- crisis post DOM */
+  var NEEDLABEL = { kurtarma: 'Arama kurtarma', saglik: 'Sağlık / ilk yardım', barinma: 'Barınma ve ısınma', gida: 'Gıda ve su', ulasim: 'Ulaşım' };
+  /* Help request cards: the need strip and the people count say what is
+     asked for before the reader opens the request. */
+  function requestBlock(p) {
+    var needs = (p.need || []).map(function (n) { return '<span class="cpost__need">' + esc(NEEDLABEL[n] || n) + '</span>'; }).join('');
+    var facts = [];
+    if (p.need) facts.push(icon('people', 'ic--sm') + '<span>' + (p.people == null ? 'Kişi sayısı bilinmiyor' : esc(p.people) + ' kişi') + '</span>');
+    if (p.location && !p.location.known && (p.location.text || p.location.region)) facts.push(icon('questionc', 'ic--sm') + '<span>Konum kesin değil</span>');
+    if (!needs && !facts.length) return '';
+    return '<div class="cpost__request">' + (needs ? '<div class="cpost__needs">' + needs + '</div>' : '') +
+      (facts.length ? '<div class="cpost__facts">' + facts.map(function (f) { return '<span>' + f + '</span>'; }).join('') + '</div>' : '') + '</div>';
+  }
+  function statePill(p) {
+    return '<span class="cpost__state" data-open="' + (p.resolved ? '' : '1') + '">' + icon(p.resolved ? 'lock' : 'clock', 'ic--sm') + '<span>' + (p.resolved ? 'Talep kapalı' : 'Talep açık') + '</span></span>';
+  }
   function cpostHTML(p, opts) {
     opts = opts || {};
     var u = S.byId[p.uid] || S.me;
     var v = state.verified[p.id] || p.v;
     var vl = S.VER[v];
-    return '<article class="cpost" data-id="' + p.id + '" data-version="'+(p.version||1)+'" data-v="' + v + '" data-resolved="' + (p.resolved ? '1' : '') + '" data-tag="' + p.tag + '">' +
+    var help = !!p.need || (p.tag === 'yardim' && v !== 'official');
+    return '<article class="cpost" data-id="' + p.id + '" data-version="'+(p.version||1)+'" data-v="' + v + '" data-resolved="' + (p.resolved ? '1' : '') + '" data-tag="' + p.tag + '"' + (help ? ' data-help="1"' : '') + '>' +
       '<span class="av">' + u.avatar + '</span>' +
       '<div class="cpost__col">' +
         '<div class="cpost__head">' +
           '<span class="cpost__name">' + esc(u.name) + '</span>' +
           (u.org ? '<span class="post__verified">' + icon('vbadge') + '</span>' : '') +
           '<span class="post__handle">@' + esc(u.handle) + '</span>' +
-          '<span class="post__dot">·</span><span class="post__time">' + esc(p.t) + '</span>' +
+          '<span class="post__dot">·</span><span class="post__time">' + esc(p.t) + '</span>' + (help && p.need ? statePill(p) : '') +
         '</div>' +
         '<span class="vpill vpill--' + v + '">' + icon(VICON[v]) +
           '<span class="vpill__t">' + esc(vl.label) + '</span></span>' +
         '<div class="cpost__body">' + esc(p.text) + '</div>' +
         sourceHTML(p) +
-        (p.corrects?'<button class="text-action" type="button" data-thread="'+esc(p.corrects)+'">İlgili önceki gönderi</button>':'')+
-        (p.tag === 'yardim' && (p.uid === 'me' || p.simulationId || p.need) ? '<div class="request-status">' + icon(p.resolved ? 'checkc' : 'clock', 'ic--sm') + '<span>' + (p.resolved ? 'Talep sahibi ihtiyacın karşılandığını belirtti' : 'Talep açık · ' + (p.offers ? p.offers + ' destek önerisi' : p.location && !p.location.known ? (p.location.text || p.location.region ? 'Konum kesin değil' : 'Konum henüz belirtilmedi') : 'Henüz destek önerisi yok')) + '</span></div>' : '') +
+        (p.corrects?'<button class="text-action" type="button" data-thread="'+esc(p.corrects)+'">İlgili önceki gönderi</button>':'')+        (help ? requestBlock(p) : '') +
         '<div class="cpost__meta">' +
           '<span class="cpost__loc">' + icon('pin', 'ic--sm') + esc((p.region && p.region !== p.loc ? p.region + ' · ' : '') + p.loc) + '</span>' +
-          '<span class="cpost__tag">' + esc(TAGLABEL[p.tag]) + '</span>' +
-          (p.uid === 'me' && p.tag === 'yardim' ? '<button class="request-resolve" type="button" data-resolve="' + p.id + '">' + (p.resolved ? 'İhtiyaç karşılandı · Yeniden aç' : 'İhtiyacım karşılandı') + '</button>' : '') +
-          (p.uid === 'me' && p.need ? '<button class="cpost__why" type="button" data-edit-request="' + p.id + '">Talebi güncelle</button>' : '') +
-          '<button class="cpost__why" type="button" data-why="' + p.id + '">' +
+          '<span class="cpost__tag">' + esc(TAGLABEL[p.tag]) + '</span>' +          '<button class="cpost__why" type="button" data-why="' + p.id + '">' +
             icon('questionc', 'ic--sm') + '<span>Gerekçe</span></button>' +
           (p.uid !== 'me' && (!M.shared||p.actions.includes('observation.create')) ? '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
             (state.corroborations[p.id] ? ' data-done="1"' : '') + '>' +
@@ -92,8 +104,9 @@
     if (topic && topic.value && p.tag !== topic.value) return false;
     switch (state.filter) {
       case 'resmi': return v === 'official';
-      case 'yardim': return p.tag === 'yardim' && !p.resolved;
+      case 'yardim': return !!p.need && !p.resolved;
       case 'dogrulanmis': return v === 'verified';
+      case 'dogrulanmamis': return v === 'unverified';
       case 'mine': return p.uid === 'me' && p.tag === 'yardim';
       default: return true;
     }
@@ -138,10 +151,10 @@
           '</div>' +
         '</div>' +
         '<div class="chips" role="group" aria-label="Filtreler">' +
-          [['all', 'Tümü'], ['resmi', 'Resmî'], ['yardim', 'Yardım'], ['dogrulanmis', 'Doğrulanmış'], ['mine', 'Taleplerim']]
+          [['resmi', 'Resmî'], ['yardim', 'Yardım'], ['dogrulanmis', 'Doğrulanmış'], ['dogrulanmamis', 'Doğrulanmamış'], ['mine', 'Taleplerim']]
             .map(function (c) {
               return '<button class="chip" type="button" data-filter="' + c[0] + '" aria-pressed="' +
-                (c[0] === 'all' ? 'true' : 'false') + '">' + esc(c[1]) +
+                'false' + '">' + esc(c[1]) +
                 '<span class="chip__n" data-count="' + c[0] + '"></span></button>';
             }).join('') +
         '</div>' +
@@ -226,8 +239,9 @@
     var c = {
       all: all.length,
       resmi: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'official'; }).length,
-      yardim: all.filter(function (p) { return p.tag === 'yardim' && !p.resolved; }).length,
+      yardim: all.filter(function (p) { return !!p.need && !p.resolved; }).length,
       dogrulanmis: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'verified'; }).length,
+      dogrulanmamis: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'unverified'; }).length,
       mine: all.filter(function (p) { return p.uid === 'me' && p.tag === 'yardim'; }).length
     };
     if (M.shared) c = M.sharedView.counts;
@@ -260,7 +274,7 @@
       if (show) { n.style.setProperty('--i', Math.min(idx, 8)); idx++; }
     });
     if (M.applySearch) M.applySearch($('#feed-search-input').value);
-    var titles = { all: 'Bölgeden güncellemeler', resmi: 'Resmî kaynaklardan', yardim: 'Açık yardım talepleri', dogrulanmis: 'Doğrulanmış bilgiler', mine: 'Yardım taleplerim' };
+    var titles = { all: 'Bölgeden güncellemeler', resmi: 'Resmî kaynaklardan', yardim: 'Açık yardım talepleri', dogrulanmis: 'Doğrulanmış bilgiler', dogrulanmamis: 'Doğrulanmamış bilgiler', mine: 'Yardım taleplerim' };
     var heading = $('#panel-crisis .clist__h');
     if (heading) heading.textContent = titles[state.filter] || titles.all;
     if (instant || M.motionOff()) return;
@@ -285,6 +299,14 @@
     }, 420);
   }
 
+  function selectFilter(name, instant) {
+    if (name === 'mine') { var r = $('#crisis-region'), t = $('#crisis-topic'); if (r) r.value = ''; if (t) t.value = ''; if (M.applySearch) M.applySearch(''); }
+    $$('.chip[data-filter]').forEach(function (c) { c.setAttribute('aria-pressed', c.dataset.filter === name ? 'true' : 'false'); });
+    state.filter = name;
+    if (M.shared) M.refreshShared(true); else applyFilter(!!instant);
+  }
+  M.setCrisisFilter = selectFilter;
+
   function wireCrisisPanel() {
     var panel = $('#panel-crisis');
     $('#crisis-region').addEventListener('change', function () { if(M.shared) M.refreshShared(true); else applyFilter(true); });
@@ -293,7 +315,7 @@
     panel.addEventListener('click', function (e) {
       var edit = e.target.closest('[data-edit-request]');
       if (edit) { M.openImdat({ editId: edit.dataset.editRequest }); return; }
-      if (e.target.closest('#my-requests')) { $('.chip[data-filter="mine"]').click(); return; }
+      if (e.target.closest('#my-requests')) { selectFilter('mine', false); return; }
       if (e.target.closest('#close-ccomposer')) { $('#ccomposer').hidden = true; $('#crisis-write').focus(); return; }
       var resolved = e.target.closest('[data-resolve]');
       if (resolved && M.shared) {
@@ -321,10 +343,8 @@
           $('#crisis-region').value = ''; $('#crisis-topic').value = '';
           if (M.applySearch) M.applySearch('');
         }
-        $$('.chip[data-filter]', panel).forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
-        chip.setAttribute('aria-pressed', 'true');
-        state.filter = chip.dataset.filter;
-        if(M.shared) M.refreshShared(true); else applyFilter(false);
+        // Chips toggle: pressing the active chip returns to the full list.
+        selectFilter(chip.getAttribute('aria-pressed') === 'true' ? 'all' : chip.dataset.filter, false);
         return;
       }
       var vb = e.target.closest('[data-verify]');

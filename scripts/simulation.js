@@ -100,7 +100,7 @@
     removeRun();
     if (!M.state.crisis) M.activateCrisis({ immediate: true });
     M.setTabInstant('crisis');
-    M.$('#crisis-region').value = ''; M.$('#crisis-topic').value = ''; M.applySearch(''); M.$('.chip[data-filter="all"]').click();
+    M.$('#crisis-region').value = ''; M.$('#crisis-topic').value = ''; M.applySearch(''); M.setCrisisFilter('all', true);
     random = rng(seed);
     run = { id: 'sim-' + (++sequence), seed: seed, speed: speed, status: 'running', turn: 0, limit: count * 8, replay: false,
       metrics: { posts: 0, reads: 0, offers: 0, resolved: 0, updates: 0, rumors: 0, misses: 0 }, actors: [], events: [], order: [] };

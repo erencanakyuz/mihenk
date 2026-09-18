@@ -744,3 +744,45 @@ Implemented on branch `feature/request-thread-page`. Nothing has been committed.
 - `tools/verify.mjs` does not exercise the request page; the access script is the only
   new automated check.
 - The old modal thread remains for ordinary posts and reports.
+
+## 20. Follow-up: single entry point and card redesign (18 September 2026)
+
+Feedback after a live demo: the old reply modal still opened for posts tagged `yardim`,
+which competed with the new page, and the card offered no clear way in.
+
+### Changes
+
+- **Help calls join the request page.** Any post tagged `yardim` (a "help call") opens
+  the request page and follows the same channel rules. This supersedes the section 3
+  sentence that kept ordinary `yardim` posts in the old modal. Server side, `helpPost`
+  in `server/request-policy.mjs` decides; coordination writes on a help call are limited
+  to its author and request moderators, and other posts still have no coordination channel.
+  Help calls have no close, reopen, management or field privacy; their page title is
+  `Yardım çağrısı` and the header shows no state chip.
+- **Card redesign (`scripts/crisis.js`, `scripts/request-thread.js`,
+  `styles/request-page.css`).** Help cards show `Talep açık` / `Talep kapalı` in the
+  header row, need chips, the people count and an uncertain-location note, then one
+  primary `Talebi aç` (`Çağrıyı aç` for help calls) button with `Destek öner`, readable
+  message counts (`N güncelleme · N topluluk mesajı`) and the report action. Clicking
+  the card text also opens the page unless text is selected. The owner-only
+  `İhtiyacım karşılandı` and `Talebi güncelle` card buttons were removed; those actions
+  live on the page.
+- **Counts.** `messageCounts` (readable coordination and community messages, withdrawn
+  offers excluded) is projected per viewer for help posts; the local adapter keeps the
+  same counters and restores them for seed posts from saved messages.
+- **Requester notification.** A coordination change while the requester reads the
+  community tab now marks the coordination tab; community changes still mark only
+  moderators.
+- **Composer fixes found in the demo.** After a successful send the textarea, visibility
+  and message-kind selectors reset; the closed-request header shows the closure reason.
+
+### Verification
+
+- `npm run check:syntax` passes; `node lab/request-access-check.mjs` passes 52 of 52,
+  including the new help-call checks (author-only private coordination, outsider read and
+  write rejection, moderator read, ordinary posts rejecting the coordination channel).
+- Playwright card captures at 1440 and 390 px in local and shared modes: state chip,
+  need chips, counts and entry button render; no removed owner buttons; body click and
+  `Talebi aç` open the page; a help call opens with the `Yardım çağrısı` title and a
+  read-only coordination composer for non-authors; the outsider card contains no private
+  address. No console errors.
