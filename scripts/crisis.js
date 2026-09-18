@@ -277,6 +277,7 @@
     var titles = { all: 'Bölgeden güncellemeler', resmi: 'Resmî kaynaklardan', yardim: 'Açık yardım talepleri', dogrulanmis: 'Doğrulanmış bilgiler', dogrulanmamis: 'Doğrulanmamış bilgiler', mine: 'Yardım taleplerim' };
     var heading = $('#panel-crisis .clist__h');
     if (heading) heading.textContent = titles[state.filter] || titles.all;
+    if (M.renderSectionNote) M.renderSectionNote('crisis:' + (state.filter || 'all'));
     if (instant || M.motionOff()) return;
 
     nodes.forEach(function (n) {

@@ -15,9 +15,10 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8');
 
 const CSS = ['styles/tokens.css', 'styles/base.css', 'styles/feed.css',
-             'styles/crisis.css', 'styles/refine.css', 'styles/plain.css', 'styles/request-page.css'];
+             'styles/crisis.css', 'styles/refine.css', 'styles/plain.css', 'styles/request-page.css',
+             'styles/section-notes.css'];
 const JS = ['data/catalog.js', 'data/seed.js', 'scripts/transport.js', 'scripts/app.js', 'scripts/feed.js', 'scripts/crisis.js',
-            'scripts/imdat.js', 'scripts/request-thread.js', 'scripts/request-page.js', 'scripts/demo.js', 'scripts/simulation.js'];
+            'scripts/imdat.js', 'scripts/request-thread.js', 'scripts/request-page.js', 'scripts/section-notes.js', 'scripts/demo.js', 'scripts/simulation.js'];
 
 const ASSET_MIME = {
   '.avif': 'image/avif',

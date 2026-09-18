@@ -61,7 +61,6 @@
 .rp-tabs>button[aria-selected="true"]::after { content:""; position:absolute; bottom:-1px; height:3px; inset-inline:16px; border-radius:3px; background:var(--c-accent); }
 .rp-new-dot { height:7px; width:7px; border-radius:50%; background:var(--c-accent); }
 .rp-conversation { max-width:880px; margin:auto; padding:0 4px; }
-.rp-channel-note { color:var(--c-text-2); font-size:12px; line-height:1.6; padding:16px 0 6px; }
 .rp-message { display:flex; gap:12px; padding:24px 0; border-bottom:1px solid var(--c-border); scroll-margin-top:160px; }
 .rp-message--reply { margin-left:46px; position:relative; }
 .rp-message--reply::before { content:""; position:absolute; left:-27px; top:0; width:15px; height:39px; border-left:1px solid var(--c-border); border-bottom:1px solid var(--c-border); border-radius:0 0 0 7px; }
@@ -115,7 +114,7 @@
   .rp-statement-body { padding:0 14px 14px; }.rp-statement-body>p { font-size:14px; }.rp-fields { grid-template-columns:1fr; }
   .rp-tabs { margin-top:4px; }.rp-tabs>button { flex:1; min-width:0; padding:10px 8px; gap:7px; font-size:13px; min-height:60px; }
   .rp-tabs>button>span { max-width:130px; }.rp-tabs>button::after { inset-inline:4px!important; }
-  .rp-conversation { padding:0; }.rp-channel-note { font-size:11px; padding:12px 0 2px; }
+  .rp-conversation { padding:0; }
   .rp-message { padding:18px 0; gap:9px; }.rp-message--reply { margin-left:18px; }.rp-message--reply::before { left:-12px; width:8px; height:32px; }
   .rp-avatar { width:30px; height:30px; flex-basis:30px; font-size:11px; }.rp-audience { margin-left:0; }
   .rp-message-meta { font-size:11px; gap:3px 8px; }.rp-message-meta>b { font-size:13px; }.rp-message p { font-size:14px; line-height:1.65; }

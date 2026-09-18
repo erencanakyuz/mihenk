@@ -12,7 +12,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~305 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~306 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -1762,7 +1762,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .rp-tabs>button[aria-selected="true"]::after { content:""; position:absolute; bottom:-1px; height:3px; inset-inline:16px; border-radius:3px; background:var(--c-accent); }
 .rp-new-dot { height:7px; width:7px; border-radius:50%; background:var(--c-accent); }
 .rp-conversation { max-width:880px; margin:auto; padding:0 4px; }
-.rp-channel-note { color:var(--c-text-2); font-size:12px; line-height:1.6; padding:16px 0 6px; }
 .rp-message { display:flex; gap:12px; padding:24px 0; border-bottom:1px solid var(--c-border); scroll-margin-top:160px; }
 .rp-message--reply { margin-left:46px; position:relative; }
 .rp-message--reply::before { content:""; position:absolute; left:-27px; top:0; width:15px; height:39px; border-left:1px solid var(--c-border); border-bottom:1px solid var(--c-border); border-radius:0 0 0 7px; }
@@ -1816,7 +1815,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   .rp-statement-body { padding:0 14px 14px; }.rp-statement-body>p { font-size:14px; }.rp-fields { grid-template-columns:1fr; }
   .rp-tabs { margin-top:4px; }.rp-tabs>button { flex:1; min-width:0; padding:10px 8px; gap:7px; font-size:13px; min-height:60px; }
   .rp-tabs>button>span { max-width:130px; }.rp-tabs>button::after { inset-inline:4px!important; }
-  .rp-conversation { padding:0; }.rp-channel-note { font-size:11px; padding:12px 0 2px; }
+  .rp-conversation { padding:0; }
   .rp-message { padding:18px 0; gap:9px; }.rp-message--reply { margin-left:18px; }.rp-message--reply::before { left:-12px; width:8px; height:32px; }
   .rp-avatar { width:30px; height:30px; flex-basis:30px; font-size:11px; }.rp-audience { margin-left:0; }
   .rp-message-meta { font-size:11px; gap:3px 8px; }.rp-message-meta>b { font-size:13px; }.rp-message p { font-size:14px; line-height:1.65; }
@@ -1852,6 +1851,69 @@ ul { list-style: none; margin: 0; padding: 0; }
   .request-actions--entry .request-counts { width:100%; order:9; }
 }
 :root[data-plain="1"] .request-actions--entry .open-request { border:1px solid #fff; }
+
+/* ===== styles/section-notes.css ===== */
+/* ==========================================================================
+   MİHENK - bölüm açıklama şeridi (section notes)
+   Listenin üstünde duran, "Anladım" ile kapatılan kısa bilgilendirme.
+   Renk yalnızca sol kenar çizgisi ve %12 tonlama olarak taşınır; metin
+   normal metin renginde kaldığı için kontrast her tonda güvenli.
+   ========================================================================== */
+.snote {
+  --snote-c: var(--c-accent);
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px;
+  margin: 12px var(--pad-x) 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--snote-c);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--snote-c) 12%, transparent);
+}
+.snote[data-tone="official"]   { --snote-c: var(--v-official); }
+.snote[data-tone="verified"]   { --snote-c: var(--v-verified); }
+.snote[data-tone="unverified"] { --snote-c: var(--v-unverified); }
+
+.snote__t {
+  flex: 1 1 180px; min-width: 0; margin: 0;
+  color: var(--c-text); font-size: var(--fs-meta); line-height: 1.6;
+}
+.snote__ok {
+  flex: none; margin-left: auto;
+  display: inline-flex; align-items: center;
+  min-height: 38px; padding: 0 16px;
+  border: 1px solid color-mix(in srgb, var(--snote-c) 60%, var(--c-border));
+  border-radius: 999px;
+  background: transparent; color: var(--c-text);
+  font-size: var(--fs-meta); font-weight: 700;
+  transition: background-color 140ms var(--ease-out), border-color 140ms var(--ease-out);
+}
+.snote__ok:hover { background: color-mix(in srgb, var(--snote-c) 18%, transparent); }
+
+/* talep sayfası: şerit konuşma sütununun kendi hizasında durur */
+.rp-conversation > .snote { margin: 16px 0 4px; }
+
+@media (max-width: 700px) {
+  .snote { margin: 10px var(--pad-x) 2px; padding: 11px 12px; }
+  .rp-conversation > .snote { margin: 14px 0 2px; }
+}
+/* 320 px: metin tam satırı alır, düğme altına, metnin hizasına geçer */
+@media (max-width: 380px) {
+  .snote__ok { margin-left: 0; }
+}
+
+/* düz mod: tonlama yok, tek bir ince çerçeve kalır */
+:root[data-plain="1"] .snote {
+  display: block;
+  background: none;
+  border: 1px solid #777;
+  padding: 10px var(--pad-x);
+}
+:root[data-plain="1"] .snote__t { color: #fff; font-size: 15px; }
+:root[data-plain="1"] .snote__ok {
+  margin: 10px 0 0; width: auto;
+  border: 1px solid #777; color: #fff; font-weight: 400;
+}
+:root[data-plain="1"] .snote__ok:hover { background: none; }
 
 </style>
 
@@ -3431,6 +3493,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var titles = { all: 'Bölgeden güncellemeler', resmi: 'Resmî kaynaklardan', yardim: 'Açık yardım talepleri', dogrulanmis: 'Doğrulanmış bilgiler', dogrulanmamis: 'Doğrulanmamış bilgiler', mine: 'Yardım taleplerim' };
     var heading = $('#panel-crisis .clist__h');
     if (heading) heading.textContent = titles[state.filter] || titles.all;
+    if (M.renderSectionNote) M.renderSectionNote('crisis:' + (state.filter || 'all'));
     if (instant || M.motionOff()) return;
 
     nodes.forEach(function (n) {
@@ -4334,7 +4397,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back aria-label="Akışa dön">'+glyph('chevl')+'<span>Akışa dön</span></button><div><h1 tabindex="-1">'+pageTitle(p)+'</h1><span class="rp-id">#'+esc(p.id.slice(0,8))+'</span></div>'+(p.kind==='request'?'<span class="rp-state">'+glyph(p.status==='closed'?'lock':'clock')+(p.status==='closed'?'Talep kapalı'+({resolved:' · İhtiyaç karşılandı',withdrawn:' · Geri çekildi',duplicate:' · Mükerrer'}[p.closeReason]||''):'Talep açık')+'</span>':'')+'</header>'+statement(p)+
       (p.publicAccess==='restricted'?'<p class="rp-notice">'+glyph('lock')+'Bu talep yalnızca size ve yetkili moderatörlere açık.</p>':'')+
       '<div class="rp-tabs" role="tablist" aria-label="Talep konuşmaları">'+Object.keys(labels).map(function(channel){return '<button role="tab" id="rp-tab-'+channel+'" aria-controls="rp-panel" aria-selected="'+(page.channel===channel)+'" tabindex="'+(page.channel===channel?'0':'-1')+'" data-request-channel="'+channel+'">'+glyph(channel==='coordination'?'shield':'people')+'<span>'+labels[channel]+'</span>'+(page.unread[channel]?'<span class="rp-new-dot" aria-label="Yeni mesaj"></span>':'')+'</button>';}).join('')+'</div>'+
-      '<section class="rp-conversation" id="rp-panel" role="tabpanel" aria-labelledby="rp-tab-'+page.channel+'"><div class="rp-channel-note">'+(page.channel==='coordination'?(c.canReadPrivate?'Talep sahibi ve yetkili moderatörler arasında iletişim':'Herkese açık güncellemeler. Destek için Topluluk desteği sekmesini kullanın.'):'Yapabileceğiniz desteği ve güncel bilgileri paylaşın.')+'</div><p class="rp-connection" role="status" hidden></p><button class="rp-updates" data-refresh-request hidden>Yeni mesajlar · Güncelle</button>'+
+      '<section class="rp-conversation" id="rp-panel" role="tabpanel" aria-labelledby="rp-tab-'+page.channel+'">'+M.sectionNoteHTML('request:'+page.channel,(page.channel==='coordination'?(c.canReadPrivate?'Talep sahibi ve yetkili moderatörler arasında iletişim':'Herkese açık güncellemeler. Destek için Topluluk desteği sekmesini kullanın.'):'Yapabileceğiniz desteği ve güncel bilgileri paylaşın.'))+'<p class="rp-connection" role="status" hidden></p><button class="rp-updates" data-refresh-request hidden>Yeni mesajlar · Güncelle</button>'+
       (page.thread.nextMessageOffset!=null?'<button class="rp-earlier" data-earlier>Önceki mesajları göster</button>':'')+'<div class="rp-messages">'+messagesHTML()+'</div>'+composer()+'</section>'+
       (!M.shared?'<footer class="rp-local">Yerel prototip · Gerçek yardım iletilmez.</footer>':'');
     page.node.querySelectorAll('details[data-section]').forEach(function(n){n.addEventListener('toggle',function(){if(page)page.expanded[n.dataset.section]=n.open;});});
@@ -4453,6 +4516,109 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     document.addEventListener('visibilitychange',function(){if(!document.hidden&&page)load(false);});
   };
 })(window.MIHENK=window.MIHENK||{});
+
+/* ===== scripts/section-notes.js ===== */
+/* ==========================================================================
+   MİHENK - bölüm açıklamaları (section notes)
+   Her sekmenin listesinin hemen üstünde, oranın ne olduğunu ve orada nasıl
+   davranılacağını bir iki cümleyle söyleyen kısa bir şerit. "Anladım"
+   şeridi kapatır ve bunu bölüm başına hatırlar; okuyucu aynı açıklamayı
+   ikinci kez okumak zorunda kalmaz.
+   Renk yalnızca kenar çizgisi ve çok düşük yoğunluklu bir tonlama olarak
+   kullanılır: metin her zaman normal metin renginde kalır.
+   ========================================================================== */
+(function (M) {
+  'use strict';
+  var esc = M.CATALOG.esc;
+
+  /* tone: styles/section-notes.css içindeki data-tone eşleşmeleri */
+  var NOTES = {
+    foryou: { tone: 'accent', text: 'Genel akışın. Kriz bilgisi ve yardım çağrıları için Kriz Var sekmesine geç.' },
+    following: { tone: 'accent', text: 'Takip ettiğin hesapların paylaşımları.' },
+    'crisis:all': { tone: 'accent', text: 'Bölgeden gelen tüm paylaşımlar. Paylaşmadan önce doğrulama etiketine bak.' },
+    'crisis:resmi': { tone: 'official', text: 'Resmî kurum duyuruları. Yorumlar kapalıdır; bilgiyi olduğu gibi aktar.' },
+    'crisis:yardim': { tone: 'accent', text: 'Açık yardım talepleri. Destek verebiliyorsan talebi aç ve öneri yaz.' },
+    'crisis:dogrulanmis': { tone: 'verified', text: 'Birden fazla kaynakla doğrulanmış bilgiler. Paylaşırken kaynağı belirt.' },
+    'crisis:dogrulanmamis': { tone: 'unverified', text: 'Henüz doğrulanmamış bildirimler. Gördüysen “Ben de gördüm” de; yaymadan önce bekle.' },
+    'crisis:mine': { tone: 'accent', text: 'Kendi yardım taleplerin. Durumu güncelle, karşılandıysa kapat.' },
+    'request:coordination': { tone: 'accent' },
+    'request:community': { tone: 'verified' }
+  };
+
+  function dismissed(key) {
+    try { return localStorage.getItem('mihenk:note:' + key) === '1'; } catch (_) { return false; }
+  }
+  function remember(key) {
+    try { localStorage.setItem('mihenk:note:' + key, '1'); } catch (_) { /* özel mod: şerit bu oturumda kapanır */ }
+  }
+
+  /* Şeridin HTML'i. Metni olmayan bölümler (talep sayfası) metnini kendisi
+     verir, böylece oradaki mevcut açıklama aynen korunur. */
+  function sectionNoteHTML(key, text) {
+    var note = NOTES[key] || {};
+    var body = text || note.text || '';
+    if (!body || dismissed(key)) return '';
+    return '<div class="snote" role="note" data-note="' + esc(key) + '" data-tone="' + esc(note.tone || 'accent') + '">' +
+      '<p class="snote__t">' + esc(body) + '</p>' +
+      '<button class="snote__ok" type="button" data-note-ok="' + esc(key) + '">Anladım</button></div>';
+  }
+  M.sectionNoteHTML = sectionNoteHTML;
+
+  /* Şeridin listesinin üstüne girdiği yer */
+  function target(key) {
+    if (key === 'foryou' || key === 'following') {
+      var panel = M.panel && M.panel(key);
+      var list = panel && panel.querySelector('.feed__list');
+      return list ? { host: panel, anchor: list } : null;
+    }
+    if (key.indexOf('crisis:') === 0) {
+      var crisis = M.$('#panel-crisis'), clist = M.$('#clist');
+      return crisis && clist ? { host: crisis, anchor: clist } : null;
+    }
+    return null;
+  }
+
+  M.renderSectionNote = function (key) {
+    var spot = target(key);
+    if (!spot) return;
+    var current = spot.host.querySelector('.snote');
+    if (current) {
+      if (current.dataset.note === key) return;
+      current.remove();
+    }
+    var html = sectionNoteHTML(key);
+    if (html) spot.host.insertBefore(M.el(html), spot.anchor);
+  };
+
+  M.syncSectionNotes = function () {
+    M.renderSectionNote('foryou');
+    M.renderSectionNote('following');
+    if (M.$('#clist')) M.renderSectionNote('crisis:' + ((M.state && M.state.filter) || 'all'));
+  };
+
+  /* "Anladım": şeridi kaldır, odağı şeritten sonraki öğeye taşı. */
+  document.addEventListener('click', function (e) {
+    var button = e.target.closest('[data-note-ok]');
+    if (!button) return;
+    var strip = button.closest('.snote');
+    remember(button.dataset.noteOk);
+    if (!strip) return;
+    var focused = document.activeElement === button;
+    var next = null;
+    if (focused) {
+      next = M.$$('a[href], button:not([disabled]), input, select, textarea').filter(function (node) {
+        return !strip.contains(node) && node.offsetParent !== null &&
+          (strip.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING);
+      })[0];
+    }
+    strip.remove();
+    if (next) next.focus({ preventScroll: true });
+  });
+
+  M.on('tab', M.syncSectionNotes);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', M.syncSectionNotes);
+  else M.syncSectionNotes();
+})(window.MIHENK = window.MIHENK || {});
 
 /* ===== scripts/demo.js ===== */
 /* ==========================================================================

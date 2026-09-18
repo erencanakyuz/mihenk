@@ -1,0 +1,61 @@
+/* ==========================================================================
+   MİHENK - bölüm açıklama şeridi (section notes)
+   Listenin üstünde duran, "Anladım" ile kapatılan kısa bilgilendirme.
+   Renk yalnızca sol kenar çizgisi ve %12 tonlama olarak taşınır; metin
+   normal metin renginde kaldığı için kontrast her tonda güvenli.
+   ========================================================================== */
+.snote {
+  --snote-c: var(--c-accent);
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px;
+  margin: 12px var(--pad-x) 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--snote-c);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--snote-c) 12%, transparent);
+}
+.snote[data-tone="official"]   { --snote-c: var(--v-official); }
+.snote[data-tone="verified"]   { --snote-c: var(--v-verified); }
+.snote[data-tone="unverified"] { --snote-c: var(--v-unverified); }
+
+.snote__t {
+  flex: 1 1 180px; min-width: 0; margin: 0;
+  color: var(--c-text); font-size: var(--fs-meta); line-height: 1.6;
+}
+.snote__ok {
+  flex: none; margin-left: auto;
+  display: inline-flex; align-items: center;
+  min-height: 38px; padding: 0 16px;
+  border: 1px solid color-mix(in srgb, var(--snote-c) 60%, var(--c-border));
+  border-radius: 999px;
+  background: transparent; color: var(--c-text);
+  font-size: var(--fs-meta); font-weight: 700;
+  transition: background-color 140ms var(--ease-out), border-color 140ms var(--ease-out);
+}
+.snote__ok:hover { background: color-mix(in srgb, var(--snote-c) 18%, transparent); }
+
+/* talep sayfası: şerit konuşma sütununun kendi hizasında durur */
+.rp-conversation > .snote { margin: 16px 0 4px; }
+
+@media (max-width: 700px) {
+  .snote { margin: 10px var(--pad-x) 2px; padding: 11px 12px; }
+  .rp-conversation > .snote { margin: 14px 0 2px; }
+}
+/* 320 px: metin tam satırı alır, düğme altına, metnin hizasına geçer */
+@media (max-width: 380px) {
+  .snote__ok { margin-left: 0; }
+}
+
+/* düz mod: tonlama yok, tek bir ince çerçeve kalır */
+:root[data-plain="1"] .snote {
+  display: block;
+  background: none;
+  border: 1px solid #777;
+  padding: 10px var(--pad-x);
+}
+:root[data-plain="1"] .snote__t { color: #fff; font-size: 15px; }
+:root[data-plain="1"] .snote__ok {
+  margin: 10px 0 0; width: auto;
+  border: 1px solid #777; color: #fff; font-weight: 400;
+}
+:root[data-plain="1"] .snote__ok:hover { background: none; }
