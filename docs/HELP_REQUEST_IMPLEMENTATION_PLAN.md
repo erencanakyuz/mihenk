@@ -786,3 +786,32 @@ which competed with the new page, and the card offered no clear way in.
   `Talebi aç` open the page; a help call opens with the `Yardım çağrısı` title and a
   read-only coordination composer for non-authors; the outsider card contains no private
   address. No console errors.
+
+## 21. Follow-up: announcements, offers, filters (18 September 2026)
+
+Requested during the same review session and committed as `e0867a7`.
+
+- **Institutional announcements take no comments.** Posts whose verification is
+  `official` (non-request) reject `reply.create` on the server
+  (`Kurumsal duyurulara yorum yazılamaz.`), expose no `reply.create` action, show
+  `Kurumsal duyuru · Yorumlar kapalı` instead of a thread button on the crisis card,
+  hide the reply action on ordinary feed cards, and open the old modal read-only with the
+  same note. They are not help calls even when tagged `yardim`.
+- **Offer withdrawal.** The request page asks `Destek önerisi geri çekilsin mi?` in a
+  modal before sending `offer.withdraw`; withdrawn offers are removed from thread and
+  update projections and from the local adapter's counters, so no placeholder remains.
+- **Filters.** `Tümü` is gone; the chips are `Resmî · Yardım · Doğrulanmış ·
+  Doğrulanmamış · Taleplerim`, none pressed by default, each a toggle (pressing the
+  active chip returns to the full list). `M.setCrisisFilter(name, instant)` is the single
+  entry point used by the wizard, the simulation and the `#my-requests` shortcut. The
+  `Yardım` filter lists only structured requests (`need`), not information posts.
+  `dogrulanmamis` exists server side in the filter list, counts and operation schema.
+  Chips wrap instead of scrolling; mobile chips are 36 px high.
+- **Bilgi paylaş** matches the red request button in green (`#1f7f57`, white text,
+  4.9:1) and keeps its plain-mode outline.
+
+Verification: `npm run check:syntax` passes; `node lab/request-access-check.mjs` passes
+56 of 56 (adds withdrawn-offer removal, official-announcement rejection and the
+unverified filter); crisis head captures at 1440, 390 and 320 px show one chip row on
+desktop and two on phones with no horizontal scroll; the toggle returns to
+`Bölgeden güncellemeler`; the official card carries the closed-comments note.

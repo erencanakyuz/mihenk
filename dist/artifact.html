@@ -1844,7 +1844,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .request-actions--entry .open-request:hover { background:var(--c-accent-fill); filter:brightness(1.12); }
 .request-actions--entry .open-request:active { transform:scale(.97); }
 .request-actions--entry .offer-action { min-height:40px; padding:0 14px; border:1px solid var(--c-border); border-radius:999px; }
-.request-actions--entry .request-counts { color:var(--c-text-2); font-size:12px; line-height:1.5; }
+.request-actions .request-counts { color:var(--c-text-2); font-size:12px; line-height:1.5; }
 .request-actions--entry .report-action { margin-left:auto; }
 @media(max-width:700px){
   .cpost__state { width:100%; margin-left:0; padding-left:0; margin-top:4px; }
@@ -3258,7 +3258,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     if (topic && topic.value && p.tag !== topic.value) return false;
     switch (state.filter) {
       case 'resmi': return v === 'official';
-      case 'yardim': return p.tag === 'yardim' && !p.resolved;
+      case 'yardim': return !!p.need && !p.resolved;
       case 'dogrulanmis': return v === 'verified';
       case 'dogrulanmamis': return v === 'unverified';
       case 'mine': return p.uid === 'me' && p.tag === 'yardim';
@@ -3393,7 +3393,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var c = {
       all: all.length,
       resmi: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'official'; }).length,
-      yardim: all.filter(function (p) { return p.tag === 'yardim' && !p.resolved; }).length,
+      yardim: all.filter(function (p) { return !!p.need && !p.resolved; }).length,
       dogrulanmis: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'verified'; }).length,
       dogrulanmamis: all.filter(function (p) { return (state.verified[p.id] || p.v) === 'unverified'; }).length,
       mine: all.filter(function (p) { return p.uid === 'me' && p.tag === 'yardim'; }).length
