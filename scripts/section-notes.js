@@ -4,26 +4,30 @@
    davranılacağını bir iki cümleyle söyleyen kısa bir şerit. "Anladım"
    şeridi kapatır ve bunu bölüm başına hatırlar; okuyucu aynı açıklamayı
    ikinci kez okumak zorunda kalmaz.
-   Renk yalnızca kenar çizgisi ve çok düşük yoğunluklu bir tonlama olarak
-   kullanılır: metin her zaman normal metin renginde kalır.
+   Renk yalnızca üst kenarı kıran künye plakasında taşınır: plakanın metni
+   bölümün adı, şeridin metni ise her zaman normal metin renginde kalır.
    ========================================================================== */
 (function (M) {
   'use strict';
   var esc = M.CATALOG.esc;
 
-  /* tone: styles/section-notes.css içindeki data-tone eşleşmeleri */
+  /* tone: styles/section-notes.css içindeki data-tone eşleşmeleri
+     label: künye plakasında duran bölüm adı (sekmelerin kendi adlarıyla aynı) */
   var NOTES = {
-    foryou: { tone: 'accent', text: 'Genel akışın. Kriz bilgisi ve yardım çağrıları için Kriz Var sekmesine geç.' },
-    following: { tone: 'accent', text: 'Takip ettiğin hesapların paylaşımları.' },
-    'crisis:all': { tone: 'accent', text: 'Bölgeden gelen tüm paylaşımlar. Paylaşmadan önce doğrulama etiketine bak.' },
-    'crisis:resmi': { tone: 'official', text: 'Resmî kurum duyuruları. Yorumlar kapalıdır; bilgiyi olduğu gibi aktar.' },
-    'crisis:yardim': { tone: 'accent', text: 'Açık yardım talepleri. Destek verebiliyorsan talebi aç ve öneri yaz.' },
-    'crisis:dogrulanmis': { tone: 'verified', text: 'Birden fazla kaynakla doğrulanmış bilgiler. Paylaşırken kaynağı belirt.' },
-    'crisis:dogrulanmamis': { tone: 'unverified', text: 'Henüz doğrulanmamış bildirimler. Gördüysen “Ben de gördüm” de; yaymadan önce bekle.' },
-    'crisis:mine': { tone: 'accent', text: 'Kendi yardım taleplerin. Durumu güncelle, karşılandıysa kapat.' },
-    'request:coordination': { tone: 'accent' },
-    'request:community': { tone: 'verified' }
+    foryou: { tone: 'accent', label: 'Ana akış', text: 'Genel akışın. Kriz bilgisi ve yardım çağrıları için Kriz Var sekmesine geç.' },
+    following: { tone: 'accent', label: 'Takip', text: 'Takip ettiğin hesapların paylaşımları.' },
+    'crisis:all': { tone: 'accent', label: 'Bölgeden güncellemeler', text: 'Bölgeden gelen tüm paylaşımlar. Paylaşmadan önce doğrulama etiketine bak.' },
+    'crisis:resmi': { tone: 'official', label: 'Resmî duyurular', text: 'Resmî kurum duyuruları. Yorumlar kapalıdır; bilgiyi olduğu gibi aktar.' },
+    'crisis:yardim': { tone: 'accent', label: 'Yardım talepleri', text: 'Açık yardım talepleri. Destek verebiliyorsan talebi aç ve öneri yaz.' },
+    'crisis:dogrulanmis': { tone: 'verified', label: 'Doğrulanmış bilgi', text: 'Birden fazla kaynakla doğrulanmış bilgiler. Paylaşırken kaynağı belirt.' },
+    'crisis:dogrulanmamis': { tone: 'unverified', label: 'Doğrulanmamış', text: 'Henüz doğrulanmamış bildirimler. Gördüysen “Ben de gördüm” de; yaymadan önce bekle.' },
+    'crisis:mine': { tone: 'accent', label: 'Taleplerim', text: 'Kendi yardım taleplerin. Durumu güncelle, karşılandıysa kapat.' },
+    'request:coordination': { tone: 'accent', label: 'Yetkililerle iletişim' },
+    'request:community': { tone: 'verified', label: 'Topluluk desteği' }
   };
+
+  /* plakanın ikonu tonun anlamını taşır */
+  var TONE_ICON = { accent: 'exclam', official: 'shield', verified: 'checkc', unverified: 'questionc' };
 
   function dismissed(key) {
     try { return localStorage.getItem('mihenk:note:' + key) === '1'; } catch (_) { return false; }
@@ -38,8 +42,12 @@
     var note = NOTES[key] || {};
     var body = text || note.text || '';
     if (!body || dismissed(key)) return '';
-    return '<div class="snote" role="note" data-note="' + esc(key) + '" data-tone="' + esc(note.tone || 'accent') + '">' +
-      '<p class="snote__t">' + esc(body) + '</p>' +
+    var tone = note.tone || 'accent';
+    var plate = note.label
+      ? '<span class="kunye">' + M.icon(TONE_ICON[tone] || TONE_ICON.accent, 'ic--sm') + esc(note.label) + '</span>'
+      : '';
+    return '<div class="snote" role="note" data-note="' + esc(key) + '" data-tone="' + esc(tone) + '">' +
+      plate + '<p class="snote__t">' + esc(body) + '</p>' +
       '<button class="snote__ok" type="button" data-note-ok="' + esc(key) + '">Anladım</button></div>';
   }
   M.sectionNoteHTML = sectionNoteHTML;

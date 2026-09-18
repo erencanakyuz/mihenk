@@ -92,7 +92,7 @@
 :root[data-plain="1"] .crisis-actions .btn { margin: 0; width: 100%; min-height: 44px; font-size: 15px; }
 :root[data-plain="1"] .chip { border: 1px solid #666; }
 :root[data-plain="1"] .chip[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
-:root[data-plain="1"] .pin { border: 2px solid var(--c-accent); background: none; }
+:root[data-plain="1"] .pin { margin-top: 12px; border: 2px solid var(--c-accent); background: none; }
 :root[data-plain="1"] .btn { border: 2px solid currentColor; }
 
 /* byte-size comparison chip */

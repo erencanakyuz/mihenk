@@ -26,12 +26,17 @@
 .rp-verification[data-verification="disputed"] { color:var(--v-disputed); }
 .rp-facts { display:flex; flex-wrap:wrap; gap:8px 24px; margin:12px 0 20px; font-size:13px; color:var(--c-text-2); }
 .rp-facts>span { display:flex; align-items:center; gap:7px; }
-.rp-statement { border:1px solid var(--c-border); border-left:3px solid var(--c-accent); border-radius:10px; background:var(--c-bg-2); }
+/* Beyan kartının kimliği künye plakasında durur (styles/base.css .kunye);
+   sol kenar çizgisi kaldırıldı, kart plakanın yarısı kadar boşluk bırakır. */
+.rp-statement { position:relative; margin-top:13px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
 .request-page summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:14px 18px; min-height:48px; }
 .request-page summary::-webkit-details-marker { display:none; }
 .request-page summary>.ic:last-child { margin-left:auto; transition:transform .15s; }
 .request-page details[open]>summary>.ic:last-child { transform:rotate(180deg); }
-.rp-statement>summary { flex-wrap:wrap; }
+/* plaka üst kenarda durduğu için özet satırı biraz aşağıdan başlar */
+.rp-statement>summary { flex-wrap:wrap; padding-top:20px; }
+/* düz mod: plaka akışa girer ve kendi satırını alır */
+:root[data-plain="1"] .rp-statement>summary>.kunye { flex:1 0 100%; order:-1; }
 .rp-statement-author { display:flex; align-items:center; gap:12px; }
 .rp-statement-author strong { display:block; font-size:14px; font-weight:600; }
 .rp-statement-author small { display:block; color:var(--c-text-2); margin-top:3px; font-size:12px; }
@@ -131,7 +136,7 @@
   .rp-message-actions>button { min-height:44px; }.rp-parent { padding:6px 0; }.rp-statement-peek { padding-left:39px; }
   .rp-overview { padding-top:18px; }.rp-overview h2 { font-size:19px; }.rp-overview-title { gap:7px; }
   .rp-verification { font-size:11px; }.rp-facts { gap:7px 14px; margin:10px 0 14px; font-size:12px; }
-  .request-page summary { padding:12px; }.rp-statement-author { gap:9px; }.rp-statement-author strong { font-size:13px; }.rp-statement-author small { font-size:11px; }
+  .request-page summary { padding:12px; }.rp-statement>summary { padding-top:19px; }.rp-statement-author { gap:9px; }.rp-statement-author strong { font-size:13px; }.rp-statement-author small { font-size:11px; }
   .rp-statement-body { padding:0 14px 14px; }.rp-statement-body>p { font-size:14px; }.rp-fields { grid-template-columns:1fr; }
   .rp-tabs { margin-top:4px; }.rp-tabs>button { flex:1; min-width:0; padding:10px 8px; gap:7px; font-size:13px; min-height:60px; }
   .rp-tabs>button>span { max-width:130px; }.rp-tabs>button::after { inset-inline:4px!important; }

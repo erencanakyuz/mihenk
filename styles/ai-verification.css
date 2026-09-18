@@ -1,0 +1,14 @@
+/* AI verification note on information posts: a labelled prototype block, not a result. */
+.ai-note { margin: 12px 0 4px; padding: 12px 14px; border: 1px dashed var(--c-border); border-radius: 10px; background: var(--c-bg-2); color: var(--c-text-2); font-size: 13px; }
+.ai-note__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
+.ai-note__tag { font-weight: 700; color: var(--c-text); }
+.ai-note__state { font-weight: 600; color: var(--c-accent); }
+.ai-note[data-ai="queued"] .ai-note__state { color: var(--v-unverified); }
+.ai-note[data-ai="reviewed"] .ai-note__state { color: var(--v-verified); }
+.ai-note p { margin: 6px 0 10px; line-height: 1.55; }
+.ai-note__legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 12px; }
+.ai-note__legend li { display: inline-flex; align-items: center; gap: 6px; }
+.ai-note__legend li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #8a93a5; }
+.ai-note__legend li[data-verdict="true"]::before { background: var(--v-verified); }
+.ai-note__legend li[data-verdict="false"]::before { background: var(--v-disputed); }
+:root[data-plain="1"] .ai-note { border-color: #777; background: #000; }

@@ -21,7 +21,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~307 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~309 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -651,6 +651,45 @@ ul { list-style: none; margin: 0; padding: 0; }
 .btn--lg { height: 52px; font-size: 17px; padding: 0 24px; }
 .btn--block { width: 100%; }
 
+/* ---- künye plakası ------------------------------------------------------
+   Vurgulu kartın kimliği, kartın üst kenarını kıran dolu bir plakada durur:
+   dosyalanmış bir evrak sekmesi gibi. Renk yalnızca plakada; kartın kendisi
+   sakin kalır ve hiçbir yerde dikey renkli kenar kullanılmaz. Dolu renk +
+   koyu mürekkep, akıştaki doğrulama pilleriyle (.vpill) aynı dili konuşur.
+   Plaka kartın dışına taştığı için taşıyıcı kart position:relative olmak ve
+   üstünde 13 px boşluk bırakmak zorundadır.
+   ------------------------------------------------------------------------ */
+.kunye {
+  --kunye-c: var(--c-accent-fill);
+  --kunye-ink: var(--c-accent-ink);
+  position: absolute; z-index: 1;
+  top: 0; left: 16px;
+  transform: translateY(-50%);
+  display: inline-flex; align-items: center; gap: 7px;
+  max-width: calc(100% - 32px);
+  height: 26px; padding: 0 11px;
+  border-radius: 5px;
+  background: var(--kunye-c); color: var(--kunye-ink);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, .45);
+  font-family: var(--ff-display);
+  font-size: 12.5px; font-weight: 700; line-height: 1;
+  letter-spacing: 0; text-transform: none; white-space: nowrap;
+  overflow: hidden;
+}
+.kunye .ic { width: 14px; height: 14px; stroke-width: 2.4; }
+/* doğrulama tonları: dolu zemin + koyu mürekkep (bkz. tools/contrast.mjs) */
+.kunye[data-tone="official"]   { --kunye-c: var(--v-official);   --kunye-ink: #11151c; }
+.kunye[data-tone="verified"]   { --kunye-c: var(--v-verified);   --kunye-ink: #12130f; }
+.kunye[data-tone="unverified"] { --kunye-c: var(--v-unverified); --kunye-ink: #12130f; }
+.kunye[data-tone="disputed"]   { --kunye-c: var(--v-disputed);   --kunye-ink: #12130f; }
+/* düz mod: plaka sıradan bir satır etiketine döner, hiçbir şeyi kırmaz */
+:root[data-plain="1"] .kunye {
+  position: static; transform: none;
+  height: auto; max-width: none; padding: 0; margin-bottom: 6px;
+  border-radius: 0; background: none; color: #fff; box-shadow: none;
+  font-family: inherit; font-size: 15px; white-space: normal;
+}
+
 /* ---- toast ------------------------------------------------------------- */
 .toast-layer {
   position: fixed; inset: 0 0 auto 0; z-index: 120;
@@ -1062,18 +1101,15 @@ ul { list-style: none; margin: 0; padding: 0; }
 @keyframes pin-out { from { transform: scaleY(1); opacity: 1; } to { transform: scaleY(.02); opacity: 0; } }
 
 .pin {
-  margin: 12px var(--pad-x);
+  position: relative;
+  margin: 25px var(--pad-x) 12px;
   border: 1px solid var(--c-border);
-  border-left: 3px solid var(--c-accent);
   background: var(--c-bg-2);
   border-radius: 16px;
   padding: 14px 16px 16px;
 }
-.pin__k {
-  display: flex; align-items: center; gap: 8px;
-  color: var(--c-accent); font-weight: 800; font-size: var(--fs-meta);
-  letter-spacing: .1em; text-transform: uppercase;
-}
+/* künye plakası: biçim styles/base.css'teki .kunye'den gelir */
+.pin__k { gap: 8px; }
 .pin__k .ic { animation: warn-pulse var(--pulse-dur, 2s) ease-in-out infinite; }
 .pin__t { font-size: 17px; font-weight: 700; margin-top: 6px; letter-spacing: -.01em; }
 .pin__s { font-size: var(--fs-body); color: var(--c-text-2); margin-top: 2px; }
@@ -1152,8 +1188,12 @@ ul { list-style: none; margin: 0; padding: 0; }
 .vpill--unverified { background: var(--v-unverified); }
 .vpill--disputed   { background: var(--v-disputed); }
 .vpill__t { color: inherit; }
-/* the coloured left slab makes the state readable without reading text */
-.cpost { border-left: 3px solid var(--c-border); }
+/* Doğrulama şeridi: buradaki renk süs değil, bilgi - kartın durumu metin
+   okumadan anlaşılır. Künye plakasına geçildikten sonra sistemde başka
+   hiçbir yerde dikey renkli kenar kalmadığı için şerit bir üsluptan çıkıp
+   veri kanalına dönüşüyor: 3 px yerine 4 px, sol köşeler yarıçapsız, yani
+   kartın kenarına gömülü tam boy dolu bir kanal. */
+.cpost { border-left: 4px solid var(--c-border); border-radius: 0 14px 14px 0; padding-left: 18px; }
 .cpost[data-v="verified"]   { border-left-color: var(--v-verified); }
 .cpost[data-v="official"]   { border-left-color: var(--v-official); }
 .cpost[data-v="unverified"] { border-left-color: var(--v-unverified); }
@@ -1373,7 +1413,8 @@ ul { list-style: none; margin: 0; padding: 0; }
 .crisis-intro { padding: 18px 16px 0; }
 .crisis-intro h1 { font: 700 25px/1.2 var(--ff-display); letter-spacing: -.6px; margin: 8px 0; }
 .crisis-intro p { color: var(--c-text-2); font-size: 14px; line-height: 22px; margin: 0; }
-.scenario-label { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--c-accent); }
+/* biçimini .kunye taşır (styles/base.css); burada yalnızca akıştaki yeri kalır */
+.scenario-label { align-items: center; gap: 7px; }
 .crisis-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px; }
 .crisis-actions .sos { width: 100%; margin: 0; height: auto; min-height: 50px; font-size: 14px; letter-spacing: 0; font-weight: 650; background: #b8374c; color: #fff; }
 .crisis-actions .btn { border-radius: 12px; font-size: 14px; }
@@ -1389,8 +1430,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .cpost__why, .cpost__verify { min-height: 36px; }
 .vpill { height: 25px; font-size: 11px; font-weight: 650; letter-spacing: 0; padding: 0 9px; }
 .vpill .ic { width: 14px; height: 14px; }
-.pin { margin: 16px 0; border-left-width: 1px; padding: 20px; }
-.pin__k { letter-spacing: 0; text-transform: none; }
+.pin { margin: 29px 0 16px; padding: 20px; }
 .pin__go { border-radius: 10px; }
 .flow__step { position: relative; inset: auto; }
 .modal { max-height: calc(100dvh - 40px); overflow-y: auto; }
@@ -1455,7 +1495,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   .act__n { font-size: 11px; }
   .crisis-actions { gap: 8px; padding: 12px; }
   .crisis-actions .sos, .crisis-actions .btn { font-size: 12px; }
-  .pin { margin: 12px; }
+  .pin { margin: 25px 12px 12px; }
   .lab-stats div { padding: 8px; }
 }
 :root[data-plain="1"] .prototype-banner { background: #000; color: #fff; }
@@ -1553,17 +1593,17 @@ ul { list-style: none; margin: 0; padding: 0; }
    treatment as .pin, one notch warmer: a soft lift off the page, roomier
    padding and the two action buttons sitting inside the card.
    ========================================================================== */
+/* Künye plakası üst kenarı kırdığı için kart konumlanır ve üstünde plakanın
+   yarısı kadar boşluk bırakır; sol kenar çizgisi kaldırıldı. */
 .crisis-card {
-  margin: 14px var(--pad-x) 12px;
+  position: relative;
+  margin: 27px var(--pad-x) 12px;
   border: 1px solid var(--c-border);
-  border-left: 1px solid var(--c-accent);
   border-radius: 16px;
   background: linear-gradient(180deg, var(--c-bg-3) 0%, var(--c-bg-2) 58%);
   box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
-  overflow: hidden;
 }
 .crisis-card .crisis-intro { padding: 18px 18px 0; }
-.crisis-card .scenario-label { font-weight: 700; letter-spacing: .01em; }
 .crisis-card .crisis-intro h1 { font-size: 23px; margin: 8px 0 5px; }
 /* the shared read-only view keeps its bigger headline */
 [data-shared="1"] .crisis-card .crisis-intro h1 { font-size: clamp(24px, 5vw, 32px); }
@@ -1695,7 +1735,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 :root[data-plain="1"] .crisis-actions .btn { margin: 0; width: 100%; min-height: 44px; font-size: 15px; }
 :root[data-plain="1"] .chip { border: 1px solid #666; }
 :root[data-plain="1"] .chip[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
-:root[data-plain="1"] .pin { border: 2px solid var(--c-accent); background: none; }
+:root[data-plain="1"] .pin { margin-top: 12px; border: 2px solid var(--c-accent); background: none; }
 :root[data-plain="1"] .btn { border: 2px solid currentColor; }
 
 /* byte-size comparison chip */
@@ -1789,12 +1829,17 @@ ul { list-style: none; margin: 0; padding: 0; }
 .rp-verification[data-verification="disputed"] { color:var(--v-disputed); }
 .rp-facts { display:flex; flex-wrap:wrap; gap:8px 24px; margin:12px 0 20px; font-size:13px; color:var(--c-text-2); }
 .rp-facts>span { display:flex; align-items:center; gap:7px; }
-.rp-statement { border:1px solid var(--c-border); border-left:3px solid var(--c-accent); border-radius:10px; background:var(--c-bg-2); }
+/* Beyan kartının kimliği künye plakasında durur (styles/base.css .kunye);
+   sol kenar çizgisi kaldırıldı, kart plakanın yarısı kadar boşluk bırakır. */
+.rp-statement { position:relative; margin-top:13px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
 .request-page summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:14px 18px; min-height:48px; }
 .request-page summary::-webkit-details-marker { display:none; }
 .request-page summary>.ic:last-child { margin-left:auto; transition:transform .15s; }
 .request-page details[open]>summary>.ic:last-child { transform:rotate(180deg); }
-.rp-statement>summary { flex-wrap:wrap; }
+/* plaka üst kenarda durduğu için özet satırı biraz aşağıdan başlar */
+.rp-statement>summary { flex-wrap:wrap; padding-top:20px; }
+/* düz mod: plaka akışa girer ve kendi satırını alır */
+:root[data-plain="1"] .rp-statement>summary>.kunye { flex:1 0 100%; order:-1; }
 .rp-statement-author { display:flex; align-items:center; gap:12px; }
 .rp-statement-author strong { display:block; font-size:14px; font-weight:600; }
 .rp-statement-author small { display:block; color:var(--c-text-2); margin-top:3px; font-size:12px; }
@@ -1894,7 +1939,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   .rp-message-actions>button { min-height:44px; }.rp-parent { padding:6px 0; }.rp-statement-peek { padding-left:39px; }
   .rp-overview { padding-top:18px; }.rp-overview h2 { font-size:19px; }.rp-overview-title { gap:7px; }
   .rp-verification { font-size:11px; }.rp-facts { gap:7px 14px; margin:10px 0 14px; font-size:12px; }
-  .request-page summary { padding:12px; }.rp-statement-author { gap:9px; }.rp-statement-author strong { font-size:13px; }.rp-statement-author small { font-size:11px; }
+  .request-page summary { padding:12px; }.rp-statement>summary { padding-top:19px; }.rp-statement-author { gap:9px; }.rp-statement-author strong { font-size:13px; }.rp-statement-author small { font-size:11px; }
   .rp-statement-body { padding:0 14px 14px; }.rp-statement-body>p { font-size:14px; }.rp-fields { grid-template-columns:1fr; }
   .rp-tabs { margin-top:4px; }.rp-tabs>button { flex:1; min-width:0; padding:10px 8px; gap:7px; font-size:13px; min-height:60px; }
   .rp-tabs>button>span { max-width:130px; }.rp-tabs>button::after { inset-inline:4px!important; }
@@ -1943,22 +1988,27 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* ==========================================================================
    MİHENK - bölüm açıklama şeridi (section notes)
    Listenin üstünde duran, "Anladım" ile kapatılan kısa bilgilendirme.
-   Renk yalnızca sol kenar çizgisi ve %12 tonlama olarak taşınır; metin
-   normal metin renginde kaldığı için kontrast her tonda güvenli.
+   Renk yalnızca üst kenarı kıran künye plakasında taşınır; şeridin kendisi
+   sakin bir kart yüzeyi olarak kalır ve metin normal metin renginde durduğu
+   için kontrast her tonda güvenli.
    ========================================================================== */
 .snote {
   --snote-c: var(--c-accent);
+  position: relative;
   display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px;
-  margin: 12px var(--pad-x) 2px;
-  padding: 12px 14px;
+  margin: 25px var(--pad-x) 2px;
+  padding: 14px;
   border: 1px solid var(--c-border);
-  border-left: 3px solid var(--snote-c);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--snote-c) 12%, transparent);
+  background: var(--c-bg-2);
 }
 .snote[data-tone="official"]   { --snote-c: var(--v-official); }
 .snote[data-tone="verified"]   { --snote-c: var(--v-verified); }
 .snote[data-tone="unverified"] { --snote-c: var(--v-unverified); }
+/* plakanın tonu şeridin tonundan gelir: markup'ta ikinci bir data-tone yok */
+.snote[data-tone="official"] .kunye   { --kunye-c: var(--v-official);   --kunye-ink: #11151c; }
+.snote[data-tone="verified"] .kunye   { --kunye-c: var(--v-verified);   --kunye-ink: #12130f; }
+.snote[data-tone="unverified"] .kunye { --kunye-c: var(--v-unverified); --kunye-ink: #12130f; }
 
 .snote__t {
   flex: 1 1 180px; min-width: 0; margin: 0;
@@ -1977,20 +2027,21 @@ ul { list-style: none; margin: 0; padding: 0; }
 .snote__ok:hover { background: color-mix(in srgb, var(--snote-c) 18%, transparent); }
 
 /* talep sayfası: şerit konuşma sütununun kendi hizasında durur */
-.rp-conversation > .snote { margin: 16px 0 4px; }
+.rp-conversation > .snote { margin: 29px 0 4px; }
 
 @media (max-width: 700px) {
-  .snote { margin: 10px var(--pad-x) 2px; padding: 11px 12px; }
-  .rp-conversation > .snote { margin: 14px 0 2px; }
+  .snote { margin: 23px var(--pad-x) 2px; padding: 13px 12px; }
+  .rp-conversation > .snote { margin: 27px 0 2px; }
 }
 /* 320 px: metin tam satırı alır, düğme altına, metnin hizasına geçer */
 @media (max-width: 380px) {
   .snote__ok { margin-left: 0; }
 }
 
-/* düz mod: tonlama yok, tek bir ince çerçeve kalır */
+/* düz mod: tonlama yok, plaka düz bir satır etiketine döner, ince çerçeve kalır */
 :root[data-plain="1"] .snote {
   display: block;
+  margin-top: 12px;
   background: none;
   border: 1px solid #777;
   padding: 10px var(--pad-x);
@@ -2001,6 +2052,22 @@ ul { list-style: none; margin: 0; padding: 0; }
   border: 1px solid #777; color: #fff; font-weight: 400;
 }
 :root[data-plain="1"] .snote__ok:hover { background: none; }
+
+/* ===== styles/ai-verification.css ===== */
+/* AI verification note on information posts: a labelled prototype block, not a result. */
+.ai-note { margin: 12px 0 4px; padding: 12px 14px; border: 1px dashed var(--c-border); border-radius: 10px; background: var(--c-bg-2); color: var(--c-text-2); font-size: 13px; }
+.ai-note__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
+.ai-note__tag { font-weight: 700; color: var(--c-text); }
+.ai-note__state { font-weight: 600; color: var(--c-accent); }
+.ai-note[data-ai="queued"] .ai-note__state { color: var(--v-unverified); }
+.ai-note[data-ai="reviewed"] .ai-note__state { color: var(--v-verified); }
+.ai-note p { margin: 6px 0 10px; line-height: 1.55; }
+.ai-note__legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 12px; }
+.ai-note__legend li { display: inline-flex; align-items: center; gap: 6px; }
+.ai-note__legend li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #8a93a5; }
+.ai-note__legend li[data-verdict="true"]::before { background: var(--v-verified); }
+.ai-note__legend li[data-verdict="false"]::before { background: var(--v-disputed); }
+:root[data-plain="1"] .ai-note { border-color: #777; background: #000; }
 
 </style>
 
@@ -3440,7 +3507,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var head = el(
       '<div class="crisis-head">' +
         '<div class="crisis-card">' +
-        '<div class="crisis-intro"><span class="scenario-label">' + icon('shield', 'ic--sm') + 'Kriz bilgi merkezi</span>' +
+        '<div class="crisis-intro"><span class="scenario-label kunye">' + icon('shield', 'ic--sm') + 'Kriz bilgi merkezi</span>' +
         '<h1>' + (M.shared ? esc(M.sharedView.title) : 'Kahramanmaraş depremi') + '</h1><p>Bölgeni seç, güvenilir bilgiyi takip et.</p></div>' +
         '<div class="crisis-actions">' +
         '<button class="sos" id="sos" type="button">' + icon('sos') +
@@ -3817,7 +3884,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   /* ------------------------------------------------------- pinned card */
   function pinHTML() {
     return '<div class="pin-wrap"><div class="pin" role="region" aria-label="Kriz bildirimi">' +
-      '<div class="pin__k">' + icon('shield', 'ic--sm') + '<span>' + (M.shared ? 'Kriz bilgi alanı' : 'Kriz bilgi alanı · Tatbikat') + '</span></div>' +
+      '<div class="pin__k kunye">' + icon('shield', 'ic--sm') + '<span>' + (M.shared ? 'Kriz bilgi alanı' : 'Kriz bilgi alanı · Tatbikat') + '</span></div>' +
       '<div class="pin__t">' + (M.shared ? esc(M.sharedView.title) : 'Kahramanmaraş deprem senaryosu') + '</div>' +
       '<div class="pin__s">Doğrulanmış bilgi ve yardım çağrıları</div>' +
       '<button class="btn pin__go" type="button" data-goto-crisis>' +
@@ -4503,7 +4570,8 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var peek=statementText.replace(/\s+/g,' ').trim();
     return '<section class="rp-overview" aria-label="'+(p.kind==='request'?'Talep özeti':'Çağrı özeti')+'">'+(title?'<div class="rp-overview-title">'+title+chip+'</div>':'')+
       '<div class="rp-facts">'+(title?'':chip)+(p.kind==='request'?'<span>'+glyph('people')+(p.people==null?'Kişi sayısı henüz bilinmiyor':esc(p.people)+' kişi')+'</span>':'')+'<span>'+glyph('pin')+esc(p.kind==='request'?(p.publicLocationText||p.location.region||'Konum belirtilmedi'):([p.location.region,p.location.text].filter(Boolean).join(' · ')||'Konum belirtilmedi'))+'</span>'+(!p.location.known?'<span>'+glyph('questionc')+'Konum kesin değil</span>':'')+'</div>'+
-      detail('statement','<span class="rp-statement-author">'+avatar(p.author)+'<span><strong>'+(p.kind==='request'?(written?'Talep sahibinin beyanı':'Beyan eklenmedi'):'Çağrı metni')+'</strong><small>'+esc(p.author.name)+' · '+esc(date(p.updatedAt))+'</small></span></span>'+(peek?'<span class="rp-statement-peek">'+esc(peek)+'</span>':''),
+      /* Kartın kimliği üst kenarı kıran künye plakasında durur; özet satırında beyanın sahibi ve zamanı kalır. */
+      detail('statement','<span class="kunye">'+glyph('quill')+(p.kind==='request'?(written?'Talep sahibinin beyanı':'Beyan eklenmedi'):'Çağrı metni')+'</span><span class="rp-statement-author">'+avatar(p.author)+'<span><strong>'+esc(p.author.name)+'</strong><small>'+esc(date(p.updatedAt))+'</small></span></span>'+(peek?'<span class="rp-statement-peek">'+esc(peek)+'</span>':''),
       '<div class="rp-statement-body">'+(peek?'<p>'+esc(statementText)+'</p>':'<p class="rp-hint">Talep sahibi ek bir açıklama yazmadı. İhtiyaç başlıkları yukarıda görünür.</p>')+fields(p)+'</div>','rp-statement')+ownerActions(p)+management(p)+'</section>';
   }
   function messageHTML(m,indented){
@@ -4726,26 +4794,30 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
    davranılacağını bir iki cümleyle söyleyen kısa bir şerit. "Anladım"
    şeridi kapatır ve bunu bölüm başına hatırlar; okuyucu aynı açıklamayı
    ikinci kez okumak zorunda kalmaz.
-   Renk yalnızca kenar çizgisi ve çok düşük yoğunluklu bir tonlama olarak
-   kullanılır: metin her zaman normal metin renginde kalır.
+   Renk yalnızca üst kenarı kıran künye plakasında taşınır: plakanın metni
+   bölümün adı, şeridin metni ise her zaman normal metin renginde kalır.
    ========================================================================== */
 (function (M) {
   'use strict';
   var esc = M.CATALOG.esc;
 
-  /* tone: styles/section-notes.css içindeki data-tone eşleşmeleri */
+  /* tone: styles/section-notes.css içindeki data-tone eşleşmeleri
+     label: künye plakasında duran bölüm adı (sekmelerin kendi adlarıyla aynı) */
   var NOTES = {
-    foryou: { tone: 'accent', text: 'Genel akışın. Kriz bilgisi ve yardım çağrıları için Kriz Var sekmesine geç.' },
-    following: { tone: 'accent', text: 'Takip ettiğin hesapların paylaşımları.' },
-    'crisis:all': { tone: 'accent', text: 'Bölgeden gelen tüm paylaşımlar. Paylaşmadan önce doğrulama etiketine bak.' },
-    'crisis:resmi': { tone: 'official', text: 'Resmî kurum duyuruları. Yorumlar kapalıdır; bilgiyi olduğu gibi aktar.' },
-    'crisis:yardim': { tone: 'accent', text: 'Açık yardım talepleri. Destek verebiliyorsan talebi aç ve öneri yaz.' },
-    'crisis:dogrulanmis': { tone: 'verified', text: 'Birden fazla kaynakla doğrulanmış bilgiler. Paylaşırken kaynağı belirt.' },
-    'crisis:dogrulanmamis': { tone: 'unverified', text: 'Henüz doğrulanmamış bildirimler. Gördüysen “Ben de gördüm” de; yaymadan önce bekle.' },
-    'crisis:mine': { tone: 'accent', text: 'Kendi yardım taleplerin. Durumu güncelle, karşılandıysa kapat.' },
-    'request:coordination': { tone: 'accent' },
-    'request:community': { tone: 'verified' }
+    foryou: { tone: 'accent', label: 'Ana akış', text: 'Genel akışın. Kriz bilgisi ve yardım çağrıları için Kriz Var sekmesine geç.' },
+    following: { tone: 'accent', label: 'Takip', text: 'Takip ettiğin hesapların paylaşımları.' },
+    'crisis:all': { tone: 'accent', label: 'Bölgeden güncellemeler', text: 'Bölgeden gelen tüm paylaşımlar. Paylaşmadan önce doğrulama etiketine bak.' },
+    'crisis:resmi': { tone: 'official', label: 'Resmî duyurular', text: 'Resmî kurum duyuruları. Yorumlar kapalıdır; bilgiyi olduğu gibi aktar.' },
+    'crisis:yardim': { tone: 'accent', label: 'Yardım talepleri', text: 'Açık yardım talepleri. Destek verebiliyorsan talebi aç ve öneri yaz.' },
+    'crisis:dogrulanmis': { tone: 'verified', label: 'Doğrulanmış bilgi', text: 'Birden fazla kaynakla doğrulanmış bilgiler. Paylaşırken kaynağı belirt.' },
+    'crisis:dogrulanmamis': { tone: 'unverified', label: 'Doğrulanmamış', text: 'Henüz doğrulanmamış bildirimler. Gördüysen “Ben de gördüm” de; yaymadan önce bekle.' },
+    'crisis:mine': { tone: 'accent', label: 'Taleplerim', text: 'Kendi yardım taleplerin. Durumu güncelle, karşılandıysa kapat.' },
+    'request:coordination': { tone: 'accent', label: 'Yetkililerle iletişim' },
+    'request:community': { tone: 'verified', label: 'Topluluk desteği' }
   };
+
+  /* plakanın ikonu tonun anlamını taşır */
+  var TONE_ICON = { accent: 'exclam', official: 'shield', verified: 'checkc', unverified: 'questionc' };
 
   function dismissed(key) {
     try { return localStorage.getItem('mihenk:note:' + key) === '1'; } catch (_) { return false; }
@@ -4760,8 +4832,12 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var note = NOTES[key] || {};
     var body = text || note.text || '';
     if (!body || dismissed(key)) return '';
-    return '<div class="snote" role="note" data-note="' + esc(key) + '" data-tone="' + esc(note.tone || 'accent') + '">' +
-      '<p class="snote__t">' + esc(body) + '</p>' +
+    var tone = note.tone || 'accent';
+    var plate = note.label
+      ? '<span class="kunye">' + M.icon(TONE_ICON[tone] || TONE_ICON.accent, 'ic--sm') + esc(note.label) + '</span>'
+      : '';
+    return '<div class="snote" role="note" data-note="' + esc(key) + '" data-tone="' + esc(tone) + '">' +
+      plate + '<p class="snote__t">' + esc(body) + '</p>' +
       '<button class="snote__ok" type="button" data-note-ok="' + esc(key) + '">Anladım</button></div>';
   }
   M.sectionNoteHTML = sectionNoteHTML;
@@ -4820,6 +4896,65 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   M.on('tab', M.syncSectionNotes);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', M.syncSectionNotes);
   else M.syncSectionNotes();
+})(window.MIHENK = window.MIHENK || {});
+
+/* ===== scripts/ai-verification.js ===== */
+/* ==========================================================================
+   MİHENK - AI verification note (prototype placeholder)
+
+   Shows, on the moderator tab of an information post, where the planned
+   AI verification stands. Nothing is verified here: the block only mirrors
+   the queue rules so the presentation can show them. The model, its
+   sources and the server contract are a TODO (see the plan, section 25).
+   Priority rules mirrored:
+     1. posts older than one hour that no moderator has handled, oldest first
+     2. posts moderators already handled, oldest first
+     3. everything else, oldest first
+   ========================================================================== */
+(function (M) {
+  'use strict';
+  var HOUR = 60 * 60 * 1000;
+
+  function attention(p) { return ((p.messageCounts && p.messageCounts.coordination) || p.updates || 0) > 0; }
+  function ageOf(p) { var at = p.createdAt ? new Date(p.createdAt).getTime() : NaN; return isNaN(at) ? 0 : Date.now() - at; }
+
+  function status(p) {
+    if (attention(p)) return { key: 'reviewed', label: 'Moderatör değerlendirdi', text: 'Yapay zeka bu paylaşımı ikinci öncelikte yeniden tarar ve moderatör sonucuyla karşılaştırır.' };
+    if (ageOf(p) >= HOUR) return { key: 'queued', label: 'Yapay zeka sırasında', text: 'Bir saattir moderatör ilgilenmedi. Tanımlı kurum kaynakları taranıp bir etiket önerilecek (birinci öncelik).' };
+    return { key: 'waiting', label: 'Moderatör bekleniyor', text: 'Bir saat içinde moderatör ilgilenmezse yapay zeka kurum kaynaklarını tarayıp etiket önerir.' };
+  }
+
+  function html(p) {
+    var s = status(p);
+    return '<section class="ai-note" data-ai="' + s.key + '" aria-label="Yapay zeka doğrulaması">' +
+      '<div class="ai-note__head"><span class="ai-note__tag">Yapay zeka doğrulaması · Prototip</span><span class="ai-note__state">' + s.label + '</span></div>' +
+      '<p>' + s.text + '</p>' +
+      '<ul class="ai-note__legend" aria-label="Olası sonuçlar"><li data-verdict="true">Doğrulandı</li><li data-verdict="false">Yalan</li><li data-verdict="unclear">Muallak</li></ul>' +
+      '</section>';
+  }
+
+  function infoPost(p) { return !!p && !p.need && p.kind !== 'request' && p.v !== 'official' && p.verification !== 'official'; }
+
+  function place() {
+    var page = document.getElementById('request-page');
+    if (!page || !M.requestPageActive) return;
+    var host = page.querySelector('.rp-conversation');
+    if (!host) return;
+    var channel = new URLSearchParams(location.search).get('channel') || 'coordination';
+    var existing = host.querySelector('.ai-note');
+    var p = M.getPost ? M.getPost(M.requestPageActive) : null;
+    if (channel !== 'coordination' || !infoPost(p)) { if (existing) existing.remove(); return; }
+    var s = status(p);
+    if (existing) { if (existing.dataset.ai !== s.key) existing.outerHTML = html(p); return; }
+    var strip = host.querySelector('.snote'), node = M.el(html(p));
+    if (strip) strip.after(node); else host.prepend(node);
+  }
+
+  var frame = null;
+  function schedule() { if (frame) return; frame = requestAnimationFrame(function () { frame = null; place(); }); }
+  new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
+  window.addEventListener('popstate', schedule);
+  M.placeAiNote = place;
 })(window.MIHENK = window.MIHENK || {});
 
 /* ===== scripts/demo.js ===== */

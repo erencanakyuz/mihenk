@@ -56,7 +56,8 @@
     var peek=statementText.replace(/\s+/g,' ').trim();
     return '<section class="rp-overview" aria-label="'+(p.kind==='request'?'Talep özeti':'Çağrı özeti')+'">'+(title?'<div class="rp-overview-title">'+title+chip+'</div>':'')+
       '<div class="rp-facts">'+(title?'':chip)+(p.kind==='request'?'<span>'+glyph('people')+(p.people==null?'Kişi sayısı henüz bilinmiyor':esc(p.people)+' kişi')+'</span>':'')+'<span>'+glyph('pin')+esc(p.kind==='request'?(p.publicLocationText||p.location.region||'Konum belirtilmedi'):([p.location.region,p.location.text].filter(Boolean).join(' · ')||'Konum belirtilmedi'))+'</span>'+(!p.location.known?'<span>'+glyph('questionc')+'Konum kesin değil</span>':'')+'</div>'+
-      detail('statement','<span class="rp-statement-author">'+avatar(p.author)+'<span><strong>'+(p.kind==='request'?(written?'Talep sahibinin beyanı':'Beyan eklenmedi'):'Çağrı metni')+'</strong><small>'+esc(p.author.name)+' · '+esc(date(p.updatedAt))+'</small></span></span>'+(peek?'<span class="rp-statement-peek">'+esc(peek)+'</span>':''),
+      /* Kartın kimliği üst kenarı kıran künye plakasında durur; özet satırında beyanın sahibi ve zamanı kalır. */
+      detail('statement','<span class="kunye">'+glyph('quill')+(p.kind==='request'?(written?'Talep sahibinin beyanı':'Beyan eklenmedi'):'Çağrı metni')+'</span><span class="rp-statement-author">'+avatar(p.author)+'<span><strong>'+esc(p.author.name)+'</strong><small>'+esc(date(p.updatedAt))+'</small></span></span>'+(peek?'<span class="rp-statement-peek">'+esc(peek)+'</span>':''),
       '<div class="rp-statement-body">'+(peek?'<p>'+esc(statementText)+'</p>':'<p class="rp-hint">Talep sahibi ek bir açıklama yazmadı. İhtiyaç başlıkları yukarıda görünür.</p>')+fields(p)+'</div>','rp-statement')+ownerActions(p)+management(p)+'</section>';
   }
   function messageHTML(m,indented){

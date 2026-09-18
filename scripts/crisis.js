@@ -125,7 +125,7 @@
     var head = el(
       '<div class="crisis-head">' +
         '<div class="crisis-card">' +
-        '<div class="crisis-intro"><span class="scenario-label">' + icon('shield', 'ic--sm') + 'Kriz bilgi merkezi</span>' +
+        '<div class="crisis-intro"><span class="scenario-label kunye">' + icon('shield', 'ic--sm') + 'Kriz bilgi merkezi</span>' +
         '<h1>' + (M.shared ? esc(M.sharedView.title) : 'Kahramanmaraş depremi') + '</h1><p>Bölgeni seç, güvenilir bilgiyi takip et.</p></div>' +
         '<div class="crisis-actions">' +
         '<button class="sos" id="sos" type="button">' + icon('sos') +
@@ -502,7 +502,7 @@
   /* ------------------------------------------------------- pinned card */
   function pinHTML() {
     return '<div class="pin-wrap"><div class="pin" role="region" aria-label="Kriz bildirimi">' +
-      '<div class="pin__k">' + icon('shield', 'ic--sm') + '<span>' + (M.shared ? 'Kriz bilgi alanı' : 'Kriz bilgi alanı · Tatbikat') + '</span></div>' +
+      '<div class="pin__k kunye">' + icon('shield', 'ic--sm') + '<span>' + (M.shared ? 'Kriz bilgi alanı' : 'Kriz bilgi alanı · Tatbikat') + '</span></div>' +
       '<div class="pin__t">' + (M.shared ? esc(M.sharedView.title) : 'Kahramanmaraş deprem senaryosu') + '</div>' +
       '<div class="pin__s">Doğrulanmış bilgi ve yardım çağrıları</div>' +
       '<button class="btn pin__go" type="button" data-goto-crisis>' +

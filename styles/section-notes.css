@@ -1,22 +1,27 @@
 /* ==========================================================================
    MİHENK - bölüm açıklama şeridi (section notes)
    Listenin üstünde duran, "Anladım" ile kapatılan kısa bilgilendirme.
-   Renk yalnızca sol kenar çizgisi ve %12 tonlama olarak taşınır; metin
-   normal metin renginde kaldığı için kontrast her tonda güvenli.
+   Renk yalnızca üst kenarı kıran künye plakasında taşınır; şeridin kendisi
+   sakin bir kart yüzeyi olarak kalır ve metin normal metin renginde durduğu
+   için kontrast her tonda güvenli.
    ========================================================================== */
 .snote {
   --snote-c: var(--c-accent);
+  position: relative;
   display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px;
-  margin: 12px var(--pad-x) 2px;
-  padding: 12px 14px;
+  margin: 25px var(--pad-x) 2px;
+  padding: 14px;
   border: 1px solid var(--c-border);
-  border-left: 3px solid var(--snote-c);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--snote-c) 12%, transparent);
+  background: var(--c-bg-2);
 }
 .snote[data-tone="official"]   { --snote-c: var(--v-official); }
 .snote[data-tone="verified"]   { --snote-c: var(--v-verified); }
 .snote[data-tone="unverified"] { --snote-c: var(--v-unverified); }
+/* plakanın tonu şeridin tonundan gelir: markup'ta ikinci bir data-tone yok */
+.snote[data-tone="official"] .kunye   { --kunye-c: var(--v-official);   --kunye-ink: #11151c; }
+.snote[data-tone="verified"] .kunye   { --kunye-c: var(--v-verified);   --kunye-ink: #12130f; }
+.snote[data-tone="unverified"] .kunye { --kunye-c: var(--v-unverified); --kunye-ink: #12130f; }
 
 .snote__t {
   flex: 1 1 180px; min-width: 0; margin: 0;
@@ -35,20 +40,21 @@
 .snote__ok:hover { background: color-mix(in srgb, var(--snote-c) 18%, transparent); }
 
 /* talep sayfası: şerit konuşma sütununun kendi hizasında durur */
-.rp-conversation > .snote { margin: 16px 0 4px; }
+.rp-conversation > .snote { margin: 29px 0 4px; }
 
 @media (max-width: 700px) {
-  .snote { margin: 10px var(--pad-x) 2px; padding: 11px 12px; }
-  .rp-conversation > .snote { margin: 14px 0 2px; }
+  .snote { margin: 23px var(--pad-x) 2px; padding: 13px 12px; }
+  .rp-conversation > .snote { margin: 27px 0 2px; }
 }
 /* 320 px: metin tam satırı alır, düğme altına, metnin hizasına geçer */
 @media (max-width: 380px) {
   .snote__ok { margin-left: 0; }
 }
 
-/* düz mod: tonlama yok, tek bir ince çerçeve kalır */
+/* düz mod: tonlama yok, plaka düz bir satır etiketine döner, ince çerçeve kalır */
 :root[data-plain="1"] .snote {
   display: block;
+  margin-top: 12px;
   background: none;
   border: 1px solid #777;
   padding: 10px var(--pad-x);

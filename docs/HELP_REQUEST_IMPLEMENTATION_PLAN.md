@@ -917,3 +917,34 @@ Open design question raised by the owner after the merge: the thin colored left 
 the crisis head card, the pinned card, the statement card and the explainer strips reads
 as generic; alternatives are being explored in a separate design artifact before any
 further styling change.
+
+## 25. AI verification for information posts (TODO, UI placeholder only)
+
+Decided by the product owner on 18 September 2026 for the presentation; only the
+user-facing placeholder exists (`scripts/ai-verification.js`, `styles/ai-verification.css`).
+No model, no server contract, no automatic labelling runs yet.
+
+**Sources.** The model is given a fixed list of recognised public institutions and
+disaster-relief organisations as its research sources. It searches those sources and
+decides whether an information post is true, false or unclear.
+
+**Labels.** `Doğrulandı` (green), `Yalan` (red), `Muallak` (grey). Open design point:
+keep the AI verdict as a separate field and chip (`aiVerdict`) so it never overwrites the
+moderator or official verification state; the moderator verdict stays authoritative.
+
+**Priority queue** (the one-hour threshold is a first guess):
+1. Information posts published more than one hour ago that no moderator has handled,
+   oldest first.
+2. If none, posts that moderators have already handled, oldest to newest (re-check).
+3. If none, every information post in plain order, oldest to newest.
+
+**Placeholder behaviour today.** On the moderator tab of an information post the block
+`Yapay zeka doğrulaması · Prototip` shows one of three states derived from the same rules:
+`Moderatör bekleniyor` (younger than one hour, no moderator message), `Yapay zeka sırasında`
+(older than one hour, no moderator message) and `Moderatör değerlendirdi` (a moderator
+message exists), plus the three-label legend. Presentation note: the block is a promise of
+the mechanism, not a result.
+
+**Still to design.** Model prompt and provenance (which source supported the verdict),
+rate and cost limits, what happens when sources disagree, how a verdict is surfaced on the
+card and in the feed filters, and the audit record of each automatic label.

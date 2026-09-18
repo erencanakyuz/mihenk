@@ -35,7 +35,8 @@
 .crisis-intro { padding: 18px 16px 0; }
 .crisis-intro h1 { font: 700 25px/1.2 var(--ff-display); letter-spacing: -.6px; margin: 8px 0; }
 .crisis-intro p { color: var(--c-text-2); font-size: 14px; line-height: 22px; margin: 0; }
-.scenario-label { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--c-accent); }
+/* biçimini .kunye taşır (styles/base.css); burada yalnızca akıştaki yeri kalır */
+.scenario-label { align-items: center; gap: 7px; }
 .crisis-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px; }
 .crisis-actions .sos { width: 100%; margin: 0; height: auto; min-height: 50px; font-size: 14px; letter-spacing: 0; font-weight: 650; background: #b8374c; color: #fff; }
 .crisis-actions .btn { border-radius: 12px; font-size: 14px; }
@@ -51,8 +52,7 @@
 .cpost__why, .cpost__verify { min-height: 36px; }
 .vpill { height: 25px; font-size: 11px; font-weight: 650; letter-spacing: 0; padding: 0 9px; }
 .vpill .ic { width: 14px; height: 14px; }
-.pin { margin: 16px 0; border-left-width: 1px; padding: 20px; }
-.pin__k { letter-spacing: 0; text-transform: none; }
+.pin { margin: 29px 0 16px; padding: 20px; }
 .pin__go { border-radius: 10px; }
 .flow__step { position: relative; inset: auto; }
 .modal { max-height: calc(100dvh - 40px); overflow-y: auto; }
@@ -117,7 +117,7 @@
   .act__n { font-size: 11px; }
   .crisis-actions { gap: 8px; padding: 12px; }
   .crisis-actions .sos, .crisis-actions .btn { font-size: 12px; }
-  .pin { margin: 12px; }
+  .pin { margin: 25px 12px 12px; }
   .lab-stats div { padding: 8px; }
 }
 :root[data-plain="1"] .prototype-banner { background: #000; color: #fff; }
@@ -215,17 +215,17 @@
    treatment as .pin, one notch warmer: a soft lift off the page, roomier
    padding and the two action buttons sitting inside the card.
    ========================================================================== */
+/* Künye plakası üst kenarı kırdığı için kart konumlanır ve üstünde plakanın
+   yarısı kadar boşluk bırakır; sol kenar çizgisi kaldırıldı. */
 .crisis-card {
-  margin: 14px var(--pad-x) 12px;
+  position: relative;
+  margin: 27px var(--pad-x) 12px;
   border: 1px solid var(--c-border);
-  border-left: 1px solid var(--c-accent);
   border-radius: 16px;
   background: linear-gradient(180deg, var(--c-bg-3) 0%, var(--c-bg-2) 58%);
   box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
-  overflow: hidden;
 }
 .crisis-card .crisis-intro { padding: 18px 18px 0; }
-.crisis-card .scenario-label { font-weight: 700; letter-spacing: .01em; }
 .crisis-card .crisis-intro h1 { font-size: 23px; margin: 8px 0 5px; }
 /* the shared read-only view keeps its bigger headline */
 [data-shared="1"] .crisis-card .crisis-intro h1 { font-size: clamp(24px, 5vw, 32px); }

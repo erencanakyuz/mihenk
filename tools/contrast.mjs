@@ -49,6 +49,10 @@ for (const [k, c] of Object.entries(V)) {
   chk(`kriz · ${k} · sol şerit (grafik)`, c, C.bg, 3);
 }
 
+// --- künye plakası: vurgulu kartın kimliği dolu bir plakada durur (.kunye)
+chk('künye · plaka yazısı / mavi dolgu', '#ffffff', '#2176bc', 4.5);
+chk('künye · resmî tonu / plaka yazısı', '#11151c', V.official, 4.5);
+
 // --- plain mode (pure #000 / #fff, monospace)
 chk('düz mod · metin', '#ffffff', '#000000', 4.5);
 chk('düz mod · ikincil metin', '#bbbbbb', '#000000', 4.5);
