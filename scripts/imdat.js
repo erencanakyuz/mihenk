@@ -14,10 +14,13 @@
     { id: 'ulasim',   label: 'Ulaşım', ic: 'arrowr' }
   ];
 
-  var CHAIN = [
-    { t: 'Talebiniz paylaşıldı', s: 'Bilgilerinizi aynı talep üzerinden güncelleyebilirsiniz.' },
-    { t: 'Talep açık', s: 'Yanıtları talebinizden takip edin. Bir destek önerisi, yardımın ulaştığı anlamına gelmez.' }
-  ];
+  /* The first item must not repeat the step heading word for word. */
+  function chainItems() {
+    return [
+      { t: st.editId ? 'Bilgiler kaydedildi' : 'Kriz Var akışında görünüyor', s: 'Bilgilerinizi aynı talep üzerinden güncelleyebilirsiniz.' },
+      { t: 'Talep açık', s: 'Yanıtları talebinizden takip edin. Bir destek önerisi, yardımın ulaştığı anlamına gelmez.' }
+    ];
+  }
 
   var st = { need: [], addr: '', people: null, step: 0, editId: null, region: '', locationKnown: false };
   var draft = st;
@@ -46,10 +49,10 @@
     }
     if (i === 1) {
       return '<h2 class="flow__q" id="flowq">Konumunuz</h2>' +
-        '<p class="flow__hint">Mahalle, sokak veya yakınındaki belirgin bir yeri yaz.</p>' +
+        '<p class="flow__hint">Mahalle veya yakınındaki belirgin bir yeri yazın. Sokak ve bina bilgisini aşağıdaki özel alana ekleyin.</p>' +
         '<div class="flow__body">' + regionsHTML() +
-        '<label class="field"><span class="field__l">Herkese açık yer tarifi</span><input id="public-location" type="text" maxlength="240" placeholder="Mahalle veya yakındaki belirgin bir yer"></label>'+ 
-        '<details class="flow-private"><summary>Adres, telefon ve görünürlük (isteğe bağlı)</summary><label class="field"><span class="field__l">Ayrıntılı adres tarifi</span><input type="text" id="addr" placeholder="Sokak, bina ve ulaşım tarifi" maxlength="240" autocomplete="off"></label>'+privacySelect('address-privacy','Adresin görünürlüğü',st.privacy?.address)+
+        '<label class="field"><span class="field__l">Herkese açık yer tarifi</span><input id="public-location" type="text" maxlength="240" placeholder="Mahalle veya yakındaki belirgin bir yer"></label>'+
+        '<details class="flow-private"><summary>Özel bilgiler ve görünürlük (isteğe bağlı)</summary><label class="field"><span class="field__l">Ayrıntılı adres</span><input type="text" id="addr" placeholder="Sokak, bina ve ulaşım tarifi" maxlength="240" autocomplete="off"></label>'+privacySelect('address-privacy','Adresin görünürlüğü',st.privacy?.address)+
         '<label class="field"><span class="field__l">Telefon (isteğe bağlı)</span><input type="tel" id="request-phone" maxlength="40" autocomplete="off" placeholder="Ulaşılabilecek telefon"></label>'+privacySelect('phone-privacy','Telefonun görünürlüğü',st.privacy?.phone)+'<p class="field-hint">Özel bilgileri yalnızca siz ve yetkili moderatörler görebilir.</p></details>'+ 
         '<button class="location-skip" type="button" data-flow="unknown-location">Konumdan emin değilim, devam et</button><p class="field-hint">Yazdığınız ilçe ve yer tarifi korunur.</p></div>';
     }
@@ -60,26 +63,27 @@
         '<button class="stepper__b" type="button" data-step="-1" aria-label="Azalt">' + icon('minus', 'ic--lg') + '</button>' +
         '<input class="stepper__v" id="peoplev" type="text" inputmode="numeric" aria-label="Kişi sayısı" placeholder="?" value="">' +
         '<button class="stepper__b" type="button" data-step="1" aria-label="Artır">' + icon('plus', 'ic--lg') + '</button>' +
-        '</div><label class="field"><span class="field__l">Beyanınız (herkese açık, isteğe bağlı)</span><textarea id="request-details" rows="3" maxlength="2000" placeholder="İhtiyacınızı açıklayın. Özel adres ve telefonu buraya yazmayın."></textarea></label><p class="flow__hint">Biliyorsan toplam sayıyı yaz. Daha sonra güncelleyebilirsin.</p><button class="location-skip" type="button" data-flow="unknown-people">Kişi sayısını bilmiyorum, devam et</button></div>';
+        '</div><p class="flow__hint">Biliyorsanız toplam sayıyı yazın. Daha sonra güncelleyebilirsiniz.</p><label class="field"><span class="field__l">Beyanınız (herkese açık, isteğe bağlı)</span><textarea id="request-details" rows="3" maxlength="2000" placeholder="İhtiyacınızı açıklayın. Özel adres ve telefonu buraya yazmayın."></textarea></label><p class="field-hint">Bu metin talebinizin en üstünde herkese açık görünür.</p><button class="location-skip" type="button" data-flow="unknown-people">Kişi sayısını bilmiyorum, devam et</button></div>';
     }
     if (i === 3) {
-      return '<h2 class="flow__q" id="flowq">Çağrınızı gözden geçirin</h2>' +
-        '<p class="flow__hint">İhtiyacını ve adres tarifini son kez kontrol et.</p>' +
+      return '<h2 class="flow__q" id="flowq">Talebinizi gözden geçirin</h2>' +
+        '<p class="flow__hint">Neyin herkese açık, neyin yalnızca moderatörlere açık olduğunu son kez kontrol edin.</p>' +
         '<div class="flow__body"><div class="review" id="review"></div></div>';
     }
-    return '<h2 class="flow__q" id="flowq">Talebiniz paylaşıldı</h2>' +
-      '<p class="flow__hint">Tekrar paylaşmana gerek yok. Durumunu Taleplerim’den takip edebilirsin.</p>' +
+    var chain = chainItems();
+    return '<h2 class="flow__q" id="flowq">' + (st.editId ? 'Talebiniz güncellendi' : 'Talebiniz paylaşıldı') + '</h2>' +
+      '<p class="flow__hint">Tekrar paylaşmanıza gerek yok. Talebinizi buradan takip edebilirsiniz.</p>' +
       '<div class="flow__body"><div class="chain" id="chain">' +
-      CHAIN.map(function (c, k) {
+      chain.map(function (c, k) {
         return '<div class="chain__i" data-k="' + k + '">' +
           '<span class="chain__b">' + icon(k === 0 ? 'check' : 'clock', 'ic--sm') + '</span>' +
           '<span><span class="chain__t">' + esc(c.t) + '</span><br><span class="chain__s">' + esc(c.s) + '</span></span>' +
-          '</div>' + (k < CHAIN.length - 1 ? '<div class="chain__line"></div>' : '');
+          '</div>' + (k < chain.length - 1 ? '<div class="chain__line"></div>' : '');
       }).join('') + '</div></div>';
   }
 
   function footHTML(i) {
-    if (i === 4) return '<div class="flow__foot"><button class="btn" data-flow="requests" type="button">Taleplerime git</button></div>';
+    if (i === 4) return '<div class="flow__foot"><button class="btn" data-flow="requests" type="button">' + (st.savedId ? 'Talebimi aç' : 'Taleplerime git') + '</button></div>';
     return '<div class="flow__foot">' +
       (i > 0 ? '<button class="btn btn--ghost" data-flow="prev" type="button" '+(st.pending?'disabled':'')+' style="flex:0 0 auto;width:52px" aria-label="Geri">' + icon('chevl') + '</button>' : '') +
       '<button class="btn" data-flow="next" type="button">' + (i === 3 ? (st.pending?'Gönderimi yeniden dene':st.editId ? 'Değişiklikleri kaydet' : 'Talebi oluştur') : 'Devam') + '</button>' +
@@ -108,6 +112,11 @@
     heading.focus();
   }
 
+  /* A public landmark is location knowledge too: it must not leave the request marked uncertain. */
+  function knownLocation() {
+    st.locationKnown = !!(String(st.addr || '').trim() || st.region || String(st.publicLocationText || '').trim());
+    return st.locationKnown;
+  }
   function afterRender() {
     if (st.step === 0) {
       $$('[data-need]').forEach(function (b) {
@@ -115,26 +124,28 @@
       });
     }
     if (st.step === 1) {
-      [['public-location','publicLocationText'],['request-phone','phone']].forEach(function(pair){var n=$('#'+pair[0]);n.value=st[pair[1]]||'';n.oninput=function(){st[pair[1]]=n.value;if(pair[1]==='publicLocationText')st.locationKnown=!!((st.addr||'').trim()||st.region||n.value.trim());};});
+      [['public-location','publicLocationText'],['request-phone','phone']].forEach(function(pair){var n=$('#'+pair[0]);n.value=st[pair[1]]||'';n.oninput=function(){st[pair[1]]=n.value;knownLocation();};});
       st.privacy=st.privacy||{address:'private',phone:'private'};
       [['address-privacy','address'],['phone-privacy','phone']].forEach(function(pair){$('#'+pair[0]).onchange=function(){st.privacy[pair[1]]=this.value;};});
-      var a = $('#addr'); if (a) { a.value = st.addr; a.addEventListener('input', function () { st.addr = a.value; st.locationKnown = !!(st.addr.trim() || st.region || (st.publicLocationText || '').trim()); }); }
+      var a = $('#addr'); if (a) { a.value = st.addr; a.addEventListener('input', function () { st.addr = a.value; knownLocation(); }); }
       var region = $('#request-region'); region.value = st.region || '';
-      region.addEventListener('change', function () { st.region = region.value; st.locationKnown = !!(st.addr.trim() || st.region || (st.publicLocationText || '').trim()); });
+      region.addEventListener('change', function () { st.region = region.value; knownLocation(); });
     }
     if (st.step === 2) { var details=$('#request-details');details.value=st.details||'';details.oninput=function(){st.details=details.value;};var v = $('#peoplev'); if (v) { v.value = st.people === null ? '' : st.people; v.addEventListener('input', function () { st.people = v.value.trim() === '' ? null : v.value; }); } }
     if (st.step === 3) {
       var names = st.need.map(function (n) {
         return (NEEDS.filter(function (x) { return x.id === n; })[0] || {}).label;
       }).filter(Boolean);
+      /* The review separates what becomes public from what stays private, and never shows the private address as the location. */
       $('#review').innerHTML =
         row('İhtiyaç', names.length ? names.join(', ') : 'Belirtilmedi') +
-        row('Herkese açık konum', ([st.region, (st.publicLocationText || '').trim()].filter(Boolean).join(' · ') || 'Belirtilmedi') + (!st.locationKnown && (st.addr || st.region || st.publicLocationText) ? ' · Konum kesin değil' : '')) +
-        row('Adres tarifi', st.addr ? st.addr + ' · ' + (st.privacy?.address === 'public' ? 'Herkese açık' : 'Yalnızca moderatörler') : 'Eklenmedi') +
+        row('İlçe', st.region || 'Belirtilmedi') +
+        row('Herkese açık yer tarifi', (String(st.publicLocationText || '').trim() || 'Belirtilmedi') + (!st.locationKnown ? ' · Konum kesin değil' : '')) +
+        row('Ayrıntılı adres', String(st.addr || '').trim() ? st.addr + ' · ' + (st.privacy?.address === 'public' ? 'Herkese açık' : 'Yalnızca moderatörler') : 'Eklenmedi') +
         row('Telefon', st.phone ? st.phone + ' · ' + (st.privacy?.phone === 'public' ? 'Herkese açık' : 'Yalnızca moderatörler') : 'Eklenmedi') +
         row('Kişi sayısı', st.people === null ? 'Henüz bilinmiyor' : st.people + ' kişi') +
-        row('Beyan',st.details||'İhtiyaç özeti kullanılacak')+
-        row('Görünürlük', 'Kriz Var akışı · Doğrulanmamış olarak başlar');
+        row('Beyan', st.details || 'Yazmadınız · Yalnızca ihtiyaç başlıkları görünecek') +
+        row('Akışta', 'Kriz Var akışı · Doğrulanmamış olarak başlar');
     }
     if (st.step === 4) runChain();
   }
@@ -171,7 +182,7 @@
     }
     var node = el(
       '<div class="modal">' +
-        '<div class="flow__close"><span>' + (M.shared ? 'Yardım talebi' : 'Tatbikat · Gerçek yardım iletilmez') + '</span><button type="button" data-flow="close" aria-label="Talebi kapat">' + icon('close') + '</button></div>' +
+        '<div class="flow__close"><span>' + (M.shared ? (opts.editId ? 'Talebi düzenle' : 'Yardım talebi oluştur') : 'Tatbikat · Gerçek yardım iletilmez') + '</span><button type="button" data-flow="close" aria-label="Formu kapat">' + icon('close') + '</button></div>' +
         '<p class="flow__progress" id="flow-progress">Adım 1 / 4</p>' +
         '<div class="flow"><div class="flow__dots">' +
           [0, 1, 2, 3, 4].map(function (k) { return '<span class="flow__dot" data-on="' + (k ? '' : '1') + '"></span>'; }).join('') +
