@@ -96,6 +96,8 @@
 .rp-send:disabled { opacity:.6; cursor:wait; }
 .rp-public-note { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--c-text-2); }
 .rp-compose-hint { margin:10px 0 0; font-size:11px; color:var(--c-text-2); line-height:1.55; }
+.rp-count { display:block; text-align:right; font-size:11px; color:var(--c-text-2); margin-top:4px; font-variant-numeric:tabular-nums; }
+.rp-count--limit { color:#ffb5b5; }
 .rp-reply-target { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--c-border); }
 .rp-reply-target>span { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--c-accent); }
 .rp-reply-target>button { width:44px; height:44px; display:grid; place-items:center; }

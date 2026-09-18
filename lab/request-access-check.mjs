@@ -202,6 +202,12 @@ try{
   const plain=await neighbor.send({type:'post.create',payload:{text:'Yol açıldı.',tag:'durum'}});
   const plainCoordination=await neighbor.send({type:'reply.create',targetId:plain.entityId,payload:{text:'Deneme',channel:'coordination',visibility:'private',parentId:null}});
   ok('ordinary posts have no coordination channel',!plainCoordination.ok&&plainCoordination.error.code==='validation',code(plainCoordination));
+  // 10b. Chat messages are capped at 1000 characters with a clear message.
+  const tooLong=await neighbor.send({type:'reply.create',targetId:C,payload:{text:'x'.repeat(1001),channel:'community',visibility:'public',parentId:null}});
+  ok('messages longer than 1000 characters are rejected',!tooLong.ok&&tooLong.error.code==='validation'&&/1000/.test(tooLong.error.message),code(tooLong));
+  const longEnough=await neighbor.send({type:'reply.create',targetId:C,payload:{text:'y'.repeat(1000),channel:'community',visibility:'public',parentId:null}});
+  ok('a 1000-character message is accepted',longEnough.ok,code(longEnough));
+
   // 11. Institutional announcements take no comments; the unverified filter works.
   for(let i=0;i<4;i++)await operator('/control',{runId,action:'tick'});
   const official=(await passerby.view({filter:'resmi'})).items.find(p=>p.verification==='official');

@@ -149,6 +149,8 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
       target.version++;target.updatedAt=now;entity=target;
     } else if(cmd.type==='reply.create'||cmd.type==='offer.create') {
       fields(p,['text','channel','visibility','parentId']);
+      // Chat messages are capped at 1000 characters; the statement field has its own 2000 limit.
+      if(typeof p.text==='string'&&p.text.length>1000)reject('validation','Mesaj en fazla 1000 karakter olabilir.','text');
       if(target.kind!=='request'&&target.verification==='official')reject('validation','Kurumsal duyurulara yorum yazılamaz.');
       const channel=p.channel||'community',visibility=p.visibility||'public';
       if(!['coordination','community'].includes(channel)||!['private','public'].includes(visibility))reject('validation','Mesaj kanalını ve görünürlüğünü kontrol edin.');

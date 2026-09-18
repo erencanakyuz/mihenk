@@ -14,7 +14,8 @@
   function key(channel){return 'mihenk:request-draft:'+ (M.sharedView?M.sharedView.runId+':'+M.actorId:'local')+':'+page.id+':'+channel;}
   function draft(){var c=page.channel;if(!page.drafts[c]){try{page.drafts[c]=JSON.parse(sessionStorage.getItem(key(c)));}catch(_){}page.drafts[c]=page.drafts[c]||{text:'',visibility:c==='coordination'?'private':'public',parentId:null,kind:'reply'};}return page.drafts[c];}
   function persist(){if(!page)return;try{sessionStorage.setItem(key(page.channel),JSON.stringify(draft()));}catch(_){} }
-  function capture(){if(!page)return;var form=page.node.querySelector('.rp-compose');if(form){draft().text=form.elements.text.value;if(!draft().pending){draft().visibility=form.elements.visibility?.value||'public';draft().kind=form.elements.kind?.value||'reply';}persist();}page.node.querySelectorAll('details[data-section]').forEach(function(d){page.expanded[d.dataset.section]=d.open;});}
+  function counter(form){var count=form.querySelector('.rp-count');if(!count)return;var n=form.elements.text.value.length;count.hidden=n<800;count.textContent=n+' / 1000';count.classList.toggle('rp-count--limit',n>=1000);}
+  function capture(){if(!page)return;var form=page.node.querySelector('.rp-compose');if(form){counter(form);draft().text=form.elements.text.value;if(!draft().pending){draft().visibility=form.elements.visibility?.value||'public';draft().kind=form.elements.kind?.value||'reply';}persist();}page.node.querySelectorAll('details[data-section]').forEach(function(d){page.expanded[d.dataset.section]=d.open;});}
   function allMessages(){return (page.thread.messages||[]).concat(page.thread.parents||[]);}
   function parent(){return allMessages().find(function(m){return m.id===draft().parentId;});}
   function writing(){var c=page.thread.post.capabilities||{};return page.channel==='coordination'?c.canWriteCoordination:c.canWriteCommunity;}
@@ -62,7 +63,7 @@
     if(par?.visibility==='private')d.visibility='private';
     var canOffer=page.channel==='community'&&p.authorId!==(M.actorId||'me')&&(!M.shared||p.actions.includes('offer.create'));
     return '<form class="rp-compose" aria-label="Mesaj yaz"><div class="rp-reply-target"'+(!par?' hidden':'')+'><span>'+glyph('reply')+esc(par?par.author.name+' kişisine yanıt':'')+'</span><button type="button" data-cancel-reply aria-label="Yanıtı iptal et">'+glyph('close')+'</button></div><label for="rp-text">'+(page.channel==='coordination'?'Mesajınız':'Bilgi veya destek öneriniz')+'</label>'+
-      '<textarea id="rp-text" name="text" rows="3" maxlength="1000" placeholder="'+(page.channel==='coordination'?'Moderatörlere bir mesaj yazın…':'Paylaşabileceğiniz bilgiyi veya desteği yazın…')+'"'+(d.pending?' readonly':'')+'>'+esc(d.text)+'</textarea>'+
+      '<textarea id="rp-text" name="text" rows="3" maxlength="1000" placeholder="'+(page.channel==='coordination'?'Moderatörlere bir mesaj yazın…':'Paylaşabileceğiniz bilgiyi veya desteği yazın…')+'"'+(d.pending?' readonly':'')+'>'+esc(d.text)+'</textarea><span class="rp-count" aria-live="polite" hidden></span>'+
       '<div class="rp-compose-footer">'+(page.channel==='coordination'?'<label class="rp-visibility">'+glyph(d.visibility==='private'?'lock':'globe')+'<span class="sr-only">Mesaj görünürlüğü</span><select name="visibility"'+(par?.visibility==='private'||d.pending?' disabled':'')+'>'+options(d.visibility)+'</select></label>':'<span class="rp-public-note">'+glyph('globe')+'Herkese açık</span>')+
       (canOffer?'<label class="rp-kind"><span class="sr-only">Mesaj türü</span><select name="kind"'+(d.pending?' disabled':'')+'><option value="reply">Bilgi / yanıt</option><option value="offer"'+(d.kind==='offer'?' selected':'')+'>Destek önerisi</option></select></label>':'')+
       '<button class="rp-send" type="submit">'+glyph('send')+(d.pending?'Yeniden dene':'Gönder')+'</button></div><p class="rp-compose-hint">'+(par?.visibility==='private'?'Özel bir mesaja verdiğiniz yanıt da özel kalır.':page.channel==='coordination'?'Göndermeden önce mesajın tamamı için görünürlüğü seçin.':'Destek önerisi, yardımın ulaştığı anlamına gelmez.')+'</p><p class="rp-error" role="alert" hidden></p></form>';
@@ -79,7 +80,7 @@
       (page.thread.nextMessageOffset!=null?'<button class="rp-earlier" data-earlier>Önceki mesajları göster</button>':'')+'<div class="rp-messages">'+messagesHTML()+'</div>'+composer()+'</section>'+
       (!M.shared?'<footer class="rp-local">Yerel prototip · Gerçek yardım iletilmez.</footer>':'');
     page.node.querySelectorAll('details[data-section]').forEach(function(n){n.addEventListener('toggle',function(){if(page)page.expanded[n.dataset.section]=n.open;});});
-    var form=page.node.querySelector('.rp-compose');if(form){form.addEventListener('input',capture);form.addEventListener('change',capture);form.onsubmit=send;}
+    var form=page.node.querySelector('.rp-compose');if(form){counter(form);form.addEventListener('input',capture);form.addEventListener('change',capture);form.onsubmit=send;}
     page.node.querySelector('.rp-tabs').onkeydown=function(e){if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();switchChannel(e.key==='Home'?'coordination':e.key==='End'?'community':page.channel==='coordination'?'community':'coordination',true);};
     persist();
   }
