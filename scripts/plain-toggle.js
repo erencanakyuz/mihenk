@@ -11,9 +11,11 @@
   function active() { return !!(M.state && M.state.plain); }
 
   function rowHTML() {
-    var on = active();
+    var on = active(), bytes = '';
+    // The byte comparison moved here from the removed 'Görünüm seçenekleri' section.
+    try { if (!M.shared && M.measureBytes) { var b = M.measureBytes(), kb = function (n) { return Math.round(n / 1024) + ' KB'; }; bytes = ' <span id="bytetext">Tam sürüm: ~' + kb(b.full) + ' · Düz mod: ~' + kb(b.plain) + '</span>'; } } catch (_) { /* measurement is optional */ }
     return '<div class="band-row" id="band-row"><button class="band-toggle" id="band-toggle" type="button" aria-pressed="' + on + '">' + BARS +
-      '<span class="band-toggle__text"><b>Düşük bant genişliği modu</b><small>Görselleri ve hareketleri kapatır; metin ve işlemler kalır.</small></span>' +
+      '<span class="band-toggle__text"><b>Düşük bant genişliği modu</b><small>Görselleri ve hareketleri kapatır; metin ve işlemler kalır.' + bytes + '</small></span>' +
       '<span class="band-toggle__state">' + (on ? 'Açık' : 'Kapalı') + '</span></button></div>';
   }
 
@@ -28,6 +30,8 @@
   function placeRow() {
     var head = document.querySelector('#panel-crisis .crisis-head');
     if (!head) return;
+    // The old collapsed 'Görünüm seçenekleri' block duplicated this switch; drop it.
+    var legacy = head.querySelector('.crisis-settings'); if (legacy) legacy.remove();
     if (head.querySelector('#band-row')) { syncRow(); return; }
     var anchor = head.querySelector('.crisis-card') || head.querySelector('.crisis-actions');
     var node = M.el(rowHTML());
