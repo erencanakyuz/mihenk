@@ -9,8 +9,8 @@ import { normalizeAccess, permits, roles, accessFor, canReadMessage, canSeePost,
 import { makeScenario, advance } from '../lab/scenarios.mjs';
 
 const ROOT=path.resolve(import.meta.dirname,'..');
-const scripts=['catalog','transport','app','feed','crisis','imdat','request-thread','request-page','shared'];
-const assets=new Set(['/participant.html',...scripts.map(s=>s==='catalog'?'/data/catalog.js':'/scripts/'+s+'.js'),...['tokens','base','feed','crisis','refine','plain','request-page'].map(s=>'/styles/'+s+'.css'),'/assets/fonts/archivo-700.woff2']);
+const scripts=['catalog','transport','app','feed','crisis','imdat','request-thread','request-page','section-notes','shared'];
+const assets=new Set(['/participant.html',...scripts.map(s=>s==='catalog'?'/data/catalog.js':'/scripts/'+s+'.js'),...['tokens','base','feed','crisis','refine','plain','request-page','section-notes'].map(s=>'/styles/'+s+'.css'),'/assets/fonts/archivo-700.woff2']);
 const json=(res,code,value)=>{res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(value));};
 async function body(req,limit=65536) {
   let size=0;const parts=[];
