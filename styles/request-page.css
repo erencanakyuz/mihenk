@@ -97,7 +97,7 @@
 .rp-parent { display:inline-block; font-size:12px; margin-top:5px; color:var(--c-text-2); text-decoration:underline; text-underline-offset:3px; }
 .rp-offer { display:block; color:var(--c-accent); font-size:12px; margin-top:6px; }
 /* Community note: the comment the community stands behind, read before the thread. */
-.rp-note { margin:16px 0 4px; padding:14px 16px; border:1px solid var(--c-border); border-left:3px solid var(--v-verified); border-radius:10px; background:var(--c-bg-2); }
+.rp-note { margin:16px 0 4px; padding:14px 16px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
 .rp-note-k { display:flex; align-items:center; gap:8px; margin:0; color:var(--v-verified); font-size:12px; font-weight:700; }
 .rp-note-b { margin:8px 0 0; font-size:15px; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
 .rp-note-m { margin:6px 0 0; color:var(--c-text-2); font-size:12px; }
