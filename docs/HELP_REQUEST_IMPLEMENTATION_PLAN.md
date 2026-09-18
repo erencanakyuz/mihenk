@@ -900,3 +900,20 @@ owner action row, closure notice, management labels, both confirmation modals, t
 close without a reason, focus on the clicked tab, no per-message audience badge in
 community, 44 px back control, no horizontal scroll, no private strings in the outsider
 page, no console errors.
+
+## 24. Final merged state (18 September 2026, end of session)
+
+Branch `feature/request-thread-page` after merging `fix/request-ux-copy` (section 23) and
+regenerating bundles. Checks on this tree: `npm run check:syntax` passes; `npm run contrast`
+ALL PASS; `node lab/request-access-check.mjs` 63 of 63; `npm run verify` 23 of 24 with only
+the pre-existing byte-chip failure; the visual tour at 1440 and 390 px (feed, crisis tab,
+filters, wizard, old modal, request page with the new close and reopen confirmations,
+shared moderator and owner views) and the card checks (withdraw confirmation, help call,
+body click) report no console errors. Agent worktrees for the head restyle, the explainer
+strips and the code review were removed after merging; `mihenk-ux-fixes` can be removed
+once the branch is no longer needed.
+
+Open design question raised by the owner after the merge: the thin colored left edge on
+the crisis head card, the pinned card, the statement card and the explainer strips reads
+as generic; alternatives are being explored in a separate design artifact before any
+further styling change.
