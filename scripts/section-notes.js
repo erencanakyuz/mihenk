@@ -75,7 +75,12 @@
       current.remove();
     }
     var html = sectionNoteHTML(key);
-    if (html) spot.host.insertBefore(M.el(html), spot.anchor);
+    if (!html) return;
+    // Inserting above the visible list must not move the reader: browsers' scroll anchoring
+    // would otherwise shift scrollY by the strip's height.
+    var y = window.scrollY;
+    spot.host.insertBefore(M.el(html), spot.anchor);
+    if (window.scrollY !== y) window.scrollTo(0, y);
   };
 
   M.syncSectionNotes = function () {
@@ -104,6 +109,8 @@
   });
 
   M.on('tab', M.syncSectionNotes);
+  /* A rebuilt feed loses its strip; put it back at once so later tab switches do not insert above a scrolled list. */
+  if (typeof M.renderFeed === 'function') { var renderFeed = M.renderFeed; M.renderFeed = function (id) { var out = renderFeed.apply(this, arguments); M.renderSectionNote(id); return out; }; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', M.syncSectionNotes);
   else M.syncSectionNotes();
 })(window.MIHENK = window.MIHENK || {});

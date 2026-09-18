@@ -28,7 +28,7 @@
 .rp-facts>span { display:flex; align-items:center; gap:7px; }
 /* Beyan kartının kimliği künye plakasında durur (styles/base.css .kunye);
    sol kenar çizgisi kaldırıldı, kart plakanın yarısı kadar boşluk bırakır. */
-.rp-statement { position:relative; margin-top:13px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
+.rp-statement { position:relative; margin-top:22px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
 .request-page summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:14px 18px; min-height:48px; }
 .request-page summary::-webkit-details-marker { display:none; }
 .request-page summary>.ic:last-child { margin-left:auto; transition:transform .15s; }

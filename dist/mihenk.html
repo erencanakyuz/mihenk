@@ -21,7 +21,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~312 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~311 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -1609,7 +1609,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   padding: 15px 18px 18px;
 }
 @media (max-width: 700px) {
-  .crisis-card { margin: 12px; border-radius: 14px; }
+  .crisis-card { margin: 25px 12px 12px; border-radius: 14px; }
   .crisis-card .crisis-intro { padding: 16px 15px 0; }
   .crisis-card .crisis-intro h1 { font-size: 21px; }
   .crisis-card .crisis-actions { gap: 8px; padding: 14px 15px 15px; }
@@ -1833,7 +1833,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .rp-facts>span { display:flex; align-items:center; gap:7px; }
 /* Beyan kartının kimliği künye plakasında durur (styles/base.css .kunye);
    sol kenar çizgisi kaldırıldı, kart plakanın yarısı kadar boşluk bırakır. */
-.rp-statement { position:relative; margin-top:13px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
+.rp-statement { position:relative; margin-top:22px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
 .request-page summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:14px 18px; min-height:48px; }
 .request-page summary::-webkit-details-marker { display:none; }
 .request-page summary>.ic:last-child { margin-left:auto; transition:transform .15s; }
@@ -5112,7 +5112,12 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       current.remove();
     }
     var html = sectionNoteHTML(key);
-    if (html) spot.host.insertBefore(M.el(html), spot.anchor);
+    if (!html) return;
+    // Inserting above the visible list must not move the reader: browsers' scroll anchoring
+    // would otherwise shift scrollY by the strip's height.
+    var y = window.scrollY;
+    spot.host.insertBefore(M.el(html), spot.anchor);
+    if (window.scrollY !== y) window.scrollTo(0, y);
   };
 
   M.syncSectionNotes = function () {
@@ -5141,6 +5146,8 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   });
 
   M.on('tab', M.syncSectionNotes);
+  /* A rebuilt feed loses its strip; put it back at once so later tab switches do not insert above a scrolled list. */
+  if (typeof M.renderFeed === 'function') { var renderFeed = M.renderFeed; M.renderFeed = function (id) { var out = renderFeed.apply(this, arguments); M.renderSectionNote(id); return out; }; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', M.syncSectionNotes);
   else M.syncSectionNotes();
 })(window.MIHENK = window.MIHENK || {});
