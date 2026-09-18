@@ -1421,7 +1421,8 @@ ul { list-style: none; margin: 0; padding: 0; }
 .chips { padding-top: 6px; }
 .chip { min-height: 40px; }
 .clist__h { font-size: 14px; letter-spacing: 0; text-transform: none; padding: 18px 16px; margin: 0; }
-.cpost { margin: 0 0 12px; padding: 20px 16px; border-radius: 14px; border-left-width: 1px; }
+/* doğrulama şeridi: 4 px dolu, sol köşeler yarıçapsız (bkz. styles/crisis.css) */
+.cpost { margin: 0 0 12px; padding: 20px 16px 20px 18px; border-radius: 0 14px 14px 0; border-left-width: 4px; }
 .cpost:hover { background: var(--c-bg-2); }
 .cpost__name { font-size: 15px; }
 .cpost__head { flex-wrap: wrap; }
@@ -2068,6 +2069,35 @@ ul { list-style: none; margin: 0; padding: 0; }
 .ai-note__legend li[data-verdict="true"]::before { background: var(--v-verified); }
 .ai-note__legend li[data-verdict="false"]::before { background: var(--v-disputed); }
 :root[data-plain="1"] .ai-note { border-color: #777; background: #000; }
+
+/* ===== styles/plain-toggle.css ===== */
+/* Low-bandwidth mode switch under the crisis head, and the exit bar while the mode is on. */
+.band-row { margin: 10px var(--pad-x) 4px; }
+.band-toggle { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 10px 14px; border: 1px solid var(--c-border); border-radius: 12px; background: var(--c-bg-2); color: var(--c-text); text-align: left; transition: background-color 140ms var(--ease-out), border-color 140ms; }
+.band-toggle:hover { background: var(--c-bg-3); }
+.band-toggle > .ic { flex: none; width: 22px; height: 22px; color: var(--c-accent); }
+.band-toggle__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.band-toggle__text b { font-size: 14px; }
+.band-toggle__text small { font-size: 12px; color: var(--c-text-2); }
+.band-toggle__state { flex: none; min-width: 64px; padding: 6px 12px; border: 1px solid var(--c-border); border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--c-text-2); text-align: center; }
+.band-toggle[aria-pressed="true"] { border-color: var(--c-accent); }
+.band-toggle[aria-pressed="true"] .band-toggle__state { background: var(--c-accent-fill); border-color: var(--c-accent-fill); color: #fff; }
+.band-exit { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 6px 14px; background: #000; color: #fff; border-bottom: 2px solid #fff; font-size: 14px; font-weight: 700; }
+.band-exit > span { display: inline-flex; align-items: center; gap: 8px; }
+.band-exit .ic { width: 18px; height: 18px; }
+.band-exit button { min-height: 40px; padding: 0 16px; border: 2px solid #fff; background: #fff; color: #000; font-size: 14px; font-weight: 800; }
+.band-exit button:focus-visible { outline: 3px solid #6bb9ff; outline-offset: 2px; }
+:root[data-plain="1"] body { padding-top: 52px; }
+:root[data-plain="1"] .topbar, :root[data-plain="1"] .nav, :root[data-plain="1"] .side, :root[data-plain="1"] .rp-header { top: 52px; }
+:root[data-plain="1"] .band-toggle { border: 1px solid #777; background: #000; color: #fff; }
+:root[data-plain="1"] .band-toggle__text small { color: #ddd; }
+:root[data-plain="1"] .band-toggle__state { background: #fff; border-color: #fff; color: #000; }
+@media (max-width: 700px) {
+  .band-row { margin: 8px 12px 4px; }
+  .band-toggle__text small { display: none; }
+  .band-exit { font-size: 13px; padding: 6px 12px; }
+  .band-exit button { padding: 0 12px; }
+}
 
 </style>
 
@@ -4801,22 +4831,24 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   'use strict';
   var esc = M.CATALOG.esc;
 
-  /* tone: styles/section-notes.css içindeki data-tone eşleşmeleri
-     label: künye plakasında duran bölüm adı (sekmelerin kendi adlarıyla aynı) */
+  /* tone: styles/section-notes.css içindeki data-tone eşleşmeleri */
   var NOTES = {
-    foryou: { tone: 'accent', label: 'Ana akış', text: 'Genel akışın. Kriz bilgisi ve yardım çağrıları için Kriz Var sekmesine geç.' },
-    following: { tone: 'accent', label: 'Takip', text: 'Takip ettiğin hesapların paylaşımları.' },
-    'crisis:all': { tone: 'accent', label: 'Bölgeden güncellemeler', text: 'Bölgeden gelen tüm paylaşımlar. Paylaşmadan önce doğrulama etiketine bak.' },
-    'crisis:resmi': { tone: 'official', label: 'Resmî duyurular', text: 'Resmî kurum duyuruları. Yorumlar kapalıdır; bilgiyi olduğu gibi aktar.' },
-    'crisis:yardim': { tone: 'accent', label: 'Yardım talepleri', text: 'Açık yardım talepleri. Destek verebiliyorsan talebi aç ve öneri yaz.' },
-    'crisis:dogrulanmis': { tone: 'verified', label: 'Doğrulanmış bilgi', text: 'Birden fazla kaynakla doğrulanmış bilgiler. Paylaşırken kaynağı belirt.' },
-    'crisis:dogrulanmamis': { tone: 'unverified', label: 'Doğrulanmamış', text: 'Henüz doğrulanmamış bildirimler. Gördüysen “Ben de gördüm” de; yaymadan önce bekle.' },
-    'crisis:mine': { tone: 'accent', label: 'Taleplerim', text: 'Kendi yardım taleplerin. Durumu güncelle, karşılandıysa kapat.' },
-    'request:coordination': { tone: 'accent', label: 'Yetkililerle iletişim' },
-    'request:community': { tone: 'verified', label: 'Topluluk desteği' }
+    foryou: { tone: 'accent', text: 'Genel akışın. Kriz bilgisi ve yardım çağrıları için Kriz Var sekmesine geç.' },
+    following: { tone: 'accent', text: 'Takip ettiğin hesapların paylaşımları.' },
+    'crisis:all': { tone: 'accent', text: 'Bölgeden gelen tüm paylaşımlar. Paylaşmadan önce doğrulama etiketine bak.' },
+    'crisis:resmi': { tone: 'official', text: 'Resmî kurum duyuruları. Yorumlar kapalıdır; bilgiyi olduğu gibi aktar.' },
+    'crisis:yardim': { tone: 'accent', text: 'Açık yardım talepleri. Destek verebiliyorsan talebi aç ve öneri yaz.' },
+    'crisis:dogrulanmis': { tone: 'verified', text: 'Birden fazla kaynakla doğrulanmış bilgiler. Paylaşırken kaynağı belirt.' },
+    'crisis:dogrulanmamis': { tone: 'unverified', text: 'Henüz doğrulanmamış bildirimler. Gördüysen “Ben de gördüm” de; yaymadan önce bekle.' },
+    'crisis:mine': { tone: 'accent', text: 'Kendi yardım taleplerin. Durumu güncelle, karşılandıysa kapat.' },
+    'request:coordination': { tone: 'accent' },
+    'request:community': { tone: 'verified' }
   };
 
-  /* plakanın ikonu tonun anlamını taşır */
+  /* Künye plakası bölümün adını değil şeridin ne olduğunu söyler: bölüm adı
+     zaten listenin başlığında (.clist__h) ve sekmede yazıyor, plaka onu
+     tekrarlamaz. Hangi bölüm olduğunu plakanın tonu ve ikonu taşır. */
+  var PLATE = 'Bölüm notu';
   var TONE_ICON = { accent: 'exclam', official: 'shield', verified: 'checkc', unverified: 'questionc' };
 
   function dismissed(key) {
@@ -4833,9 +4865,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var body = text || note.text || '';
     if (!body || dismissed(key)) return '';
     var tone = note.tone || 'accent';
-    var plate = note.label
-      ? '<span class="kunye">' + M.icon(TONE_ICON[tone] || TONE_ICON.accent, 'ic--sm') + esc(note.label) + '</span>'
-      : '';
+    var plate = '<span class="kunye">' + M.icon(TONE_ICON[tone] || TONE_ICON.accent, 'ic--sm') + PLATE + '</span>';
     return '<div class="snote" role="note" data-note="' + esc(key) + '" data-tone="' + esc(tone) + '">' +
       plate + '<p class="snote__t">' + esc(body) + '</p>' +
       '<button class="snote__ok" type="button" data-note-ok="' + esc(key) + '">Anladım</button></div>';
@@ -4955,6 +4985,70 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
   window.addEventListener('popstate', schedule);
   M.placeAiNote = place;
+})(window.MIHENK = window.MIHENK || {});
+
+/* ===== scripts/plain-toggle.js ===== */
+/* ==========================================================================
+   MİHENK - low-bandwidth mode: one obvious switch, one obvious way back.
+   A prominent toggle row sits under the crisis head card; while the mode is
+   on, a fixed top bar offers "Normal görünüme dön". Uses M.setPlain and the
+   'plain' event; the old #lowband switch in "Görünüm seçenekleri" still works.
+   ========================================================================== */
+(function (M) {
+  'use strict';
+  var BARS = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h3v-5H4zM10 19h3V9h-3zM16 19h3V4h-3z"/></svg>';
+
+  function active() { return !!(M.state && M.state.plain); }
+
+  function rowHTML() {
+    var on = active();
+    return '<div class="band-row" id="band-row"><button class="band-toggle" id="band-toggle" type="button" aria-pressed="' + on + '">' + BARS +
+      '<span class="band-toggle__text"><b>Düşük bant genişliği modu</b><small>Görselleri ve hareketleri kapatır; metin ve işlemler kalır.</small></span>' +
+      '<span class="band-toggle__state">' + (on ? 'Açık' : 'Kapalı') + '</span></button></div>';
+  }
+
+  function syncRow() {
+    var button = document.getElementById('band-toggle');
+    if (!button) return;
+    var on = active(), label = on ? 'Açık' : 'Kapalı', state = button.querySelector('.band-toggle__state');
+    if (button.getAttribute('aria-pressed') !== String(on)) button.setAttribute('aria-pressed', String(on));
+    if (state && state.textContent !== label) state.textContent = label;
+  }
+
+  function placeRow() {
+    var head = document.querySelector('#panel-crisis .crisis-head');
+    if (!head) return;
+    if (head.querySelector('#band-row')) { syncRow(); return; }
+    var anchor = head.querySelector('.crisis-card') || head.querySelector('.crisis-actions');
+    var node = M.el(rowHTML());
+    if (anchor) anchor.after(node); else head.prepend(node);
+  }
+
+  function placeExit() {
+    var bar = document.getElementById('band-exit');
+    if (!active()) { if (bar) bar.remove(); return; }
+    if (bar) return;
+    bar = M.el('<div class="band-exit" id="band-exit" role="region" aria-label="Düşük bant modu"><span>' + BARS + 'Düşük bant modu açık</span><button type="button" id="band-exit-button">Normal görünüme dön</button></div>');
+    document.body.prepend(bar);
+  }
+
+  function update() { syncRow(); placeExit(); }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#band-toggle')) { M.setPlain(!active()); update(); return; }
+    if (e.target.closest('#band-exit-button')) {
+      M.setPlain(false); update();
+      var toggle = document.getElementById('band-toggle');
+      if (toggle) toggle.focus({ preventScroll: true });
+    }
+  });
+  if (M.on) M.on('plain', update);
+
+  var frame = null;
+  new MutationObserver(function () {
+    if (frame) return;
+    frame = requestAnimationFrame(function () { frame = null; placeRow(); placeExit(); });
+  }).observe(document.documentElement, { childList: true, subtree: true });
 })(window.MIHENK = window.MIHENK || {});
 
 /* ===== scripts/demo.js ===== */

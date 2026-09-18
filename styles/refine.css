@@ -43,7 +43,8 @@
 .chips { padding-top: 6px; }
 .chip { min-height: 40px; }
 .clist__h { font-size: 14px; letter-spacing: 0; text-transform: none; padding: 18px 16px; margin: 0; }
-.cpost { margin: 0 0 12px; padding: 20px 16px; border-radius: 14px; border-left-width: 1px; }
+/* doğrulama şeridi: 4 px dolu, sol köşeler yarıçapsız (bkz. styles/crisis.css) */
+.cpost { margin: 0 0 12px; padding: 20px 16px 20px 18px; border-radius: 0 14px 14px 0; border-left-width: 4px; }
 .cpost:hover { background: var(--c-bg-2); }
 .cpost__name { font-size: 15px; }
 .cpost__head { flex-wrap: wrap; }

@@ -1,0 +1,27 @@
+/* Low-bandwidth mode switch under the crisis head, and the exit bar while the mode is on. */
+.band-row { margin: 10px var(--pad-x) 4px; }
+.band-toggle { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 10px 14px; border: 1px solid var(--c-border); border-radius: 12px; background: var(--c-bg-2); color: var(--c-text); text-align: left; transition: background-color 140ms var(--ease-out), border-color 140ms; }
+.band-toggle:hover { background: var(--c-bg-3); }
+.band-toggle > .ic { flex: none; width: 22px; height: 22px; color: var(--c-accent); }
+.band-toggle__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.band-toggle__text b { font-size: 14px; }
+.band-toggle__text small { font-size: 12px; color: var(--c-text-2); }
+.band-toggle__state { flex: none; min-width: 64px; padding: 6px 12px; border: 1px solid var(--c-border); border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--c-text-2); text-align: center; }
+.band-toggle[aria-pressed="true"] { border-color: var(--c-accent); }
+.band-toggle[aria-pressed="true"] .band-toggle__state { background: var(--c-accent-fill); border-color: var(--c-accent-fill); color: #fff; }
+.band-exit { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 6px 14px; background: #000; color: #fff; border-bottom: 2px solid #fff; font-size: 14px; font-weight: 700; }
+.band-exit > span { display: inline-flex; align-items: center; gap: 8px; }
+.band-exit .ic { width: 18px; height: 18px; }
+.band-exit button { min-height: 40px; padding: 0 16px; border: 2px solid #fff; background: #fff; color: #000; font-size: 14px; font-weight: 800; }
+.band-exit button:focus-visible { outline: 3px solid #6bb9ff; outline-offset: 2px; }
+:root[data-plain="1"] body { padding-top: 52px; }
+:root[data-plain="1"] .topbar, :root[data-plain="1"] .nav, :root[data-plain="1"] .side, :root[data-plain="1"] .rp-header { top: 52px; }
+:root[data-plain="1"] .band-toggle { border: 1px solid #777; background: #000; color: #fff; }
+:root[data-plain="1"] .band-toggle__text small { color: #ddd; }
+:root[data-plain="1"] .band-toggle__state { background: #fff; border-color: #fff; color: #000; }
+@media (max-width: 700px) {
+  .band-row { margin: 8px 12px 4px; }
+  .band-toggle__text small { display: none; }
+  .band-exit { font-size: 13px; padding: 6px 12px; }
+  .band-exit button { padding: 0 12px; }
+}
