@@ -948,3 +948,26 @@ the mechanism, not a result.
 **Still to design.** Model prompt and provenance (which source supported the verdict),
 rate and cost limits, what happens when sources disagree, how a verdict is surfaced on the
 card and in the feed filters, and the audit record of each automatic label.
+
+## 26. Information posts: verification model (decided 18 September 2026)
+
+One base, two purposes. Every page has the statement on top and two tabs: a private
+moderator channel (designated volunteer moderators, the `request_moderator` role) and a
+public community channel. Official-account announcements have neither.
+
+| | Help request (`kind === 'request'`) | Information post (any other non-official post) |
+| --- | --- | --- |
+| Feed placement | `Yardım` filter only | `Doğrulanmış` / `Doğrulanmamış` by verification |
+| Page title | `Yardım talebi` | `Bilgi paylaşımı` |
+| Moderator tab | `Yetkililerle iletişim`: coordinate aid, private contact fields | `Moderatörlerle doğrulama`: moderators write their assessment, then set the verdict |
+| Community tab | `Topluluk desteği`: information and support offers | `Topluluk tartışması`: discuss accuracy; `Katılıyorum` endorsements; the most endorsed comment is pinned as `Topluluk notu` |
+| Owner actions | close / reopen, edit statement and privacy | none (posts do not close) |
+| Moderator actions | pause community, restrict access, close | `post.verify`: `Doğrulanmış` / `Doğrulanmamış` / `Çelişkili` with optional reason |
+| Card entry | `Talebi aç`, `Destek öner`, `Bilgi paylaş` | `Tartışmayı aç`; if the post is about a request, `Talebin topluluk desteğine git` |
+| AI | none | placeholder now (section 25), queue later |
+
+Quote mechanic: an information post may carry `about: <request id>` (set from the request
+page or card through `Bu talep hakkında bilgi paylaş`); the server validates the target
+and projects a need summary only while the request stays readable. `Ben de gördüm` is
+removed from cards; corroboration lives in the community tab as endorsements. Endorsement
+weighting by account credibility is a later step; v1 counts one vote per account.
