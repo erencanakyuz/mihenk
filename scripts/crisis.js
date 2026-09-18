@@ -42,7 +42,9 @@
     var needs = (p.need || []).map(function (n) { return '<span class="cpost__need">' + esc(NEEDLABEL[n] || n) + '</span>'; }).join('');
     var facts = [];
     if (p.need) facts.push(icon('people', 'ic--sm') + '<span>' + (p.people == null ? 'Kişi sayısı bilinmiyor' : esc(p.people) + ' kişi') + '</span>');
-    if (p.location && !p.location.known && (p.location.text || p.location.region)) facts.push(icon('questionc', 'ic--sm') + '<span>Konum kesin değil</span>');
+    // Uncertainty is a property of the request, not of the fields this viewer may read:
+    // a private address must not silently remove the note for outsiders.
+    if (p.location && !p.location.known && (p.need || p.location.text || p.location.region)) facts.push(icon('questionc', 'ic--sm') + '<span>Konum kesin değil</span>');
     if (!needs && !facts.length) return '';
     return '<div class="cpost__request">' + (needs ? '<div class="cpost__needs">' + needs + '</div>' : '') +
       (facts.length ? '<div class="cpost__facts">' + facts.map(function (f) { return '<span>' + f + '</span>'; }).join('') + '</div>' : '') + '</div>';
@@ -78,7 +80,9 @@
             (state.corroborations[p.id] ? ' data-done="1"' : '') + '>' +
             icon('checkc', 'ic--sm') + '<span>' + (state.corroborations[p.id] ? 'Beyanın alındı' : 'Ben de gördüm') + '</span></button>' : '') +
         '</div>' +
-      (M.cardActions ? M.cardActions(p) : '') + '</div></article>';
+      // The actions read the same effective verification as data-help, so the card body
+      // and the entry button never disagree after a local verification change.
+      (M.cardActions ? M.cardActions(v === p.v ? p : Object.assign({}, p, { v: v })) : '') + '</div></article>';
   }
 
   M.crisisPostHTML = cpostHTML;

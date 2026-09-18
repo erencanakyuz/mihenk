@@ -126,7 +126,7 @@ export function projectView(service,session,query={}) {
     actions:state.status==='stopped'||state.status==='replay'?[]:['post.create','request.create'].filter(type=>permits(actor,type)),
     at:new Date().toISOString()};
   const visible=[...items,...relatedPosts,...ownRequests,...(thread?[thread.post]:[])];
-  service.store.seen(session,[...visible.flatMap(p=>[p.id,p.originalId,p.authorId].filter(Boolean)),...updates.flatMap(x=>[x.targetId,x.author?.id].filter(Boolean)),...(thread?thread.messages.flatMap(m=>[m.id,m.author?.id].filter(Boolean)):[])]);
+  service.store.seen(session,[...visible.flatMap(p=>[p.id,p.originalId,p.authorId].filter(Boolean)),...updates.flatMap(x=>[x.targetId,x.author?.id].filter(Boolean)),...(thread?[...thread.messages,...thread.parents].flatMap(m=>[m.id,m.author?.id].filter(Boolean)):[])]);
   service.store.record(state.id,'view',{actorId,view});
   return view;
 }

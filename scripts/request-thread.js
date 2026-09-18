@@ -128,7 +128,11 @@
     }
     var open=e.target.closest('[data-open-request]');if(open){M.openRequestPage(open.dataset.openRequest);return;}
     var card=e.target.closest('.cpost[data-help]');
-    if(card&&!e.target.closest('button,a,select,input,textarea,details')&&!String(window.getSelection?window.getSelection():'')){M.openRequestPage(card.dataset.id);return;}
+    // Only a live selection inside this card blocks the body click; a leftover selection
+    // elsewhere on the page must not make the card unopenable.
+    var picked=window.getSelection?window.getSelection():null;
+    var selecting=!!card&&!!picked&&!picked.isCollapsed&&!!picked.anchorNode&&card.contains(picked.anchorNode);
+    if(card&&!e.target.closest('button,a,select,input,textarea,details')&&!selecting){M.openRequestPage(card.dataset.id);return;}
     var thread=e.target.closest('[data-thread]'),offer=e.target.closest('[data-offer]'),report=e.target.closest('[data-report]'),react=e.target.closest('[data-react]'),repost=e.target.closest('[data-repost]');
     if(thread){M.openThread(thread.dataset.thread);return;}if(offer){M.openThread(offer.dataset.offer,true);return;}if(report){M.openReport(report.dataset.report,Number(report.closest('[data-version]')?.dataset.version)||undefined);return;}
     var control=react||repost;if(!control)return;

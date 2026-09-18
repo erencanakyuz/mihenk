@@ -135,12 +135,19 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
       else if(cmd.type==='request.manage'){
         fields(p,['communityOpen','publicAccess','reason']);
         if(!requestModerator(actor))reject('unauthorized','Bu işlem için talep moderatörü yetkisi gerekir.');
+        // An empty management command must not bump the version and invalidate the owner's open edit.
+        if(!('communityOpen' in p)&&!('publicAccess' in p))reject('validation','Değiştirilecek bir ayar belirtin.');
         if('communityOpen' in p){if(typeof p.communityOpen!=='boolean')reject('validation','Topluluk durumunu kontrol edin.');target.communityOpen=p.communityOpen;}
         if('publicAccess' in p){if(!['public','restricted'].includes(p.publicAccess))reject('validation','Görünürlüğü kontrol edin.');target.publicAccess=p.publicAccess;}
         target.accessChange={actorId,at:now,reason:text(p.reason||'',240)};
       }
       else if(cmd.type==='request.close'||cmd.type==='request.reopen') {
-        fields(p,['reason']);target.status=cmd.type==='request.close'?'closed':'open';
+        fields(p,['reason']);
+        // Closure and reopening are state transitions: a second close must not rewrite
+        // the recorded actor, time and reason of the first one.
+        if(cmd.type==='request.close'&&target.status!=='open')reject('conflict','Bu talep zaten kapalı.');
+        if(cmd.type==='request.reopen'&&target.status!=='closed')reject('conflict','Bu talep zaten açık.');
+        target.status=cmd.type==='request.close'?'closed':'open';
         if(p.reason&&!['resolved','withdrawn','duplicate','other'].includes(p.reason))reject('validation','Kapatma nedenini seçin.');
         target.closedBy=target.status==='closed'?actorId:null;target.closedAt=target.status==='closed'?now:null;
         target.closeReason=target.status==='closed'?(p.reason||'other'):null;

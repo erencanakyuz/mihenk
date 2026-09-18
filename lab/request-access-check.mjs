@@ -171,6 +171,18 @@ try{
   const reopen=await owner.send({type:'request.reopen',targetId:R,expectedVersion:closedPost.version,payload:{}});
   const reopened=(await owner.thread(R)).thread.post;
   ok('reopening keeps community paused and access restricted',reopen.ok&&reopened.status==='open'&&reopened.communityOpen===false&&reopened.publicAccess==='restricted'&&reopened.closeReason===null);
+  const reopenAgain=await owner.send({type:'request.reopen',targetId:R,expectedVersion:reopened.version,payload:{}});
+  ok('reopening an open request is rejected',!reopenAgain.ok&&reopenAgain.error.code==='conflict',code(reopenAgain));
+  const emptyManage=await moderator.send({type:'request.manage',targetId:R,expectedVersion:reopened.version,payload:{}});
+  ok('management without a setting is rejected',!emptyManage.ok&&emptyManage.error.code==='validation',code(emptyManage));
+  version=(await owner.thread(R)).thread.post.version;
+  ok('a rejected close or manage leaves the version untouched',version===reopened.version,'version='+version);
+  const ownerClose=await owner.send({type:'request.close',targetId:R,expectedVersion:version,payload:{reason:'resolved'}});
+  const closedByOwner=(await moderator.thread(R)).thread.post;
+  const secondClose=await moderator.send({type:'request.close',targetId:R,expectedVersion:closedByOwner.version,payload:{reason:'duplicate'}});
+  const afterSecondClose=(await owner.thread(R)).thread.post;
+  ok('a second close cannot rewrite the recorded closure reason',ownerClose.ok&&!secondClose.ok&&secondClose.error.code==='conflict'&&afterSecondClose.closeReason==='resolved',code(secondClose));
+  await owner.send({type:'request.reopen',targetId:R,expectedVersion:afterSecondClose.version,payload:{}});
 
   // 8. Idempotent retry.
   const before=(await owner.thread(R)).thread.messages.length;

@@ -175,14 +175,16 @@ export async function serveRehearsal({port=8322,operatorPort=8323,host='127.0.0.
     for(const stream of streams)if(stream.session.run_id===runId){
       const actorId=stream.session.actor_id;
       if(!permits(state.actors[actorId],'read_view')){stream.res.end();continue;}
-      const change={posts:[],channels:{},accessChanged:!!delta.actors};
+      // accessChanged means this viewer's own policy or ban state moved, which is the only
+      // case that must drop privileged caches. Other accounts changing is a plain refresh.
+      const change={posts:[],channels:{},accessChanged:Object.hasOwn(delta.actors||{},actorId),actorsChanged:!!delta.actors};
       // IDs of already observed posts also invalidate content when access is removed.
       const seen=new Set(JSON.parse(store.seenFor(stream.session.token)));
       for(const p of Object.values(delta.posts||{}))if(canSeePost(state,actorId,p)||seen.has(p.id))change.posts.push(p.id);
       for(const m of [...Object.values(delta.replies||{}),...Object.values(delta.offers||{})])if(canReadMessage(state,actorId,m)){
         const channels=change.channels[m.targetId]||(change.channels[m.targetId]=[]);const c=messageChannel(m);if(!channels.includes(c))channels.push(c);
       }
-      if(change.accessChanged||change.posts.length||Object.keys(change.channels).length||delta.status||delta.reactions||delta.follows)
+      if(change.accessChanged||change.actorsChanged||change.posts.length||Object.keys(change.channels).length||delta.status||delta.reactions||delta.follows)
         stream.res.write('event: changed\ndata: '+JSON.stringify(change)+'\n\n');
     }
   });

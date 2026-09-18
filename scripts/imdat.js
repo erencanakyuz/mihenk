@@ -155,7 +155,9 @@
 
   M.openImdat = function (opts) {
     opts = opts || {};
-    if (!restored) { try { var saved = JSON.parse(sessionStorage.getItem(draftKey())); if(saved && Array.isArray(saved.need) && Number.isInteger(saved.step) && saved.step < 4) { st=saved; st.sending=false; draft=st; } } catch(_){} restored=true; }
+    // Help drafts moved to sessionStorage because they hold a private address and phone.
+    // Drop any copy an earlier build left in localStorage instead of leaving it on the device.
+    if (!restored) { try { localStorage.removeItem(draftKey()); } catch(_){} try { var saved = JSON.parse(sessionStorage.getItem(draftKey())); if(saved && Array.isArray(saved.need) && Number.isInteger(saved.step) && saved.step < 4) { st=saved; st.sending=false; draft=st; } } catch(_){} restored=true; }
     if(st.pending&&opts.editId!==st.editId)opts=st.editId?{editId:st.editId}:{};
     if (opts.editId) {
       var original = M.getPost(opts.editId);

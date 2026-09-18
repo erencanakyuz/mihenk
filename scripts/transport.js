@@ -53,16 +53,25 @@
     if(cmd.type==='request.create'||cmd.type==='request.update') {
       if(!p){p={id:id,uid:'me',tag:'yardim',v:'unverified'};M.state.extraCrisis.unshift(p);}
       ['need','people','location','details','phone','privacy','publicLocationText'].forEach(function(name){if(name in payload)p[name]=payload[name];});
+      // A partial update keeps the fields it omits; a seed post may carry no location object at all.
+      if(!p.location)p.location={known:!!p.loc,region:p.region||null,text:''};
+      if(!Array.isArray(p.need)||!p.need.length)return {ok:false,error:{code:'validation',message:'En az bir ihtiyaç seçin.',field:'need'}};
       p.region=p.location.region||'';p.loc=p.publicLocationText||p.region||p.location.text||'Konum henüz belirtilmedi';p.t='şimdi';
       p.text=p.need.map(function(n){return {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'}[n];}).join(', ')+' ihtiyacı var. '+(p.people===null?'Kişi sayısı bilinmiyor.':p.people+' kişi.');
-    } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){p.resolved=cmd.type==='request.close';p.closeReason=p.resolved?(payload.reason||'other'):null;}
+    } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){
+      if(!p)return {ok:false,error:{code:'not_found',message:'Talep bulunamadı.'}};
+      if(p.resolved===(cmd.type==='request.close'))return {ok:false,error:{code:'conflict',message:p.resolved?'Bu talep zaten kapalı.':'Bu talep zaten açık.'}};
+      p.resolved=cmd.type==='request.close';p.closeReason=p.resolved?(payload.reason||'other'):null;}
     else if(cmd.type==='reply.create'||cmd.type==='offer.create'){
       if(!p||p.resolved)return {ok:false,error:{code:'conflict',message:'Bu talep kapalı.'}};if(!p.need&&p.v==='official')return {ok:false,error:{code:'validation',message:'Kurumsal duyurulara yorum yazılamaz.'}};
       if(payload.channel==='coordination'&&p.uid!=='me')return {ok:false,error:{code:'unauthorized',message:'Bu alana yalnızca talep sahibi ve moderatörler yazabilir.'}};
-      var m={channel:payload.channel||'community',visibility:payload.visibility||'public',parentId:payload.parentId||null,id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
+      // Community messages are public on the server, so the local adapter cannot store a private one.
+      var m={channel:payload.channel||'community',visibility:(payload.channel==='coordination'?payload.visibility:'public')||'public',parentId:payload.parentId||null,id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
       (m.kind==='offer'?offlineOffers:offlineMessages).push(m);p[m.kind==='offer'?'offers':'replies']=(p[m.kind==='offer'?'offers':'replies']||0)+1;if(m.channel==='coordination')p.updates=(p.updates||0)+1;else p.support=(p.support||0)+1;
       return {ok:true,entityId:id,entityVersion:1};
-    } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});offer.withdrawn=true;offer.canWithdraw=false;var host=offlinePost(offer.targetId);if(host){host.offers=Math.max(0,(host.offers||0)-1);host.support=Math.max(0,(host.support||0)-1);}return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
+    } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});
+      if(!offer)return {ok:false,error:{code:'not_found',message:'Destek önerisi bulunamadı.'}};
+      offer.withdrawn=true;offer.canWithdraw=false;var host=offlinePost(offer.targetId);if(host){host.offers=Math.max(0,(host.offers||0)-1);host.support=Math.max(0,(host.support||0)-1);}return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
     else if(cmd.type==='report.create'){
       try { var reports=JSON.parse(localStorage.getItem('mihenk:offline-reports')||'[]');reports.push({id:id,targetId:p.id,reason:payload.reason,details:payload.details,at:new Date().toISOString()});localStorage.setItem('mihenk:offline-reports',JSON.stringify(reports)); }
       catch(_){return {ok:false,error:{code:'unavailable',message:'Bildirim bu cihazda kaydedilemedi. Yeniden deneyin.'}};}
@@ -99,9 +108,12 @@
     getView:async function(query){
       if(!M.shared){
         var p=query&&query.thread?offlinePost(query.thread):null,channel=query?.channel||'community';
-        var messages=offlineMessages.concat(offlineOffers.filter(function(o){return !o.withdrawn;})).filter(function(m){return p&&m.targetId===p.id&&(!(p.need||p.tag==='yardim')||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
+        // Same help test as the server: an official announcement has no channels.
+        var help=!!p&&(!!p.need||(p.tag==='yardim'&&p.v!=='official'));
+        var messages=offlineMessages.concat(offlineOffers.filter(function(o){return !o.withdrawn;})).filter(function(m){return p&&m.targetId===p.id&&(!help||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
         var end=Math.max(0,messages.length-(query?.messageOffset||0)),start=Math.max(0,end-40);
-        return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:messages.slice(start,end),parents:messages.filter(function(m){return messages.slice(start,end).some(function(c){return c.parentId===m.id;});}),earlierCount:start,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
+        var slice=messages.slice(start,end),shown={};slice.forEach(function(m){shown[m.id]=1;});
+        return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:slice,parents:messages.filter(function(m){return !shown[m.id]&&slice.some(function(c){return c.parentId===m.id;});}),earlierCount:start,newerCount:messages.length-end,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
       }
       query=Object.assign({},currentQuery,query||{});
       if(!query.thread)currentQuery=Object.assign({},query);

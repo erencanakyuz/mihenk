@@ -72,7 +72,9 @@
     var p=page.thread.post,c=p.capabilities;
     if(p.removed){unavailable('Bu talep kaldırıldı.');return;}
     document.title=pageTitle(p)+' · MİHENK';
-    var d=draft();if(d.parentId&&!parent()){d.parentId=null;delete d.pending;persist();}
+    // A parent that is not in the loaded window only drops the reply target. A pending
+    // command keeps its own frozen parentId so an uncertain retry reuses the same command ID.
+    var d=draft();if(d.parentId&&!parent()){d.parentId=null;persist();}
     page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back aria-label="Akışa dön">'+glyph('chevl')+'<span>Akışa dön</span></button><div><h1 tabindex="-1">'+pageTitle(p)+'</h1><span class="rp-id">#'+esc(p.id.slice(0,8))+'</span></div>'+(p.kind==='request'?'<span class="rp-state">'+glyph(p.status==='closed'?'lock':'clock')+(p.status==='closed'?'Talep kapalı'+({resolved:' · İhtiyaç karşılandı',withdrawn:' · Geri çekildi',duplicate:' · Mükerrer'}[p.closeReason]||''):'Talep açık')+'</span>':'')+'</header>'+statement(p)+
       (p.publicAccess==='restricted'?'<p class="rp-notice">'+glyph('lock')+'Bu talep yalnızca size ve yetkili moderatörlere açık.</p>':'')+
       '<div class="rp-tabs" role="tablist" aria-label="Talep konuşmaları">'+Object.keys(labels).map(function(channel){return '<button role="tab" id="rp-tab-'+channel+'" aria-controls="rp-panel" aria-selected="'+(page.channel===channel)+'" tabindex="'+(page.channel===channel?'0':'-1')+'" data-request-channel="'+channel+'">'+glyph(channel==='coordination'?'shield':'people')+'<span>'+labels[channel]+'</span>'+(page.unread[channel]?'<span class="rp-new-dot" aria-label="Yeni mesaj"></span>':'')+'</button>';}).join('')+'</div>'+
@@ -96,6 +98,8 @@
     else if(result.error.code!=='unavailable'||result.error.retryable===false)delete d.pending;
     if(page===current){try{sessionStorage.setItem(key(channel),JSON.stringify(d));}catch(_){}if(current.channel===channel){
       if(result.ok){await load(false);if(page===current){var input=page.node.querySelector('#rp-text');input?.focus({preventScroll:true});}}
+      // A refresh during the send detaches this composer; rebuild it so the error is still shown.
+      else if(!form.isConnected){render();M.toast(result.error.message);}
       else{form.elements.text.readOnly=!!d.pending;button.disabled=false;button.textContent=d.pending?'Gönderimi yeniden dene':'Gönder';error.hidden=false;error.textContent=result.error.message;if(result.error.code==='conflict')page.node.querySelector('[data-refresh-request]').hidden=false;}
     }}
   }
@@ -156,7 +160,7 @@
     if(button.dataset.replyTo||button.hasAttribute('data-cancel-reply')){
       capture();if(draft().pending){M.toast('Önce bekleyen mesajın gönderimini tamamlayın.');return;}
       draft().parentId=button.dataset.replyTo||null;if(parent()?.visibility==='private')draft().visibility='private';persist();
-      var form=page.node.querySelector('.rp-compose');if(form){var replacement=M.el(composer());form.replaceWith(replacement);replacement.addEventListener('input',capture);replacement.addEventListener('change',capture);replacement.onsubmit=send;replacement.querySelector('textarea').focus();}return;
+      var form=page.node.querySelector('.rp-compose');if(form){var replacement=M.el(composer());form.replaceWith(replacement);replacement.addEventListener('input',capture);replacement.addEventListener('change',capture);replacement.onsubmit=send;replacement.querySelector('textarea')?.focus();}return;
     }
     if(button.dataset.withdrawOffer){
       var msg=allMessages().find(function(m){return m.id===button.dataset.withdrawOffer;});if(!msg)return;
@@ -182,8 +186,11 @@
     var channels=change.channels?.[page.id]||[];
     if(channels.includes(page.channel)){var b=page.node.querySelector('[data-refresh-request]');if(b)b.hidden=false;}
     // The requester always learns about coordination; only moderators get a community dot.
-    var other=page.channel==='coordination'?'community':'coordination';
-    if(channels.includes(other)&&(other==='coordination'||page.thread?.post.capabilities.canManagePublicAccess)){
+    // Moderators are recognised by private access on a request they do not own, so help
+    // calls (which have no management controls) mark their moderators too.
+    var other=page.channel==='coordination'?'community':'coordination',post=page.thread?.post;
+    var moderating=!!post&&post.capabilities.canReadPrivate&&post.authorId!==(M.actorId||'me');
+    if(channels.includes(other)&&(other==='coordination'||moderating)){
       page.unread[other]=true;var tab=page.node.querySelector('[data-request-channel="'+other+'"]');if(tab&&!tab.querySelector('.rp-new-dot'))tab.insertAdjacentHTML('beforeend','<span class="rp-new-dot" aria-label="Yeni mesaj"></span>');
     }
   };
