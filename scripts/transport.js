@@ -5,7 +5,7 @@
   function converted(p){
     var me=currentView.me.id;
     return Object.assign({},p,{uid:p.authorId===me?'me':p.authorId,v:p.verification,t:time(p.updatedAt),
-      loc:p.location.text||p.location.region||'Konum henüz belirtilmedi',region:p.location.region||'',
+      loc:p.publicLocationText||p.location.region||p.location.text||'Konum henüz belirtilmedi',region:p.location.region||'',
       source:p.source.kind,sourceUrl:p.source.url||'',resolved:p.status==='closed',views:0,
       replies:p.replies||0,reposts:p.reposts||0,likes:p.likes||0});
   }
@@ -31,22 +31,33 @@
     if(!response.ok){var error=new Error(value.error?value.error.message:'Bağlantı kurulamadı.');error.code=value.error?value.error.code:'unavailable';error.detail=value;throw error;}
     return value;
   }
-  function offlinePost(id){return (M.state?M.state.extraCrisis:[]).concat(M.SEED.crisis,M.SEED.forYou,M.SEED.following).find(function(p){return p.id===id;});}
+  var localLoaded=false,localReceipts={};
+  function loadLocal(){
+    if(localLoaded||!M.state)return;localLoaded=true;
+    try{var saved=JSON.parse(sessionStorage.getItem('mihenk:requests:v1'));if(saved){M.state.extraCrisis=saved.posts||[];offlineMessages=saved.messages||[];offlineOffers=saved.offers||[];localReceipts=saved.receipts||{};}}catch(_){}
+  }
+  function persistLocal(){try{sessionStorage.setItem('mihenk:requests:v1',JSON.stringify({posts:M.state.extraCrisis,messages:offlineMessages,offers:offlineOffers,receipts:localReceipts}));}catch(_){}}
+  function offlinePost(id){loadLocal();return (M.state?M.state.extraCrisis:[]).concat(M.SEED.crisis,M.SEED.forYou,M.SEED.following).find(function(p){return p.id===id;});}
   function publicOffline(p){
+    if(!p)return null;
     var author=M.SEED.byId[p.uid]||M.SEED.me;
     return Object.assign({},p,{authorId:p.uid,author:author,kind:p.need?'request':'post',version:p.version||1,status:p.resolved?'closed':'open',
       source:{kind:p.source||null,url:p.sourceUrl||null},verification:p.v||'unverified',createdAt:p.createdAt||new Date().toISOString(),updatedAt:p.updatedAt||new Date().toISOString(),
-      location:p.location||{known:!!p.loc,region:p.region||null,text:p.loc||''}});
+      location:p.location||{known:!!p.loc,region:p.region||null,text:p.loc||''},
+      capabilities:{canReadPrivate:p.uid==='me',canEditStatement:p.uid==='me',canWriteCoordination:p.uid==='me'&&!p.resolved,canWriteCommunity:!p.resolved&&p.communityOpen!==false,canManagePublicAccess:false,canClose:p.uid==='me'&&!p.resolved,canReopen:p.uid==='me'&&!!p.resolved}});
   }
   function offlineSend(cmd){
     var p=offlinePost(cmd.targetId), payload=cmd.payload||{}, id=crypto.randomUUID(), version=1;
     if(cmd.type==='request.create'||cmd.type==='request.update') {
       if(!p){p={id:id,uid:'me',tag:'yardim',v:'unverified'};M.state.extraCrisis.unshift(p);}
-      Object.assign(p,{need:payload.need,people:payload.people,location:payload.location,region:payload.location.region||'',loc:payload.location.text||payload.location.region||'Konum henüz belirtilmedi',t:'şimdi'});
-      p.text=payload.need.map(function(n){return {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'}[n];}).join(', ')+' ihtiyacı var. '+(p.people===null?'Kişi sayısı bilinmiyor.':p.people+' kişi.');
-    } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){p.resolved=cmd.type==='request.close';}
+      ['need','people','location','details','phone','privacy','publicLocationText'].forEach(function(name){if(name in payload)p[name]=payload[name];});
+      p.region=p.location.region||'';p.loc=p.publicLocationText||p.region||p.location.text||'Konum henüz belirtilmedi';p.t='şimdi';
+      p.text=p.need.map(function(n){return {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'}[n];}).join(', ')+' ihtiyacı var. '+(p.people===null?'Kişi sayısı bilinmiyor.':p.people+' kişi.');
+    } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){p.resolved=cmd.type==='request.close';p.closeReason=p.resolved?(payload.reason||'other'):null;}
     else if(cmd.type==='reply.create'||cmd.type==='offer.create'){
-      var m={id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
+      if(!p||p.resolved)return {ok:false,error:{code:'conflict',message:'Bu talep kapalı.'}};
+      if(payload.channel==='coordination'&&p.uid!=='me')return {ok:false,error:{code:'unauthorized',message:'Bu alana yalnızca talep sahibi ve moderatörler yazabilir.'}};
+      var m={channel:payload.channel||'community',visibility:payload.visibility||'public',parentId:payload.parentId||null,id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
       (m.kind==='offer'?offlineOffers:offlineMessages).push(m);p[m.kind==='offer'?'offers':'replies']=(p[m.kind==='offer'?'offers':'replies']||0)+1;
       return {ok:true,entityId:id,entityVersion:1};
     } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});offer.withdrawn=true;offer.canWithdraw=false;return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
@@ -62,7 +73,7 @@
   if(M.shared){
     ready=(async function(){
       var join=new URLSearchParams(location.hash.slice(1)).get('join');
-      if(join){history.replaceState(null,'',location.pathname);await request('/api/session/redeem',{method:'POST',body:JSON.stringify({joinCode:join})});}
+      if(join){history.replaceState(null,'',location.pathname+location.search);await request('/api/session/redeem',{method:'POST',body:JSON.stringify({joinCode:join})});}
       return hydrate(await request('/api/view'));
     })();
     ready.catch(function(error){
@@ -73,9 +84,23 @@
   M.getPost=function(id){return M.shared?(cache.has(id)?converted(cache.get(id)):null):offlinePost(id);};
   M.rawPost=function(id){return M.shared?cache.get(id):publicOffline(offlinePost(id));};
   M.transport={
+    initLocal:loadLocal,
+    getRequestView:async function(id,channel,offset){
+      if(!M.shared)return M.transport.getView({thread:id,channel:channel,messageOffset:offset||0});
+      var view=await request('/api/view?'+new URLSearchParams({thread:id,channel:channel||'coordination',messageOffset:offset||0,messageLimit:40,context:'page',relatedLimit:0,limit:1}));
+      if(currentView&&currentView.accessRevision!==view.accessRevision)cache.clear();
+      if(view.thread)cache.set(view.thread.post.id,view.thread.post);
+      return view;
+    },
+    clearRequestCache:function(){cache.clear();},
     ready:function(){return ready;},query:function(){return Object.assign({},currentQuery);},
     getView:async function(query){
-      if(!M.shared){var p=query&&query.thread?offlinePost(query.thread):null;return {thread:p?{post:publicOffline(p),messages:offlineMessages.concat(offlineOffers).filter(function(m){return m.targetId===p.id;}),earlierCount:0}:null};}
+      if(!M.shared){
+        var p=query&&query.thread?offlinePost(query.thread):null,channel=query?.channel||'community';
+        var messages=offlineMessages.concat(offlineOffers).filter(function(m){return p&&m.targetId===p.id&&(!p.need||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
+        var end=Math.max(0,messages.length-(query?.messageOffset||0)),start=Math.max(0,end-40);
+        return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:messages.slice(start,end),parents:messages.filter(function(m){return messages.slice(start,end).some(function(c){return c.parentId===m.id;});}),earlierCount:start,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
+      }
       query=Object.assign({},currentQuery,query||{});
       if(!query.thread)currentQuery=Object.assign({},query);
       var serial=++generation;
@@ -85,10 +110,10 @@
     },
     send:async function(command){
       command.commandId=command.commandId||crypto.randomUUID();
-      if(!M.shared)return offlineSend(command);
+      if(!M.shared){loadLocal();if(localReceipts[command.commandId])return localReceipts[command.commandId];var result=offlineSend(command);if(result.ok){localReceipts[command.commandId]=result;persistLocal();}return result;}
       try{
         var result=await request('/api/commands',{method:'POST',body:JSON.stringify(command)});
-        try{await M.transport.getView();listeners.forEach(function(fn){fn();});}catch(_){/* The stored receipt remains successful if refreshing fails. */}
+        try{if(!M.requestPageActive)await M.transport.getView();listeners.forEach(function(fn){fn();});}catch(_){/* The stored receipt remains successful if refreshing fails. */}
         return result;
       }catch(error){return error.detail||{ok:false,error:{code:'unavailable',message:'Gönderim doğrulanamadı. Bilgileriniz korundu; yeniden deneyin.',retryable:true}};}
     },
@@ -97,7 +122,7 @@
       if(!M.shared)return function(){};
       var stream=new EventSource('/api/events');
       stream.addEventListener('ready',function(){listeners.forEach(function(fn){fn('reconnect');});});
-      stream.addEventListener('changed',function(){listeners.forEach(function(fn){fn('changed');});});
+      stream.addEventListener('changed',function(event){var change={};try{change=JSON.parse(event.data);}catch(_){}listeners.forEach(function(fn){fn('changed',change);});});
       stream.onerror=function(){if(M.connectionStatus)M.connectionStatus(false);};
       stream.onopen=function(){if(M.connectionStatus)M.connectionStatus(true);};
       return function(){stream.close();};

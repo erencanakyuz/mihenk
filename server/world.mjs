@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { hash } from './store.mjs';
-import { permits, canSeePost, canTarget } from './access.mjs';
+import { permits, canSeePost, canTarget, privateRequestAccess, requestModerator, canReadMessage, messageChannel } from './access.mjs';
 export const NEEDS = {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'};
 export const TAGS = ['yardim','enkaz','kayip','nokta','resmi','durum'];
 const collections = ['actors','posts','replies','offers','reports','reactions','follows','observations'];
@@ -39,7 +39,7 @@ function source(value) {
   return {kind:value.kind,url:null};
 }
 function requestFields(payload,partial=false) {
-  fields(payload,['need','people','location']);
+  fields(payload,['need','people','location','details','phone','privacy','publicLocationText']);
   const out={};
   if (!partial || 'need' in payload) {
     if (!Array.isArray(payload.need)||!payload.need.length||payload.need.length>5||payload.need.some(n=>!Object.hasOwn(NEEDS,n)))
@@ -51,6 +51,13 @@ function requestFields(payload,partial=false) {
     out.people=payload.people;
   }
   if (!partial || 'location' in payload) out.location=location(payload.location);
+  for(const [name,max] of [['details',2000],['phone',40],['publicLocationText',240]])
+    if(name in payload)out[name]=text(payload[name],max,false,name);
+  if('privacy' in payload){
+    fields(payload.privacy,['address','phone']);
+    if(!['public','private'].includes(payload.privacy.address)||!['public','private'].includes(payload.privacy.phone))reject('validation','Bilgi görünürlüğünü seçin.','privacy');
+    out.privacy={...payload.privacy};
+  }
   return out;
 }
 const needsText=p=>p.need.map(n=>NEEDS[n]).join(', ')+' ihtiyacı var. '+(p.people===null?'Kişi sayısı henüz bilinmiyor.':p.people+' kişi.');
@@ -121,20 +128,50 @@ export function execute(state,actorId,cmd,now=new Date().toISOString()) {
     if(!target||target.removed) reject('not_found','Gönderi bulunamadı.');
     if(cmd.type.startsWith('request.')) {
       if(target.kind!=='request') reject('validation','Bu kayıt bir yardım talebi değil.');
-      own(target,actorId); version(target,cmd);
+      if(!privateRequestAccess(state,actorId,target))own(target,actorId);
+      version(target,cmd);
+      if(cmd.type==='request.update')own(target,actorId);
       if(cmd.type==='request.update') { Object.assign(target,requestFields(p,true)); target.text=needsText(target); }
-      else if(cmd.type==='request.close'||cmd.type==='request.reopen') { fields(p,[]); target.status=cmd.type==='request.close'?'closed':'open'; }
+      else if(cmd.type==='request.manage'){
+        fields(p,['communityOpen','publicAccess','reason']);
+        if(!requestModerator(actor))reject('unauthorized','Bu işlem için talep moderatörü yetkisi gerekir.');
+        if('communityOpen' in p){if(typeof p.communityOpen!=='boolean')reject('validation','Topluluk durumunu kontrol edin.');target.communityOpen=p.communityOpen;}
+        if('publicAccess' in p){if(!['public','restricted'].includes(p.publicAccess))reject('validation','Görünürlüğü kontrol edin.');target.publicAccess=p.publicAccess;}
+        target.accessChange={actorId,at:now,reason:text(p.reason||'',240)};
+      }
+      else if(cmd.type==='request.close'||cmd.type==='request.reopen') {
+        fields(p,['reason']);target.status=cmd.type==='request.close'?'closed':'open';
+        if(p.reason&&!['resolved','withdrawn','duplicate','other'].includes(p.reason))reject('validation','Kapatma nedenini seçin.');
+        target.closedBy=target.status==='closed'?actorId:null;target.closedAt=target.status==='closed'?now:null;
+        target.closeReason=target.status==='closed'?(p.reason||'other'):null;
+      }
       else reject('validation','İşlem tanınmıyor.');
       target.version++;target.updatedAt=now;entity=target;
     } else if(cmd.type==='reply.create'||cmd.type==='offer.create') {
-      fields(p,['text']);
+      fields(p,['text','channel','visibility','parentId']);
+      const channel=p.channel||'community',visibility=p.visibility||'public';
+      if(!['coordination','community'].includes(channel)||!['private','public'].includes(visibility))reject('validation','Mesaj kanalını ve görünürlüğünü kontrol edin.');
+      if(target.kind==='request'){
+        if(target.status!=='open')reject('conflict','Bu talep kapalı. Yeni mesaj yazılamaz.');
+        if(channel==='coordination'&&!privateRequestAccess(state,actorId,target))reject('unauthorized','Bu alana yalnızca talep sahibi ve moderatörler yazabilir.');
+        if(channel==='community'&&target.communityOpen===false)reject('conflict','Topluluk mesajları durduruldu.');
+      }else if(channel!=='community')reject('validation','Bu gönderide koordinasyon kanalı yok.');
+      if(channel==='community'&&visibility!=='public')reject('validation','Topluluk mesajları herkese açıktır.');
+      let parentId=null;
+      if(p.parentId){
+        const parent=state.replies[p.parentId]||state.offers[p.parentId];
+        if(!parent||parent.targetId!==target.id||messageChannel(parent)!==channel||!canReadMessage(state,actorId,parent))reject('validation','Yanıt verilen mesaj bu konuşmada bulunamadı.');
+        if(parent.visibility==='private'&&visibility!=='private')reject('validation','Özel mesaja verilen yanıt da özel olmalı.');
+        parentId=parent.id;
+      }
       if(cmd.type==='offer.create') {
+        if(channel!=='community')reject('validation','Destek önerileri topluluk alanına yazılır.');
         if(target.kind!=='request'||target.status!=='open') reject('conflict','Bu talep kapalı. Güncel durumu kontrol edin.');
         if(target.authorId===actorId) reject('validation','Kendi talebinize destek öneremezsiniz.');
         if(Object.values(state.offers).some(o=>o.targetId===target.id&&o.authorId===actorId&&!o.withdrawn)) reject('conflict','Bu talepte açık bir destek öneriniz var.');
         version(target,cmd);
       }
-      entity={...stamp,id:randomUUID(),targetId:target.id,text:text(p.text,1000,true),withdrawn:false};
+      entity={...stamp,id:randomUUID(),targetId:target.id,text:text(p.text,1000,true),channel,visibility,parentId,withdrawn:false};
       state[cmd.type==='offer.create'?'offers':'replies'][entity.id]=entity;
     } else if(cmd.type==='post.react') {
       fields(p,['active']);

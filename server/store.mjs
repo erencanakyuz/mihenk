@@ -65,6 +65,7 @@ export function openStore(filename) {
       });
     },
     session(token) { return token ? db.prepare('SELECT * FROM sessions WHERE token=? AND expires>?').get(hash(token), Date.now()) : null; },
+    seenFor(storedToken) { return db.prepare('SELECT seen FROM sessions WHERE token=?').get(storedToken)?.seen || '[]'; },
     seen(session, ids) {
       const seen = [...new Set([...JSON.parse(session.seen),...ids])].slice(-5000);
       db.prepare('UPDATE sessions SET seen=? WHERE token=?').run(JSON.stringify(seen),session.token);

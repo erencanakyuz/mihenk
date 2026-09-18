@@ -5,12 +5,12 @@ import { randomUUID } from 'node:crypto';
 import { openStore, secret, hash } from './store.mjs';
 import { AppError, createWorldService, applyDelta, reject } from './world.mjs';
 import { projectView } from './views.mjs';
-import { normalizeAccess, permits, roles, accessFor } from './access.mjs';
+import { normalizeAccess, permits, roles, accessFor, canReadMessage, canSeePost, messageChannel } from './access.mjs';
 import { makeScenario, advance } from '../lab/scenarios.mjs';
 
 const ROOT=path.resolve(import.meta.dirname,'..');
-const scripts=['catalog','transport','app','feed','crisis','imdat','request-thread','shared'];
-const assets=new Set(['/participant.html',...scripts.map(s=>s==='catalog'?'/data/catalog.js':'/scripts/'+s+'.js'),...['tokens','base','feed','crisis','refine','plain'].map(s=>'/styles/'+s+'.css'),'/assets/fonts/archivo-700.woff2']);
+const scripts=['catalog','transport','app','feed','crisis','imdat','request-thread','request-page','shared'];
+const assets=new Set(['/participant.html',...scripts.map(s=>s==='catalog'?'/data/catalog.js':'/scripts/'+s+'.js'),...['tokens','base','feed','crisis','refine','plain','request-page'].map(s=>'/styles/'+s+'.css'),'/assets/fonts/archivo-700.woff2']);
 const json=(res,code,value)=>{res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(value));};
 async function body(req,limit=65536) {
   let size=0;const parts=[];
@@ -171,11 +171,19 @@ export async function serveRehearsal({port=8322,operatorPort=8323,host='127.0.0.
     }catch(error){if(!res.headersSent)fail(res,error);else res.end();}
   });
   service.listeners.add((runId,delta)=>{
-    const publicChange=Object.keys(delta).some(k=>!['reports'].includes(k));
-    if(!publicChange)return;
+    const state=store.read(runId);
     for(const stream of streams)if(stream.session.run_id===runId){
-      if(!permits(store.read(runId)?.actors[stream.session.actor_id],'read_view'))stream.res.end();
-      else stream.res.write('event: changed\ndata: {}\n\n');
+      const actorId=stream.session.actor_id;
+      if(!permits(state.actors[actorId],'read_view')){stream.res.end();continue;}
+      const change={posts:[],channels:{},accessChanged:!!delta.actors};
+      // IDs of already observed posts also invalidate content when access is removed.
+      const seen=new Set(JSON.parse(store.seenFor(stream.session.token)));
+      for(const p of Object.values(delta.posts||{}))if(canSeePost(state,actorId,p)||seen.has(p.id))change.posts.push(p.id);
+      for(const m of [...Object.values(delta.replies||{}),...Object.values(delta.offers||{})])if(canReadMessage(state,actorId,m)){
+        const channels=change.channels[m.targetId]||(change.channels[m.targetId]=[]);const c=messageChannel(m);if(!channels.includes(c))channels.push(c);
+      }
+      if(change.accessChanged||change.posts.length||Object.keys(change.channels).length||delta.status||delta.reactions||delta.follows)
+        stream.res.write('event: changed\ndata: '+JSON.stringify(change)+'\n\n');
     }
   });
   const listen=(server,p)=>new Promise((resolve,reject)=>{server.once('error',reject);server.listen(p,host,resolve);});

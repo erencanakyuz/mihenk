@@ -15,12 +15,12 @@ export function observation(view){
   const posts=unique(view.items),relatedPosts=unique(view.relatedPosts||[]),ownRequests=unique(view.ownRequests||[]);
   const messageIds=new Set((view.thread?.messages||[]).map(m=>m.id));
   return {title:view.title,account:view.me,query:view.query,posts,relatedPosts,ownRequests,ownRequestIds:(view.ownRequests||[]).map(p=>p.id),
-    thread:view.thread?{post:postView(view.thread.post),messages:view.thread.messages.map(({id,author,authorActions,text,kind,createdAt,withdrawn,canWithdraw})=>({id,author,authorActions:(authorActions||[]).map(t=>t.replace('.','_')),text,kind,targetKind:kind==='offer'?'offer':'message',createdAt,withdrawn,canWithdraw})),earlierCount:view.thread.earlierCount,newerCount:view.thread.newerCount,nextMessageOffset:view.thread.nextMessageOffset}:null,
+    thread:view.thread?{post:postView(view.thread.post),channel:view.thread.channel||'community',messages:view.thread.messages.map(({id,author,authorActions,text,kind,createdAt,withdrawn,canWithdraw,channel,visibility,parentId})=>({id,author,authorActions:(authorActions||[]).map(t=>t.replace('.','_')),text,kind,targetKind:kind==='offer'?'offer':'message',createdAt,withdrawn,canWithdraw,channel:channel||'community',visibility:visibility||'public',parentId:parentId||null})),earlierCount:view.thread.earlierCount,newerCount:view.thread.newerCount,nextMessageOffset:view.thread.nextMessageOffset}:null,
     updates:(view.updates||[]).filter(u=>!messageIds.has(u.id)).map(update=>({...update,authorActions:(update.authorActions||[]).map(t=>t.replace('.','_'))})),nextOffset:view.nextOffset,total:view.total,counts:view.counts,actions:(view.actions||[]).map(t=>t.replace('.','_'))};
 }
 
 const targetKinds=Object.freeze({
-  post_remove:'posts', account_ban:'accounts', request_update:'posts', request_close:'posts', request_reopen:'posts',
+  post_remove:'posts', account_ban:'accounts', request_manage:'posts', request_update:'posts', request_close:'posts', request_reopen:'posts',
   reply_create:'posts', offer_create:'posts', offer_withdraw:'offers', post_react:'posts', post_repost:'posts',
   account_follow:'accounts', observation_create:'posts', report_create:'posts'
 });
@@ -170,7 +170,7 @@ export class Participant {
     try{await this.request('/api/activity',{eventId:prepared.command?.commandId||randomUUID(),operation,note:args.decisionNote||'',targetId:args.targetId||null});}catch{/* Product receipts remain independent of optional decision notes. */}
     if(operation==='wait')return {ok:true,waitSeconds:args.seconds||10};
     if(operation==='read_view')return {ok:true,observation:await this.read({...args})};
-    if(operation==='open_thread')return {ok:true,observation:await this.read({...this.query,thread:args.targetId,messageOffset:args.offset||0})};
+    if(operation==='open_thread')return {ok:true,observation:await this.read({...this.query,thread:args.targetId,messageOffset:args.offset||0,channel:args.channel||'community'})};
     this.pending=prepared;await save();
     try{
       const result=await this.request('/api/commands',prepared.command);

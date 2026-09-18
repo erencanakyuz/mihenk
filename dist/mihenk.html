@@ -21,7 +21,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~298 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~303 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -1696,6 +1696,136 @@ ul { list-style: none; margin: 0; padding: 0; }
 :root[data-plain="1"] .crisis-tools { display: block; }
 :root[data-plain="1"] .bytechip { display: inline-flex; margin: 8px 0 0; }
 
+/* ===== styles/request-page.css ===== */
+/* A dedicated reading surface. Global navigation returns on leaving the request. */
+:root[data-request-page] .shell { display:block; max-width:1080px; padding:0 24px; margin:0 auto; }
+:root[data-request-page] .shell>.nav, :root[data-request-page] .shell>.side,
+:root[data-request-page] .bottombar, :root[data-request-page] .fab { display:none!important; }
+:root[data-request-page] .main { width:100%; max-width:none; min-width:0; border:0; margin:0; padding:0; }
+:root[data-request-page] .main>:not(#request-page) { display:none!important; }
+:root[data-request-page] body { padding-bottom:0; }
+.request-page { --rp-head:76px; width:100%; min-height:100dvh; color:var(--c-text); padding-bottom:24px; }
+.request-page button, .request-page select, .request-page summary { -webkit-tap-highlight-color:transparent; }
+.request-page button:focus-visible, .request-page a:focus-visible, .request-page summary:focus-visible,
+.request-page input:focus-visible, .request-page select:focus-visible, .request-page textarea:focus-visible { outline:2px solid var(--c-accent); outline-offset:4px; }
+.request-page .ic { width:18px; height:18px; flex-shrink:0; }
+.rp-header { position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:24px; min-height:var(--rp-head); background:var(--c-bg); border-bottom:1px solid var(--c-border); }
+.rp-header>div { display:flex; align-items:baseline; gap:12px; }
+.rp-header h1 { font:700 23px/1.25 var(--ff-display); margin:0; }
+.rp-id { color:var(--c-text-2); font-size:12px; }
+.rp-back { display:flex; align-items:center; gap:6px; min-height:44px; color:var(--c-text-2); font-size:13px; }
+.rp-back:hover { color:var(--c-accent); }
+.rp-state { display:flex; align-items:center; gap:7px; margin-left:auto; color:var(--c-accent); font-size:13px; white-space:nowrap; }
+.rp-overview { padding:26px 0 0; }
+.rp-overview-title { display:flex; align-items:center; flex-wrap:wrap; gap:10px 20px; }
+.rp-overview h2 { font-size:21px; line-height:1.4; letter-spacing:-.4px; margin:0; }
+.rp-verification { display:inline-flex; align-items:center; gap:6px; color:var(--v-unverified); font-size:12px; }
+.rp-verification[data-verification="verified"] { color:var(--v-verified); }
+.rp-verification[data-verification="official"] { color:var(--v-official); }
+.rp-verification[data-verification="disputed"] { color:var(--v-disputed); }
+.rp-facts { display:flex; flex-wrap:wrap; gap:8px 24px; margin:12px 0 20px; font-size:13px; color:var(--c-text-2); }
+.rp-facts>span { display:flex; align-items:center; gap:7px; }
+.rp-statement { border:1px solid var(--c-border); border-left:3px solid var(--c-accent); border-radius:10px; background:var(--c-bg-2); }
+.request-page summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:14px 18px; min-height:48px; }
+.request-page summary::-webkit-details-marker { display:none; }
+.request-page summary>.ic:last-child { margin-left:auto; transition:transform .15s; }
+.request-page details[open]>summary>.ic:last-child { transform:rotate(180deg); }
+.rp-statement-author { display:flex; align-items:center; gap:12px; }
+.rp-statement-author strong { display:block; font-size:14px; font-weight:600; }
+.rp-statement-author small { display:block; color:var(--c-text-2); margin-top:3px; font-size:12px; }
+.rp-avatar { display:grid; place-items:center; width:36px; height:36px; flex:0 0 36px; border-radius:50%; background:#314665; color:#edf1f7; font-size:12px; font-weight:700; }
+.rp-statement-body { padding:0 20px 20px 66px; }
+.rp-statement-body>p { font-size:15px; line-height:1.7; white-space:pre-wrap; overflow-wrap:anywhere; max-width:76ch; margin:0 0 14px; }
+.rp-disclosure { margin-top:12px; border-top:1px solid var(--c-border); }
+.rp-disclosure summary { padding:12px 0; font-size:13px; color:var(--c-text-2); }
+.rp-fields { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:0 0 12px; }
+.rp-fields dt { font-size:12px; color:var(--c-text-2); margin-bottom:5px; }
+.rp-fields dd { font-size:14px; overflow-wrap:anywhere; margin:0; }
+.rp-fields small { display:flex; align-items:center; gap:5px; color:var(--c-text-2); margin-top:7px; font-size:11px; }
+.rp-fields .ic { width:13px; height:13px; }
+.rp-hint { color:var(--c-text-2); font-size:12px; line-height:1.6; }
+.rp-text-button { display:inline-flex; align-items:center; gap:7px; min-height:44px; color:var(--c-accent); font-size:13px; }
+.rp-management>summary { justify-content:flex-end; padding:6px 0; font-size:12px; color:var(--c-text-2); }
+.rp-management>summary>.ic:last-child { margin-left:0; }
+.rp-manage-body { border-block:1px solid var(--c-border); padding:8px 0; }
+.rp-manage-body>div { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:10px 0; }
+.rp-manage-body b { font-size:14px; }
+.rp-manage-body small { display:block; font-size:12px; color:var(--c-text-2); margin-top:4px; max-width:64ch; }
+.rp-manage-body label { display:grid; gap:5px; font-size:13px; }
+.rp-button { padding:10px 14px; min-height:44px; border:1px solid var(--c-border); border-radius:8px; font-size:13px; flex-shrink:0; }
+.rp-button:hover { background:var(--c-bg-3); }
+.rp-tabs { display:flex; position:sticky; top:var(--rp-head); z-index:19; background:var(--c-bg); border-bottom:1px solid var(--c-border); margin-top:12px; }
+.rp-tabs>button { position:relative; display:flex; justify-content:center; align-items:center; gap:10px; min-height:62px; padding:12px 24px; color:var(--c-text-2); font-size:14px; font-weight:600; }
+.rp-tabs>button[aria-selected="true"] { color:var(--c-accent); }
+.rp-tabs>button[aria-selected="true"]::after { content:""; position:absolute; bottom:-1px; height:3px; inset-inline:16px; border-radius:3px; background:var(--c-accent); }
+.rp-new-dot { height:7px; width:7px; border-radius:50%; background:var(--c-accent); }
+.rp-conversation { max-width:880px; margin:auto; padding:0 4px; }
+.rp-channel-note { color:var(--c-text-2); font-size:12px; line-height:1.6; padding:16px 0 6px; }
+.rp-message { display:flex; gap:12px; padding:24px 0; border-bottom:1px solid var(--c-border); scroll-margin-top:160px; }
+.rp-message--reply { margin-left:46px; position:relative; }
+.rp-message--reply::before { content:""; position:absolute; left:-27px; top:0; width:15px; height:39px; border-left:1px solid var(--c-border); border-bottom:1px solid var(--c-border); border-radius:0 0 0 7px; }
+.rp-message-content { flex:1; min-width:0; }
+.rp-message-meta { display:flex; flex-wrap:wrap; align-items:center; gap:5px 10px; font-size:12px; line-height:1.6; }
+.rp-message-meta>b { color:var(--c-text); font-size:14px; }
+.rp-message-meta time { color:var(--c-text-2); }
+.rp-role { color:var(--c-accent); }
+.rp-audience { display:inline-flex; gap:4px; align-items:center; color:var(--c-text-2); margin-left:auto; }
+.rp-audience .ic { width:13px; height:13px; }
+.rp-message p { font-size:15px; line-height:1.65; margin:8px 0 4px; white-space:pre-wrap; overflow-wrap:anywhere; max-width:78ch; }
+.rp-message-actions { display:flex; gap:16px; }
+.rp-message-actions>button { display:inline-flex; align-items:center; gap:6px; min-height:36px; color:var(--c-text-2); font-size:12px; }
+.rp-message-actions>button:hover { color:var(--c-accent); }
+.rp-message-actions .ic { width:14px; height:14px; }
+.rp-parent { display:inline-block; font-size:12px; margin-top:5px; color:var(--c-text-2); text-decoration:underline; text-underline-offset:3px; }
+.rp-offer { display:block; color:var(--c-accent); font-size:12px; margin-top:6px; }
+.rp-empty { padding:44px 24px; text-align:center; }
+.rp-empty>.ic { width:30px; height:30px; color:var(--c-text-2); margin-bottom:14px; }
+.rp-empty h3,.rp-empty h2 { font-size:17px; font-weight:600; margin:0 0 8px; }
+.rp-empty p { font-size:14px; color:var(--c-text-2); line-height:1.65; }
+.rp-compose { margin:24px 0 0; padding:16px; background:var(--c-bg-2); border:1px solid var(--c-border); border-radius:12px; }
+.rp-compose>label { font-size:13px; font-weight:600; display:block; margin-bottom:10px; }
+.rp-compose textarea { display:block; width:100%; padding:0; min-height:80px; max-height:260px; resize:vertical; border:0; color:var(--c-text); background:transparent; font:16px/1.6 var(--ff); }
+.rp-compose textarea::placeholder { color:var(--c-text-2); }
+.rp-compose-footer { display:flex; flex-wrap:wrap; align-items:center; gap:10px; border-top:1px solid var(--c-border); margin-top:12px; padding-top:12px; }
+.request-page select { max-width:100%; border:1px solid var(--c-border); background:var(--c-bg); color:var(--c-text); padding:10px 28px 10px 10px; border-radius:7px; font:13px var(--ff); min-height:44px; }
+.rp-visibility { display:flex; align-items:center; gap:6px; }
+.rp-visibility>.ic { width:15px; height:15px; color:var(--c-text-2); }
+.rp-send { display:flex; align-items:center; justify-content:center; gap:8px; min-height:44px; min-width:114px; padding:10px 16px; margin-left:auto; background:var(--c-accent-fill); color:#fff; border-radius:8px; font-size:14px; font-weight:700; }
+.rp-send:hover { filter:brightness(1.12); }
+.rp-send:disabled { opacity:.6; cursor:wait; }
+.rp-public-note { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--c-text-2); }
+.rp-compose-hint { margin:10px 0 0; font-size:11px; color:var(--c-text-2); line-height:1.55; }
+.rp-reply-target { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--c-border); }
+.rp-reply-target>span { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--c-accent); }
+.rp-reply-target>button { width:44px; height:44px; display:grid; place-items:center; }
+.rp-error,.rp-connection { font-size:13px; color:#ffb5b5; line-height:1.6; margin-top:12px; }
+.rp-readonly,.rp-notice { display:flex; align-items:center; gap:10px; padding:16px 0; color:var(--c-text-2); font-size:13px; line-height:1.65; }
+.rp-updates,.rp-earlier { display:block; width:100%; min-height:44px; font-size:13px; color:var(--c-accent); border-bottom:1px solid var(--c-border); }
+.rp-local { text-align:center; margin-top:22px; color:var(--c-text-2); font-size:11px; }
+.request-page [hidden] { display:none!important; }
+@media(max-width:700px){
+  :root[data-request-page] .shell { padding:0 16px; }
+  .request-page { --rp-head:64px; padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
+  .rp-header { gap:12px; }.rp-header h1 { font-size:18px; }.rp-header>div { gap:4px; flex-direction:column; }
+  .rp-back { width:32px; justify-content:center; }.rp-back>span { display:none; }.rp-id { display:none; }.rp-state { font-size:12px; }
+  .rp-overview { padding-top:18px; }.rp-overview h2 { font-size:19px; }.rp-overview-title { gap:7px; }
+  .rp-verification { font-size:11px; }.rp-facts { gap:7px 14px; margin:10px 0 14px; font-size:12px; }
+  .request-page summary { padding:12px; }.rp-statement-author { gap:9px; }.rp-statement-author strong { font-size:13px; }.rp-statement-author small { font-size:11px; }
+  .rp-statement-body { padding:0 14px 14px; }.rp-statement-body>p { font-size:14px; }.rp-fields { grid-template-columns:1fr; }
+  .rp-tabs { margin-top:4px; }.rp-tabs>button { flex:1; min-width:0; padding:10px 8px; gap:7px; font-size:13px; min-height:60px; }
+  .rp-tabs>button>span { max-width:130px; }.rp-tabs>button::after { inset-inline:4px!important; }
+  .rp-conversation { padding:0; }.rp-channel-note { font-size:11px; padding:12px 0 2px; }
+  .rp-message { padding:18px 0; gap:9px; }.rp-message--reply { margin-left:18px; }.rp-message--reply::before { left:-12px; width:8px; height:32px; }
+  .rp-avatar { width:30px; height:30px; flex-basis:30px; font-size:11px; }.rp-audience { margin-left:0; }
+  .rp-message-meta { font-size:11px; gap:3px 8px; }.rp-message-meta>b { font-size:13px; }.rp-message p { font-size:14px; line-height:1.65; }
+  .rp-compose { padding:12px; margin-top:16px; }.rp-compose-footer { gap:8px; }.rp-send { min-width:88px; padding:10px 12px; }
+  .rp-visibility { gap:0; flex:1; }.rp-visibility>.ic { display:none; }.rp-visibility select { width:100%; font-size:12px; padding-left:8px; }
+  .rp-kind { order:3; width:100%; }.rp-kind select { width:100%; }.rp-compose-hint { font-size:11px; }
+  .rp-management>summary { padding:4px 0; }.rp-manage-body>div { flex-wrap:wrap; gap:10px; }.rp-empty { padding:30px 8px; }
+}
+@media(prefers-reduced-motion:reduce){.request-page summary>.ic { transition:none; }}
+:root[data-plain="1"] .request-page { --c-bg:#000; --c-bg-2:#000; --c-text:#fff; --c-text-2:#ddd; --c-border:#777; }
+
 </style>
 
 <script>
@@ -1956,7 +2086,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   function converted(p){
     var me=currentView.me.id;
     return Object.assign({},p,{uid:p.authorId===me?'me':p.authorId,v:p.verification,t:time(p.updatedAt),
-      loc:p.location.text||p.location.region||'Konum henüz belirtilmedi',region:p.location.region||'',
+      loc:p.publicLocationText||p.location.region||p.location.text||'Konum henüz belirtilmedi',region:p.location.region||'',
       source:p.source.kind,sourceUrl:p.source.url||'',resolved:p.status==='closed',views:0,
       replies:p.replies||0,reposts:p.reposts||0,likes:p.likes||0});
   }
@@ -1965,7 +2095,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     if(currentView&&currentView.accessRevision!==view.accessRevision){cache.clear();M.SEED.byId={};}
     currentView=view;M.sharedView=view;M.actorId=view.me.id;M.moderationOnly=view.controlMode==='moderation';
     var S=M.SEED;S.me=account(Object.assign({},view.me,{id:'me'}));S.byId.me=S.me;
-    var posts=view.items.concat(view.thread?[view.thread.post]:[]);
+    var posts=view.items.concat(view.relatedPosts||[],view.thread?[view.thread.post]:[]);
     posts.forEach(function(p){
       S.byId[p.authorId===view.me.id?'me':p.authorId]=account(p.author);
       cache.set(p.id,p);if(p.originalId)cache.set(p.originalId,Object.assign({},p,{id:p.originalId,originalId:null}));
@@ -1982,22 +2112,33 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     if(!response.ok){var error=new Error(value.error?value.error.message:'Bağlantı kurulamadı.');error.code=value.error?value.error.code:'unavailable';error.detail=value;throw error;}
     return value;
   }
-  function offlinePost(id){return (M.state?M.state.extraCrisis:[]).concat(M.SEED.crisis,M.SEED.forYou,M.SEED.following).find(function(p){return p.id===id;});}
+  var localLoaded=false,localReceipts={};
+  function loadLocal(){
+    if(localLoaded||!M.state)return;localLoaded=true;
+    try{var saved=JSON.parse(sessionStorage.getItem('mihenk:requests:v1'));if(saved){M.state.extraCrisis=saved.posts||[];offlineMessages=saved.messages||[];offlineOffers=saved.offers||[];localReceipts=saved.receipts||{};}}catch(_){}
+  }
+  function persistLocal(){try{sessionStorage.setItem('mihenk:requests:v1',JSON.stringify({posts:M.state.extraCrisis,messages:offlineMessages,offers:offlineOffers,receipts:localReceipts}));}catch(_){}}
+  function offlinePost(id){loadLocal();return (M.state?M.state.extraCrisis:[]).concat(M.SEED.crisis,M.SEED.forYou,M.SEED.following).find(function(p){return p.id===id;});}
   function publicOffline(p){
+    if(!p)return null;
     var author=M.SEED.byId[p.uid]||M.SEED.me;
     return Object.assign({},p,{authorId:p.uid,author:author,kind:p.need?'request':'post',version:p.version||1,status:p.resolved?'closed':'open',
       source:{kind:p.source||null,url:p.sourceUrl||null},verification:p.v||'unverified',createdAt:p.createdAt||new Date().toISOString(),updatedAt:p.updatedAt||new Date().toISOString(),
-      location:p.location||{known:!!p.loc,region:p.region||null,text:p.loc||''}});
+      location:p.location||{known:!!p.loc,region:p.region||null,text:p.loc||''},
+      capabilities:{canReadPrivate:p.uid==='me',canEditStatement:p.uid==='me',canWriteCoordination:p.uid==='me'&&!p.resolved,canWriteCommunity:!p.resolved&&p.communityOpen!==false,canManagePublicAccess:false,canClose:p.uid==='me'&&!p.resolved,canReopen:p.uid==='me'&&!!p.resolved}});
   }
   function offlineSend(cmd){
     var p=offlinePost(cmd.targetId), payload=cmd.payload||{}, id=crypto.randomUUID(), version=1;
     if(cmd.type==='request.create'||cmd.type==='request.update') {
       if(!p){p={id:id,uid:'me',tag:'yardim',v:'unverified'};M.state.extraCrisis.unshift(p);}
-      Object.assign(p,{need:payload.need,people:payload.people,location:payload.location,region:payload.location.region||'',loc:payload.location.text||payload.location.region||'Konum henüz belirtilmedi',t:'şimdi'});
-      p.text=payload.need.map(function(n){return {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'}[n];}).join(', ')+' ihtiyacı var. '+(p.people===null?'Kişi sayısı bilinmiyor.':p.people+' kişi.');
-    } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){p.resolved=cmd.type==='request.close';}
+      ['need','people','location','details','phone','privacy','publicLocationText'].forEach(function(name){if(name in payload)p[name]=payload[name];});
+      p.region=p.location.region||'';p.loc=p.publicLocationText||p.region||p.location.text||'Konum henüz belirtilmedi';p.t='şimdi';
+      p.text=p.need.map(function(n){return {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'}[n];}).join(', ')+' ihtiyacı var. '+(p.people===null?'Kişi sayısı bilinmiyor.':p.people+' kişi.');
+    } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){p.resolved=cmd.type==='request.close';p.closeReason=p.resolved?(payload.reason||'other'):null;}
     else if(cmd.type==='reply.create'||cmd.type==='offer.create'){
-      var m={id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
+      if(!p||p.resolved)return {ok:false,error:{code:'conflict',message:'Bu talep kapalı.'}};
+      if(payload.channel==='coordination'&&p.uid!=='me')return {ok:false,error:{code:'unauthorized',message:'Bu alana yalnızca talep sahibi ve moderatörler yazabilir.'}};
+      var m={channel:payload.channel||'community',visibility:payload.visibility||'public',parentId:payload.parentId||null,id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
       (m.kind==='offer'?offlineOffers:offlineMessages).push(m);p[m.kind==='offer'?'offers':'replies']=(p[m.kind==='offer'?'offers':'replies']||0)+1;
       return {ok:true,entityId:id,entityVersion:1};
     } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});offer.withdrawn=true;offer.canWithdraw=false;return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
@@ -2013,7 +2154,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   if(M.shared){
     ready=(async function(){
       var join=new URLSearchParams(location.hash.slice(1)).get('join');
-      if(join){history.replaceState(null,'',location.pathname);await request('/api/session/redeem',{method:'POST',body:JSON.stringify({joinCode:join})});}
+      if(join){history.replaceState(null,'',location.pathname+location.search);await request('/api/session/redeem',{method:'POST',body:JSON.stringify({joinCode:join})});}
       return hydrate(await request('/api/view'));
     })();
     ready.catch(function(error){
@@ -2024,9 +2165,23 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   M.getPost=function(id){return M.shared?(cache.has(id)?converted(cache.get(id)):null):offlinePost(id);};
   M.rawPost=function(id){return M.shared?cache.get(id):publicOffline(offlinePost(id));};
   M.transport={
+    initLocal:loadLocal,
+    getRequestView:async function(id,channel,offset){
+      if(!M.shared)return M.transport.getView({thread:id,channel:channel,messageOffset:offset||0});
+      var view=await request('/api/view?'+new URLSearchParams({thread:id,channel:channel||'coordination',messageOffset:offset||0,messageLimit:40,context:'page',relatedLimit:0,limit:1}));
+      if(currentView&&currentView.accessRevision!==view.accessRevision)cache.clear();
+      if(view.thread)cache.set(view.thread.post.id,view.thread.post);
+      return view;
+    },
+    clearRequestCache:function(){cache.clear();},
     ready:function(){return ready;},query:function(){return Object.assign({},currentQuery);},
     getView:async function(query){
-      if(!M.shared){var p=query&&query.thread?offlinePost(query.thread):null;return {thread:p?{post:publicOffline(p),messages:offlineMessages.concat(offlineOffers).filter(function(m){return m.targetId===p.id;}),earlierCount:0}:null};}
+      if(!M.shared){
+        var p=query&&query.thread?offlinePost(query.thread):null,channel=query?.channel||'community';
+        var messages=offlineMessages.concat(offlineOffers).filter(function(m){return p&&m.targetId===p.id&&(!p.need||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
+        var end=Math.max(0,messages.length-(query?.messageOffset||0)),start=Math.max(0,end-40);
+        return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:messages.slice(start,end),parents:messages.filter(function(m){return messages.slice(start,end).some(function(c){return c.parentId===m.id;});}),earlierCount:start,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
+      }
       query=Object.assign({},currentQuery,query||{});
       if(!query.thread)currentQuery=Object.assign({},query);
       var serial=++generation;
@@ -2036,10 +2191,10 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     },
     send:async function(command){
       command.commandId=command.commandId||crypto.randomUUID();
-      if(!M.shared)return offlineSend(command);
+      if(!M.shared){loadLocal();if(localReceipts[command.commandId])return localReceipts[command.commandId];var result=offlineSend(command);if(result.ok){localReceipts[command.commandId]=result;persistLocal();}return result;}
       try{
         var result=await request('/api/commands',{method:'POST',body:JSON.stringify(command)});
-        try{await M.transport.getView();listeners.forEach(function(fn){fn();});}catch(_){/* The stored receipt remains successful if refreshing fails. */}
+        try{if(!M.requestPageActive)await M.transport.getView();listeners.forEach(function(fn){fn();});}catch(_){/* The stored receipt remains successful if refreshing fails. */}
         return result;
       }catch(error){return error.detail||{ok:false,error:{code:'unavailable',message:'Gönderim doğrulanamadı. Bilgileriniz korundu; yeniden deneyin.',retryable:true}};}
     },
@@ -2048,7 +2203,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       if(!M.shared)return function(){};
       var stream=new EventSource('/api/events');
       stream.addEventListener('ready',function(){listeners.forEach(function(fn){fn('reconnect');});});
-      stream.addEventListener('changed',function(){listeners.forEach(function(fn){fn('changed');});});
+      stream.addEventListener('changed',function(event){var change={};try{change=JSON.parse(event.data);}catch(_){}listeners.forEach(function(fn){fn('changed',change);});});
       stream.onerror=function(){if(M.connectionStatus)M.connectionStatus(false);};
       stream.onopen=function(){if(M.connectionStatus)M.connectionStatus(true);};
       return function(){stream.close();};
@@ -2232,7 +2387,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       if (shell) shell.inert = false;
       $$('.bottombar, .fab').forEach(function (n) { n.inert = false; });
       var restore=lastFocus&&document.contains(lastFocus)?lastFocus:lastFocusSelector?$$(lastFocusSelector).find(function(n){return n.offsetParent!==null;}):null;
-      restore=restore||$('.tab[aria-selected="true"]');if(restore)restore.focus({preventScroll:true});
+      restore=restore||$('#request-page h1')||$('.tab[aria-selected="true"]');if(restore)restore.focus({preventScroll:true});
     }, motionOff() ? 0 : 160);
   }
   M.openModal = openModal; M.closeModal = closeModal;
@@ -2704,6 +2859,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     requestAnimationFrame(function () { moveUnderline(false); });
 
     document.documentElement.dataset.tab = state.tab;
+    if (!M.shared && M.transport && M.transport.initLocal) M.transport.initLocal();
     var initial = routeFromLocation();
     if (initial === 'following') M.setTabInstant('following');
     if (M.shared || initial === 'crisis') { M.activateCrisis({ immediate: true }); M.setTabInstant(initial); }
@@ -2711,6 +2867,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     if (!M.shared && M.initDemo) M.initDemo();
     if (!M.shared && M.initSimulation) M.initSimulation();
     if (M.shared && M.initShared) M.initShared();
+    if (M.initRequestPage) M.initRequestPage();
   }
 
   function boot() { if (M.shared) M.transport.ready().then(init).catch(function(error){ console.error('Application startup failed',error); var screen=document.getElementById('connection-screen'); if(screen)screen.textContent='Akış açılamadı. Sayfayı yenileyerek tekrar deneyin.'; }); else init(); }
@@ -3022,7 +3179,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
         '<div class="cpost__body">' + esc(p.text) + '</div>' +
         sourceHTML(p) +
         (p.corrects?'<button class="text-action" type="button" data-thread="'+esc(p.corrects)+'">İlgili önceki gönderi</button>':'')+
-        (p.tag === 'yardim' && (p.uid === 'me' || p.simulationId || p.need) ? '<div class="request-status">' + icon(p.resolved ? 'checkc' : 'clock', 'ic--sm') + '<span>' + (p.resolved ? 'Talep sahibi ihtiyacın karşılandığını belirtti' : 'Talep açık · ' + (p.offers ? p.offers + ' destek önerisi' : p.location && !p.location.known ? 'Konum henüz belirtilmedi' : 'Henüz destek önerisi yok')) + '</span></div>' : '') +
+        (p.tag === 'yardim' && (p.uid === 'me' || p.simulationId || p.need) ? '<div class="request-status">' + icon(p.resolved ? 'checkc' : 'clock', 'ic--sm') + '<span>' + (p.resolved ? 'Talep sahibi ihtiyacın karşılandığını belirtti' : 'Talep açık · ' + (p.offers ? p.offers + ' destek önerisi' : p.location && !p.location.known ? (p.location.text || p.location.region ? 'Konum kesin değil' : 'Konum henüz belirtilmedi') : 'Henüz destek önerisi yok')) + '</span></div>' : '') +
         '<div class="cpost__meta">' +
           '<span class="cpost__loc">' + icon('pin', 'ic--sm') + esc((p.region && p.region !== p.loc ? p.region + ' · ' : '') + p.loc) + '</span>' +
           '<span class="cpost__tag">' + esc(TAGLABEL[p.tag]) + '</span>' +
@@ -3653,7 +3810,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   var draft = st;
   var restored = false;
   function draftKey() { return 'mihenk:help:' + (M.sharedView ? M.sharedView.runId + ':' + M.actorId : 'offline'); }
-  function persist() { try { localStorage.setItem(draftKey(), JSON.stringify(st)); } catch (_) {} }
+  function persist() { try { sessionStorage.setItem(draftKey(), JSON.stringify(st)); } catch (_) {} }
   function showError(message) {
     var note = $('#flow-error');
     if (!note && $('#flowvp')) { note = el('<p class="flow-error" id="flow-error" role="alert"></p>'); $('#flowvp .flow__step:last-child .flow__body').appendChild(note); }
@@ -3664,6 +3821,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       M.CATALOG.regions.slice().sort(function(a,b) { return a.localeCompare(b, 'tr'); }).map(function (loc) { return '<option>' + esc(loc) + '</option>'; }).join('') + '</select></label>';
   }
 
+  function privacySelect(id,label,value){return '<label class="field"><span class="field__l">'+label+'</span><select id="'+id+'"><option value="private"'+(value!=='public'?' selected':'')+'>Yalnızca moderatörler</option><option value="public"'+(value==='public'?' selected':'')+'>Herkese açık</option></select></label>';}
   function stepHTML(i) {
     if (i === 0) {
       return '<h2 class="flow__q" id="flowq">Ne tür yardıma ihtiyacınız var?</h2>' +
@@ -3677,9 +3835,10 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       return '<h2 class="flow__q" id="flowq">Konumunuz</h2>' +
         '<p class="flow__hint">Mahalle, sokak veya yakınındaki belirgin bir yeri yaz.</p>' +
         '<div class="flow__body">' + regionsHTML() +
-        '<label class="field"><span class="field__l">Adres tarifi</span>' +
-        '<input type="text" id="addr" placeholder="Mahalle, sokak, bina tarifi" maxlength="240" autocomplete="off"></label><p class="field-hint">Bu bilgi talebinizle birlikte herkese görünür. Bir mahalle veya yakınınızdaki belirgin bir yer yeterli.</p>' +
-        '<button class="location-skip" type="button" data-flow="unknown-location">Konumu bilmiyorum, devam et</button></div>';
+        '<label class="field"><span class="field__l">Herkese açık yer tarifi</span><input id="public-location" type="text" maxlength="240" placeholder="Mahalle veya yakındaki belirgin bir yer"></label>'+ 
+        '<details class="flow-private"><summary>Adres, telefon ve görünürlük (isteğe bağlı)</summary><label class="field"><span class="field__l">Ayrıntılı adres tarifi</span><input type="text" id="addr" placeholder="Sokak, bina ve ulaşım tarifi" maxlength="240" autocomplete="off"></label>'+privacySelect('address-privacy','Adresin görünürlüğü',st.privacy?.address)+
+        '<label class="field"><span class="field__l">Telefon (isteğe bağlı)</span><input type="tel" id="request-phone" maxlength="40" autocomplete="off" placeholder="Ulaşılabilecek telefon"></label>'+privacySelect('phone-privacy','Telefonun görünürlüğü',st.privacy?.phone)+'<p class="field-hint">Özel bilgileri yalnızca siz ve yetkili moderatörler görebilir.</p></details>'+ 
+        '<button class="location-skip" type="button" data-flow="unknown-location">Konumdan emin değilim, devam et</button><p class="field-hint">Yazdığınız ilçe ve yer tarifi korunur.</p></div>';
     }
     if (i === 2) {
       return '<h2 class="flow__q" id="flowq">Kaç kişisiniz?</h2>' +
@@ -3688,7 +3847,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
         '<button class="stepper__b" type="button" data-step="-1" aria-label="Azalt">' + icon('minus', 'ic--lg') + '</button>' +
         '<input class="stepper__v" id="peoplev" type="text" inputmode="numeric" aria-label="Kişi sayısı" placeholder="?" value="">' +
         '<button class="stepper__b" type="button" data-step="1" aria-label="Artır">' + icon('plus', 'ic--lg') + '</button>' +
-        '</div><p class="flow__hint">Biliyorsan toplam sayıyı yaz. Daha sonra güncelleyebilirsin.</p><button class="location-skip" type="button" data-flow="unknown-people">Kişi sayısını bilmiyorum, devam et</button></div>';
+        '</div><label class="field"><span class="field__l">Beyanınız (herkese açık, isteğe bağlı)</span><textarea id="request-details" rows="3" maxlength="2000" placeholder="İhtiyacınızı açıklayın. Özel adres ve telefonu buraya yazmayın."></textarea></label><p class="flow__hint">Biliyorsan toplam sayıyı yaz. Daha sonra güncelleyebilirsin.</p><button class="location-skip" type="button" data-flow="unknown-people">Kişi sayısını bilmiyorum, devam et</button></div>';
     }
     if (i === 3) {
       return '<h2 class="flow__q" id="flowq">Çağrınızı gözden geçirin</h2>' +
@@ -3743,19 +3902,25 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       });
     }
     if (st.step === 1) {
+      [['public-location','publicLocationText'],['request-phone','phone']].forEach(function(pair){var n=$('#'+pair[0]);n.value=st[pair[1]]||'';n.oninput=function(){st[pair[1]]=n.value;};});
+      st.privacy=st.privacy||{address:'private',phone:'private'};
+      [['address-privacy','address'],['phone-privacy','phone']].forEach(function(pair){$('#'+pair[0]).onchange=function(){st.privacy[pair[1]]=this.value;};});
       var a = $('#addr'); if (a) { a.value = st.addr; a.addEventListener('input', function () { st.addr = a.value; st.locationKnown = !!(st.addr.trim() || st.region); }); }
       var region = $('#request-region'); region.value = st.region || '';
       region.addEventListener('change', function () { st.region = region.value; st.locationKnown = !!(st.addr.trim() || st.region); });
     }
-    if (st.step === 2) { var v = $('#peoplev'); if (v) { v.value = st.people === null ? '' : st.people; v.addEventListener('input', function () { st.people = v.value.trim() === '' ? null : v.value; }); } }
+    if (st.step === 2) { var details=$('#request-details');details.value=st.details||'';details.oninput=function(){st.details=details.value;};var v = $('#peoplev'); if (v) { v.value = st.people === null ? '' : st.people; v.addEventListener('input', function () { st.people = v.value.trim() === '' ? null : v.value; }); } }
     if (st.step === 3) {
       var names = st.need.map(function (n) {
         return (NEEDS.filter(function (x) { return x.id === n; })[0] || {}).label;
       }).filter(Boolean);
       $('#review').innerHTML =
         row('İhtiyaç', names.length ? names.join(', ') : 'Belirtilmedi') +
-        row('Konum', (st.region ? st.region + ' · ' : '') + (st.addr || 'Konum belirtilmedi')) +
+        row('Konum', (st.region ? st.region + ' · ' : '') + (st.addr || (st.region ? '' : 'Konum belirtilmedi')) + (!st.locationKnown && (st.addr || st.region) ? ' · Konum kesin değil' : '')) +
         row('Kişi sayısı', st.people === null ? 'Henüz bilinmiyor' : st.people + ' kişi') +
+        row('Beyan',st.details||'İhtiyaç özeti kullanılacak')+
+        row('Adres görünürlüğü',st.privacy?.address==='public'?'Herkese açık':'Yalnızca moderatörler')+
+        row('Telefon görünürlüğü',st.phone?(st.privacy?.phone==='public'?'Herkese açık':'Yalnızca moderatörler'):'Telefon eklenmedi')+
         row('Görünürlük', 'Kriz Var akışı · Doğrulanmamış olarak başlar');
     }
     if (st.step === 4) runChain();
@@ -3777,13 +3942,13 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
 
   M.openImdat = function (opts) {
     opts = opts || {};
-    if (!restored) { try { var saved = JSON.parse(localStorage.getItem(draftKey())); if(saved && Array.isArray(saved.need) && Number.isInteger(saved.step) && saved.step < 4) { st=saved; st.sending=false; draft=st; } } catch(_){} restored=true; }
+    if (!restored) { try { var saved = JSON.parse(sessionStorage.getItem(draftKey())); if(saved && Array.isArray(saved.need) && Number.isInteger(saved.step) && saved.step < 4) { st=saved; st.sending=false; draft=st; } } catch(_){} restored=true; }
     if(st.pending&&opts.editId!==st.editId)opts=st.editId?{editId:st.editId}:{};
     if (opts.editId) {
       var original = M.getPost(opts.editId);
       if (!original || original.uid !== 'me' || !original.need) return;
       if (!st.editId) draft = st;
-      if(st.editId!==original.id || st.step===4)st = { need: original.need.slice(), addr: original.location ? original.location.text : original.loc, people: original.people == null ? null : original.people, region: original.region || '', locationKnown: original.location ? original.location.known : true, step: 1, editId: original.id, version: original.version };
+      if(st.editId!==original.id || st.step===4)st = { need: original.need.slice(), addr: original.location ? original.location.text : original.loc, people: original.people == null ? null : original.people, region: original.region || '', locationKnown: original.location ? original.location.known : true, step: 1, editId: original.id, version: original.version, details:original.details||'',phone:original.phone||'',publicLocationText:original.publicLocationText||'',privacy:original.privacy||{address:'public',phone:'private'} };
     } else {
       if (st.editId && !st.pending) st = draft;
       if (st.step === 4 || (opts.need && !st.pending)) st = { need: opts.need || [], addr: '', people: null, step: 0, editId: null, region: '', locationKnown: false };
@@ -3822,9 +3987,10 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       var f = e.target.closest('[data-flow]');
       if (!f) return;
       if (f.dataset.flow === 'close') { M.closeModal(); return; }
-      if (f.dataset.flow === 'unknown-location') { st.addr = ''; st.region = ''; st.locationKnown = false; st.step = 2; render(1); return; }
+      if (f.dataset.flow === 'unknown-location') { st.locationKnown = false; st.step = 2; render(1); return; }
       if (f.dataset.flow === 'unknown-people') { st.people = null; st.step = 3; render(1); return; }
       if (f.dataset.flow === 'requests') {
+        if(st.savedId){M.closeModal();M.openRequestPage(st.savedId);return;}
         M.closeModal(); M.setTabInstant('crisis');
         $('.chip[data-filter="mine"]').click();
         return;
@@ -3832,7 +3998,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       if (f.dataset.flow === 'prev') { st.step = Math.max(0, st.step - 1); render(-1); return; }
       if (f.dataset.flow === 'next') {
         var error = st.step === 0 && !st.need.length ? 'Devam etmek için bir ihtiyaç seçin.' :
-          st.step === 1 && !st.addr.trim() && !st.region ? 'Bir yer tarifi yazın veya Konumu bilmiyorum ile devam edin.' :
+          st.step === 1 && !st.addr.trim() && !st.region && !(st.publicLocationText||'').trim() ? 'Bir yer tarifi yazın veya Konumdan emin değilim ile devam edin.' :
           st.step === 2 && st.people !== null && (!/^\d+$/.test(String(st.people)) || !Number.isSafeInteger(Number(st.people)) || Number(st.people) < 1) ? 'Pozitif bir tam sayı yazın veya Kişi sayısını bilmiyorum ile devam edin.' : '';
         if (error) {
           var note = $('#flow-error');
@@ -3843,7 +4009,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
         if (st.step === 3) {
           var submitting=st;
           if(M.shared || M.transport) {
-            st.pending=st.pending || {commandId:crypto.randomUUID(),type:st.editId?'request.update':'request.create',payload:{need:st.need.slice(),people:st.people===null?null:Number(st.people),location:{text:st.addr.trim(),region:st.region||null,known:!!(st.addr.trim()||st.region)}}};
+            st.pending=st.pending || {commandId:crypto.randomUUID(),type:st.editId?'request.update':'request.create',payload:{details:st.details||'',phone:st.phone||'',publicLocationText:st.publicLocationText||'',privacy:st.privacy||{address:'private',phone:'private'},need:st.need.slice(),people:st.people===null?null:Number(st.people),location:{text:st.addr.trim(),region:st.region||null,known:st.locationKnown}}};
             if(st.editId){st.pending.targetId=st.editId;st.pending.expectedVersion=st.version;}
             st.sending=true;persist();f.disabled=true;f.textContent='Gönderiliyor…';
             var result=await M.transport.send(st.pending);submitting.sending=false;
@@ -3866,6 +4032,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
               }return;
             }
             delete submitting.pending;submitting.savedId=result.entityId;submitting.step=4;persist();
+            if(M.requestPageActive)M.refreshRequestPage();
             if(M.shared)M.refreshShared(true);else if(M.renderCrisisList)M.renderCrisisList();
             if(st===submitting && node.isConnected)render(1);return;
           }
@@ -3874,7 +4041,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
           if (!post) { post = { id: 'help-' + Date.now().toString(36), uid: 'me', tag: 'yardim', v: 'unverified' }; M.state.extraCrisis.unshift(post); }
           post.text = names.join(', ') + ' ihtiyacı var.' + (st.people === null ? ' Kişi sayısı henüz bilinmiyor.' : ' ' + st.people + ' kişi.');
           post.need = st.need.slice(); post.people = st.people === null ? null : Number(st.people); post.loc = st.addr.trim() || st.region || 'Konum henüz belirtilmedi'; post.region = st.region;
-          post.location = { text: st.addr.trim(), region: st.region || null, known: !!(st.addr.trim() || st.region) };
+          post.location = { text: st.addr.trim(), region: st.region || null, known: st.locationKnown };
           post.t = st.editId ? 'güncellendi' : 'şimdi';
           post.v = 'unverified'; delete M.state.verified[post.id];
           if (M.renderCrisisList) M.renderCrisisList();
@@ -3922,8 +4089,9 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   };
   M.openThread=async function(id,offer){
     try{
-      var view=await M.transport.getView({thread:id}), thread=view.thread;
+      var view=await M.transport.getView({thread:id,channel:'coordination'}), thread=view.thread;
       if(!thread)return;
+      if(thread.post.kind==='request'&&M.openRequestPage){await M.openRequestPage(id,{view:view,offer:!!offer});return;}
       var p=thread.post, draft=read(id), mine=p.authorId===(M.actorId||'me');
       var canReply=!M.shared||p.actions.includes('reply.create'),canOffer=p.kind==='request'&&!mine&&p.status==='open'&&(!M.shared||p.actions.includes('offer.create'));
       if(offer&&!draft.pending)draft.kind='offer';
@@ -3932,7 +4100,10 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
         '<div class="thread-original"><b>'+esc(p.author.name)+'</b><p>'+esc(p.text)+'</p><p class="thread-location">'+M.icon('pin','ic--sm')+esc(p.location.text||p.location.region||'Konum henüz belirtilmedi')+'</p>'+
         (p.removed?'<strong class="thread-status">Gönderi kaldırıldı</strong>':p.kind==='request'?'<strong class="thread-status" data-closed="'+(p.status==='closed')+'">'+(p.status==='closed'?'Talep kapalı · Sahibi ihtiyacın karşılandığını belirtti':'Talep açık')+'</strong>':'')+
         '<p class="thread-time">Son güncelleme: '+esc(new Date(p.updatedAt).toLocaleString('tr-TR'))+'</p>'+
-        (M.shared&&!mine&&p.actions?.includes('account.follow')?'<button class="btn btn--ghost" data-follow-account="'+esc(p.authorId)+'">'+(p.following?'Takibi bırak':'Takip et')+'</button>':'')+'</div>'+
+        (M.shared&&!mine&&p.actions?.includes('account.follow')?'<button class="btn btn--ghost" data-follow-account="'+esc(p.authorId)+'">'+(p.following?'Takibi bırak':'Takip et')+'</button>':'')+
+        (M.shared&&p.actions?.includes('post.remove')?'<button class="btn btn--ghost" type="button" data-remove-post="'+esc(p.id)+'" data-version="'+p.version+'">Paylaşımı kaldır</button>':'')+
+        (M.shared&&p.actions?.includes('account.ban')?'<button class="btn btn--ghost" type="button" data-ban-account="'+esc(p.authorId)+'">Hesabı engelle</button>':'')+'</div>'+
+        ((view.relatedPosts||[]).length?'<section class="thread-original" aria-label="Diğer paylaşımlar"><h3>Diğer paylaşımlar</h3>'+view.relatedPosts.map(function(other){return '<article class="thread-message"><b>'+esc(other.author.name)+'</b><p class="thread-time">'+(other.relation==='corrects'?'Bu gönderide bağlantı verilen paylaşım':'Aynı kişinin diğer paylaşımı')+' · '+esc(new Date(other.createdAt).toLocaleString('tr-TR'))+'</p><p>'+esc(other.text)+'</p><button type="button" class="text-action" data-thread="'+esc(other.id)+'">Paylaşımı aç</button></article>';}).join('')+'</section>':'')+
         '<button type="button" class="new-updates" id="thread-refresh" hidden>Yeni durum veya yanıt var · Güncelle</button>'+
         '<div class="thread-messages" aria-label="Yanıtlar">'+(thread.earlierCount?'<p class="thread-time">Son 100 yanıt gösteriliyor.</p>':'')+
         (thread.messages.length?thread.messages.map(function(m){return '<article class="thread-message" data-message-id="'+esc(m.id)+'"><div><b>'+esc(m.author.name)+'</b><span>'+esc(new Date(m.createdAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}))+'</span></div>'+
@@ -4010,7 +4181,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       var control=remove||ban,targetId=remove?remove.dataset.removePost:ban.dataset.banAccount;
       var confirm=M.el('<div class="modal report-dialog"><h2 class="modal__h" id="action-title">'+(remove?'Paylaşım kaldırılsın mı?':'Hesap engellensin mi?')+'</h2><p class="modal__p">'+(remove?'Paylaşım akışta görünmeyecek. İşlem kaydı korunur.':'Bu hesap yeni paylaşım ve yanıt yazamayacak. Önceki paylaşımlar otomatik kaldırılmaz.')+'</p><p class="compose-error" role="alert" hidden></p><div class="modal__actions"><button class="btn btn--ghost" type="button" data-cancel>Vazgeç</button><button class="btn" type="button" data-confirm>'+(remove?'Paylaşımı kaldır':'Hesabı engelle')+'</button></div></div>');
       M.openModal(confirm,{labelledBy:'action-title'});confirm.querySelector('[data-cancel]').onclick=M.closeModal;
-      confirm.querySelector('[data-confirm]').onclick=async function(){this.disabled=true;var result=await M.transport.send({type:remove?'post.remove':'account.ban',targetId:targetId,...(remove?{expectedVersion:Number(remove.dataset.version)}:{}),payload:{}});if(result.ok){M.closeModal();M.refreshShared(true);M.toast(remove?'Paylaşım kaldırıldı.':'Hesabın yeni paylaşım yapması engellendi.');}else{this.disabled=false;var error=confirm.querySelector('[role="alert"]');error.hidden=false;error.textContent=result.error.message;}};return;
+      confirm.querySelector('[data-confirm]').onclick=async function(){this.disabled=true;var result=await M.transport.send({type:remove?'post.remove':'account.ban',targetId:targetId,...(remove?{expectedVersion:Number(remove.dataset.version)}:{}),payload:{}});if(result.ok){M.closeModal();M.refreshShared(true);if(remove)M.openThread(targetId);M.toast(remove?'Paylaşım kaldırıldı.':'Hesabın yeni paylaşım yapması engellendi.');}else{this.disabled=false;var error=confirm.querySelector('[role="alert"]');error.hidden=false;error.textContent=result.error.message;}};return;
     }
     var thread=e.target.closest('[data-thread]'),offer=e.target.closest('[data-offer]'),report=e.target.closest('[data-report]'),react=e.target.closest('[data-react]'),repost=e.target.closest('[data-repost]');
     if(thread){M.openThread(thread.dataset.thread);return;}if(offer){M.openThread(offer.dataset.offer,true);return;}if(report){M.openReport(report.dataset.report,Number(report.closest('[data-version]')?.dataset.version)||undefined);return;}
@@ -4019,6 +4190,195 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var result=await M.transport.send({type:react?'post.react':'post.repost',targetId:id,payload:react?{active:!p.liked}:{}});
     if(!result.ok){control.disabled=false;M.toast(result.error.message);}else if(M.refreshShared)M.refreshShared(true);
   });
+})(window.MIHENK=window.MIHENK||{});
+
+/* ===== scripts/request-page.js ===== */
+(function(M){
+  'use strict';
+  var page=null,serial=0,esc=M.CATALOG.esc;
+  var needs={kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'};
+  var labels={coordination:'Yetkililerle iletişim',community:'Topluluk desteği'};
+  function glyph(name){
+    var paths={lock:'M6 10h12v11H6zM8 10V7a4 4 0 0 1 8 0v3',globe:'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zM3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18',down:'m6 9 6 6 6-6',send:'m3 3 18 9-18 9 4-9-4-9zM7 12h14'};
+    return paths[name]?'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="'+paths[name]+'"/></svg>':M.icon(name);
+  }
+  function avatar(a){return '<span class="rp-avatar" aria-hidden="true">'+esc((a.name||'?').split(/\s+/).slice(0,2).map(function(n){return n[0];}).join(''))+'</span>';}
+  function date(value){var d=new Date(value);return isNaN(d)?'':d.toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}
+  function key(channel){return 'mihenk:request-draft:'+ (M.sharedView?M.sharedView.runId+':'+M.actorId:'local')+':'+page.id+':'+channel;}
+  function draft(){var c=page.channel;if(!page.drafts[c]){try{page.drafts[c]=JSON.parse(sessionStorage.getItem(key(c)));}catch(_){}page.drafts[c]=page.drafts[c]||{text:'',visibility:c==='coordination'?'private':'public',parentId:null,kind:'reply'};}return page.drafts[c];}
+  function persist(){if(!page)return;try{sessionStorage.setItem(key(page.channel),JSON.stringify(draft()));}catch(_){} }
+  function capture(){if(!page)return;var form=page.node.querySelector('.rp-compose');if(form){draft().text=form.elements.text.value;if(!draft().pending){draft().visibility=form.elements.visibility?.value||'public';draft().kind=form.elements.kind?.value||'reply';}persist();}page.node.querySelectorAll('details[data-section]').forEach(function(d){page.expanded[d.dataset.section]=d.open;});}
+  function allMessages(){return (page.thread.messages||[]).concat(page.thread.parents||[]);}
+  function parent(){return allMessages().find(function(m){return m.id===draft().parentId;});}
+  function writing(){var c=page.thread.post.capabilities||{};return page.channel==='coordination'?c.canWriteCoordination:c.canWriteCommunity;}
+  function options(value){return '<option value="private"'+(value==='private'?' selected':'')+'>Yalnızca moderatörler</option><option value="public"'+(value==='public'?' selected':'')+'>Herkese açık</option>';}
+  function detail(name,title,body,cls){return '<details class="'+(cls||'rp-disclosure')+'" data-section="'+name+'"'+(page.expanded[name]?' open':'')+'><summary>'+title+glyph('down')+'</summary>'+body+'</details>';}
+  function fields(p){
+    var privateFields='';
+    if(p.location.text)privateFields+='<div><dt>Adres tarifi</dt><dd>'+esc(p.location.text)+'</dd><small>'+glyph(p.privacy?.address==='private'?'lock':'globe')+(p.privacy?.address==='private'?'Yalnızca moderatörler':'Herkese açık')+'</small></div>';
+    if(p.phone)privateFields+='<div><dt>Telefon</dt><dd>'+esc(p.phone)+'</dd><small>'+glyph(p.privacy?.phone==='private'?'lock':'globe')+(p.privacy?.phone==='private'?'Yalnızca moderatörler':'Herkese açık')+'</small></div>';
+    return privateFields?detail('privateFields',glyph('lock')+'<span>İletişim bilgileri ve görünürlük</span>','<dl class="rp-fields">'+privateFields+'</dl>'+(p.capabilities.canEditStatement?'<p class="rp-hint">Görünürlüğü değiştirmek için beyanınızı düzenleyin. Özel bilgileri yalnızca siz ve yetkili moderatörler görebilir.</p>':'')):'';
+  }
+  function management(p){
+    var c=p.capabilities;if(!c.canClose&&!c.canReopen&&!c.canManagePublicAccess)return '';
+    var body='<div class="rp-manage-body">';
+    if(c.canManagePublicAccess)body+='<div><span><b>Topluluk mesajları</b><small>Geçmiş mesajlar görünür kalır. Yetkililerle iletişim devam eder.</small></span><button class="rp-button" data-manage="community">'+(p.communityOpen===false?'Mesajları aç':'Mesajları durdur')+'</button></div><div><span><b>Kamusal erişim</b><small>Kapattığınızda yalnızca talep sahibi ve yetkili moderatörler erişir.</small></span><button class="rp-button" data-manage="public">'+(p.publicAccess==='restricted'?'Herkese aç':'Herkese kapat')+'</button></div>';
+    if(c.canClose)body+='<div><label>Kapatma nedeni<select id="rp-close-reason"><option value="resolved">İhtiyaç karşılandı</option><option value="withdrawn">Talep geri çekildi</option><option value="duplicate">Mükerrer talep</option><option value="other" selected>Diğer</option></select></label><button class="rp-button" data-manage="close">Talebi kapat</button></div>';
+    if(c.canReopen)body+='<div><span>Talebi yeniden açmak diğer erişim ayarlarını değiştirmez.</span><button class="rp-button" data-manage="reopen">Talebi yeniden aç</button></div>';
+    return detail('management',glyph('dots')+'<span>Talep işlemleri</span>',body+'</div>','rp-management');
+  }
+  function statement(p){
+    var verification={unverified:'Beyan · Henüz doğrulanmadı',verified:'Doğrulanmış',official:'Resmî kaynak',disputed:'Çelişkili'};
+    var summary=(p.need||[]).map(function(n){return needs[n]||n;}).join(', ');
+    return '<section class="rp-overview" aria-label="Talep özeti"><div class="rp-overview-title"><h2>'+esc(summary||'Yardım ihtiyacı')+'</h2><span class="rp-verification" data-verification="'+esc(p.verification)+'">'+glyph('shield')+esc(verification[p.verification]||verification.unverified)+'</span></div>'+
+      '<div class="rp-facts"><span>'+glyph('people')+(p.people==null?'Kişi sayısı bilinmiyor':esc(p.people)+' kişi')+'</span><span>'+glyph('pin')+esc(p.publicLocationText||p.location.region||'Konum belirtilmedi')+'</span>'+(!p.location.known?'<span>Konum kesin değil</span>':'')+'</div>'+
+      detail('statement','<span class="rp-statement-author">'+avatar(p.author)+'<span><strong>Talep sahibinin beyanı</strong><small>'+esc(p.author.name)+' · '+esc(date(p.updatedAt))+'</small></span></span>',
+      '<div class="rp-statement-body"><p>'+esc(p.details||p.text)+'</p>'+fields(p)+(p.capabilities.canEditStatement?'<button class="rp-text-button" data-edit-statement>'+glyph('quill')+'Beyanı ve bilgileri düzenle</button>':'')+'</div>','rp-statement')+management(p)+'</section>';
+  }
+  function messageHTML(m,indented){
+    var p=page.thread.post,par=allMessages().find(function(x){return x.id===m.parentId;}),role=m.authorId===p.authorId?'Talep sahibi':m.author.requestModerator?'Moderatör':'';
+    return '<article class="rp-message'+(indented?' rp-message--reply':'')+'" id="rp-message-'+esc(m.id)+'">'+avatar(m.author)+'<div class="rp-message-content"><div class="rp-message-meta"><b>'+esc(m.author.name)+'</b>'+(role?'<span class="rp-role">'+role+'</span>':'')+'<time datetime="'+esc(m.createdAt)+'">'+esc(date(m.createdAt))+'</time><span class="rp-audience">'+glyph(m.visibility==='private'?'lock':'globe')+(m.visibility==='private'?'Özel':'Herkese açık')+'</span></div>'+
+      (par?'<a class="rp-parent" href="#rp-message-'+esc(par.id)+'" data-parent-link="'+esc(par.id)+'">'+esc(par.author.name)+' kişisine yanıt</a>':'')+
+      (m.kind==='offer'?'<span class="rp-offer">'+(m.withdrawn?'Geri çekilmiş destek önerisi':'Destek önerisi')+'</span>':'')+
+      '<p>'+esc(m.withdrawn?'Destek önerisi geri çekildi.':m.text)+'</p><div class="rp-message-actions">'+(writing()?'<button data-reply-to="'+esc(m.id)+'">'+glyph('reply')+'Yanıtla</button>':'')+(m.canWithdraw?'<button data-withdraw-offer="'+esc(m.id)+'">Önerimi geri çek</button>':'')+'</div></div></article>';
+  }
+  function messagesHTML(){
+    var ms=page.thread.messages||[],parents=page.thread.parents||[],all=parents.concat(ms),seen=new Set(),html='';
+    function add(m,depth){if(seen.has(m.id))return;seen.add(m.id);html+=messageHTML(m,depth>0);all.filter(function(x){return x.parentId===m.id;}).forEach(function(x){add(x,depth+1);});}
+    all.filter(function(m){return !m.parentId||!all.some(function(x){return x.id===m.parentId;});}).forEach(function(m){add(m,0);});all.forEach(function(m){add(m,0);});
+    if(!ms.length)return '<div class="rp-empty">'+glyph(page.channel==='coordination'?'reply':'people')+'<h3>'+(page.channel==='coordination'?(page.thread.post.capabilities.canReadPrivate?'Henüz moderatör yanıtı yok':'Henüz herkese açık bir güncelleme yok'):'Henüz destek önerisi yok')+'</h3><p>'+(page.channel==='coordination'?(writing()?'Eklemek istediğiniz bilgiyi aşağıdan paylaşabilirsiniz.':'Topluluk desteği sekmesinden bilgi veya destek paylaşabilirsiniz.'):'Yapabileceğiniz desteği veya güncel bilgiyi paylaşın.')+'</p></div>';
+    return html;
+  }
+  function composer(){
+    var p=page.thread.post,c=p.capabilities,d=draft(),par=parent();
+    if(!writing())return '<div class="rp-readonly">'+glyph('lock')+'<p>'+(p.status==='closed'?'Talep kapalı. Yeni mesaj yazılamaz.':page.channel==='community'&&p.communityOpen===false?'Topluluk mesajları moderatör tarafından durduruldu.':page.channel==='coordination'?'Buraya talep sahibi ve yetkili moderatörler yazabilir.':'Bu hesap bu konuşmada yalnızca okuyabilir.')+'</p></div>';
+    if(par?.visibility==='private')d.visibility='private';
+    var canOffer=page.channel==='community'&&p.authorId!==(M.actorId||'me')&&(!M.shared||p.actions.includes('offer.create'));
+    return '<form class="rp-compose" aria-label="Mesaj yaz"><div class="rp-reply-target"'+(!par?' hidden':'')+'><span>'+glyph('reply')+esc(par?par.author.name+' kişisine yanıt':'')+'</span><button type="button" data-cancel-reply aria-label="Yanıtı iptal et">'+glyph('close')+'</button></div><label for="rp-text">'+(page.channel==='coordination'?'Mesajınız':'Bilgi veya destek öneriniz')+'</label>'+
+      '<textarea id="rp-text" name="text" rows="3" maxlength="1000" placeholder="'+(page.channel==='coordination'?'Moderatörlere bir mesaj yazın…':'Paylaşabileceğiniz bilgiyi veya desteği yazın…')+'"'+(d.pending?' readonly':'')+'>'+esc(d.text)+'</textarea>'+
+      '<div class="rp-compose-footer">'+(page.channel==='coordination'?'<label class="rp-visibility">'+glyph(d.visibility==='private'?'lock':'globe')+'<span class="sr-only">Mesaj görünürlüğü</span><select name="visibility"'+(par?.visibility==='private'||d.pending?' disabled':'')+'>'+options(d.visibility)+'</select></label>':'<span class="rp-public-note">'+glyph('globe')+'Herkese açık</span>')+
+      (canOffer?'<label class="rp-kind"><span class="sr-only">Mesaj türü</span><select name="kind"'+(d.pending?' disabled':'')+'><option value="reply">Bilgi / yanıt</option><option value="offer"'+(d.kind==='offer'?' selected':'')+'>Destek önerisi</option></select></label>':'')+
+      '<button class="rp-send" type="submit">'+glyph('send')+(d.pending?'Yeniden dene':'Gönder')+'</button></div><p class="rp-compose-hint">'+(par?.visibility==='private'?'Özel bir mesaja verdiğiniz yanıt da özel kalır.':page.channel==='coordination'?'Göndermeden önce mesajın tamamı için görünürlüğü seçin.':'Destek önerisi, yardımın ulaştığı anlamına gelmez.')+'</p><p class="rp-error" role="alert" hidden></p></form>';
+  }
+  function render(){
+    var p=page.thread.post,c=p.capabilities;
+    if(p.removed){unavailable('Bu talep kaldırıldı.');return;}
+    var d=draft();if(d.parentId&&!parent()){d.parentId=null;delete d.pending;persist();}
+    page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back aria-label="Akışa dön">'+glyph('chevl')+'<span>Akışa dön</span></button><div><h1 tabindex="-1">Yardım talebi</h1><span class="rp-id">#'+esc(p.id.slice(0,8))+'</span></div><span class="rp-state">'+glyph(p.status==='closed'?'lock':'clock')+(p.status==='closed'?'Talep kapalı'+({resolved:' · İhtiyaç karşılandı',withdrawn:' · Geri çekildi',duplicate:' · Mükerrer'}[p.closeReason]||''):'Talep açık')+'</span></header>'+statement(p)+
+      (p.publicAccess==='restricted'?'<p class="rp-notice">'+glyph('lock')+'Bu talep yalnızca size ve yetkili moderatörlere açık.</p>':'')+
+      '<div class="rp-tabs" role="tablist" aria-label="Talep konuşmaları">'+Object.keys(labels).map(function(channel){return '<button role="tab" id="rp-tab-'+channel+'" aria-controls="rp-panel" aria-selected="'+(page.channel===channel)+'" tabindex="'+(page.channel===channel?'0':'-1')+'" data-request-channel="'+channel+'">'+glyph(channel==='coordination'?'shield':'people')+'<span>'+labels[channel]+'</span>'+(page.unread[channel]?'<span class="rp-new-dot" aria-label="Yeni mesaj"></span>':'')+'</button>';}).join('')+'</div>'+
+      '<section class="rp-conversation" id="rp-panel" role="tabpanel" aria-labelledby="rp-tab-'+page.channel+'"><div class="rp-channel-note">'+(page.channel==='coordination'?(c.canReadPrivate?'Talep sahibi ve yetkili moderatörler arasında iletişim':'Herkese açık güncellemeler. Destek için Topluluk desteği sekmesini kullanın.'):'Yapabileceğiniz desteği ve güncel bilgileri paylaşın.')+'</div><p class="rp-connection" role="status" hidden></p><button class="rp-updates" data-refresh-request hidden>Yeni mesajlar · Güncelle</button>'+
+      (page.thread.nextMessageOffset!=null?'<button class="rp-earlier" data-earlier>Önceki mesajları göster</button>':'')+'<div class="rp-messages">'+messagesHTML()+'</div>'+composer()+'</section>'+
+      (!M.shared?'<footer class="rp-local">Yerel prototip · Gerçek yardım iletilmez.</footer>':'');
+    page.node.querySelectorAll('details[data-section]').forEach(function(n){n.addEventListener('toggle',function(){if(page)page.expanded[n.dataset.section]=n.open;});});
+    var form=page.node.querySelector('.rp-compose');if(form){form.addEventListener('input',capture);form.addEventListener('change',capture);form.onsubmit=send;}
+    page.node.querySelector('.rp-tabs').onkeydown=function(e){if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();switchChannel(e.key==='Home'?'coordination':e.key==='End'?'community':page.channel==='coordination'?'community':'coordination',true);};
+    persist();
+  }
+  async function send(e){
+    e.preventDefault();var current=page,form=e.currentTarget,button=form.querySelector('[type="submit"]');if(button.disabled)return;
+    capture();var d=draft(),error=form.querySelector('.rp-error');
+    if(!d.text.trim()){error.hidden=false;error.textContent='Bir mesaj yazın.';form.elements.text.focus();return;}
+    var channel=current.channel;
+    d.pending=d.pending||{commandId:crypto.randomUUID(),type:d.kind==='offer'&&channel==='community'?'offer.create':'reply.create',targetId:current.id,expectedVersion:current.thread.post.version,payload:{text:d.text.trim(),channel:channel,visibility:channel==='community'?'public':d.visibility,parentId:d.parentId||null}};
+    persist();button.disabled=true;button.textContent='Gönderiliyor…';form.elements.text.readOnly=true;
+    var result=await M.transport.send(d.pending);
+    if(result.ok){d.text='';d.parentId=null;d.kind='reply';d.visibility=channel==='coordination'?'private':'public';delete d.pending;if(form.isConnected){form.elements.text.value='';form.elements.text.readOnly=false;if(form.elements.visibility)form.elements.visibility.value=d.visibility;if(form.elements.kind)form.elements.kind.value='reply';}}
+    else if(result.error.code!=='unavailable'||result.error.retryable===false)delete d.pending;
+    if(page===current){try{sessionStorage.setItem(key(channel),JSON.stringify(d));}catch(_){}if(current.channel===channel){
+      if(result.ok){await load(false);if(page===current){var input=page.node.querySelector('#rp-text');input?.focus({preventScroll:true});}}
+      else{form.elements.text.readOnly=!!d.pending;button.disabled=false;button.textContent=d.pending?'Gönderimi yeniden dene':'Gönder';error.hidden=false;error.textContent=result.error.message;if(result.error.code==='conflict')page.node.querySelector('[data-refresh-request]').hidden=false;}
+    }}
+  }
+  function unavailable(message){if(!page)return;page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back>'+glyph('chevl')+'Akışa dön</button><h1>Yardım talebi</h1></header><div class="rp-empty">'+glyph('lock')+'<h2>'+esc(message)+'</h2><button class="rp-button" data-refresh-request>Yeniden dene</button></div>';}
+  async function load(earlier,provided){
+    if(!page)return;var current=page,run=++serial;capture();
+    var anchor=current.node.querySelector('.rp-message'),anchorId=anchor?.id,anchorY=anchor?.getBoundingClientRect().top;
+    try{
+      var v=provided||await M.transport.getRequestView(current.id,current.channel,earlier?current.thread.nextMessageOffset:0);
+      if(page!==current||run!==serial)return;
+      if(!v.thread||v.thread.post.kind!=='request'){unavailable('Bu talep şu anda görüntülenemiyor.');return;}
+      if(earlier){v.thread.messages=v.thread.messages.concat(current.thread.messages);v.thread.parents=v.thread.parents.concat(current.thread.parents||[]);}
+      current.thread=v.thread;current.id=v.thread.post.id;current.unread[current.channel]=false;render();
+      if(earlier&&anchorId){var restored=document.getElementById(anchorId);if(restored)window.scrollBy(0,restored.getBoundingClientRect().top-anchorY);}
+    }catch(error){if(page!==current||run!==serial)return;
+      if(['unauthorized','not_found'].includes(error.code)){M.transport.clearRequestCache();current.thread=null;unavailable('Bu talep şu anda görüntülenemiyor.');}
+      else if(current.thread){var bar=current.node.querySelector('.rp-connection');if(bar){bar.hidden=false;bar.textContent='Bağlantı kurulamadı. Son bilgiler ve taslağınız korundu.';}var refresh=current.node.querySelector('[data-refresh-request]');if(refresh)refresh.hidden=false;}
+      else unavailable('Talep yüklenemedi. Bağlantınızı kontrol edin.');
+    }
+  }
+  async function switchChannel(channel,focus){
+    if(!page||channel===page.channel)return;capture();page.scroll[page.channel]=window.scrollY;page.channel=channel;
+    var url=new URL(location.href);url.searchParams.set('channel',channel);history.replaceState(history.state,'',url);
+    await load(false);if(!page)return;window.scrollTo(0,page.scroll[channel]||0);if(focus)page.node.querySelector('#rp-tab-'+channel)?.focus({preventScroll:true});
+  }
+  function leave(){
+    if(!page)return;capture();var old=page;serial++;page=null;M.requestPageActive=null;old.node.remove();document.documentElement.removeAttribute('data-request-page');
+    document.title=old.title;window.scrollTo(0,old.returnScroll||0);if(old.origin?.isConnected)old.origin.focus({preventScroll:true});
+    else document.querySelector('.tab[aria-selected="true"]')?.focus({preventScroll:true});
+    if(M.shared)M.refreshShared(false);
+  }
+  function back(){
+    if(history.state?.requestReturn){history.back();return;}
+    var url=new URL(location.href);url.searchParams.delete('request');url.searchParams.delete('channel');history.replaceState(null,'',url);leave();
+  }
+  M.openRequestPage=async function(id,opts){
+    opts=opts||{};var first=!page||page.id!==id;
+    if(first){if(page)leave();var origin=document.activeElement,node=M.el('<section id="request-page" class="request-page" aria-label="Yardım talebi"></section>');
+      page={id:id,node:node,channel:opts.channel||(opts.offer?'community':'coordination'),drafts:{},expanded:{},unread:{},scroll:{},thread:null,returnScroll:window.scrollY,origin:origin,title:document.title};
+      M.$('#main').appendChild(node);M.requestPageActive=id;document.documentElement.dataset.requestPage='1';document.title='Yardım talebi · MİHENK';
+      node.onclick=handleClick;node.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&e.target.closest('.rp-compose')){e.preventDefault();e.target.closest('form').requestSubmit();}});
+      unavailable('Talep yükleniyor…');window.scrollTo(0,0);
+      var url=new URL(location.href);url.hash='';url.searchParams.set('request',id);url.searchParams.set('channel',page.channel);
+      history[opts.fromHistory?'replaceState':'pushState'](opts.fromHistory?history.state:{requestReturn:true},'',url);
+    }
+    if(opts.offer)draft().kind='offer';
+    await load(false,opts.view&&opts.view.thread.channel===page.channel?opts.view:null);
+    if(first&&page)page.node.querySelector('h1')?.focus({preventScroll:true});
+  };
+  async function handleClick(e){
+    var button=e.target.closest('button,a');if(!button||!page)return;
+    if(button.hasAttribute('data-request-back')){back();return;}
+    if(button.dataset.requestChannel){await switchChannel(button.dataset.requestChannel,false);return;}
+    if(button.hasAttribute('data-refresh-request')){await load(false);return;}
+    if(button.hasAttribute('data-earlier')){button.disabled=true;await load(true);return;}
+    if(button.hasAttribute('data-edit-statement')){M.openImdat({editId:page.id});return;}
+    if(button.dataset.parentLink){e.preventDefault();document.getElementById('rp-message-'+button.dataset.parentLink)?.scrollIntoView({block:'center',behavior:M.motionOff()?'auto':'smooth'});return;}
+    if(button.dataset.replyTo||button.hasAttribute('data-cancel-reply')){
+      capture();if(draft().pending){M.toast('Önce bekleyen mesajın gönderimini tamamlayın.');return;}
+      draft().parentId=button.dataset.replyTo||null;if(parent()?.visibility==='private')draft().visibility='private';persist();
+      var form=page.node.querySelector('.rp-compose');if(form){var replacement=M.el(composer());form.replaceWith(replacement);replacement.addEventListener('input',capture);replacement.addEventListener('change',capture);replacement.onsubmit=send;replacement.querySelector('textarea').focus();}return;
+    }
+    if(button.dataset.withdrawOffer){
+      var msg=allMessages().find(function(m){return m.id===button.dataset.withdrawOffer;});button.disabled=true;
+      var r=await M.transport.send({type:'offer.withdraw',targetId:msg.id,expectedVersion:msg.version,payload:{}});if(r.ok)await load(false);else{button.disabled=false;M.toast(r.error.message);}return;
+    }
+    if(button.dataset.manage){
+      var p=page.thread.post,action=button.dataset.manage,payload={},type='request.manage';
+      if(action==='community')payload.communityOpen=p.communityOpen===false;
+      if(action==='public')payload.publicAccess=p.publicAccess==='restricted'?'public':'restricted';
+      if(action==='close'){type='request.close';payload.reason=page.node.querySelector('#rp-close-reason').value;}
+      if(action==='reopen')type='request.reopen';
+      button.disabled=true;var result=await M.transport.send({type:type,targetId:p.id,expectedVersion:p.version,payload:payload});
+      if(result.ok)await load(false);else{button.disabled=false;M.toast(result.error.message);}return;
+    }
+  }
+  M.requestChanged=function(change){
+    if(!page)return;
+    if(!change||change.accessChanged||change.posts?.includes(page.id)){M.transport.clearRequestCache();load(false);return;}
+    var channels=change.channels?.[page.id]||[];
+    if(channels.includes(page.channel)){var b=page.node.querySelector('[data-refresh-request]');if(b)b.hidden=false;}
+    if(page.thread?.post.capabilities.canManagePublicAccess&&channels.includes('community')&&page.channel!=='community'){
+      page.unread.community=true;var tab=page.node.querySelector('[data-request-channel="community"]');if(tab&&!tab.querySelector('.rp-new-dot'))tab.insertAdjacentHTML('beforeend','<span class="rp-new-dot" aria-label="Yeni mesaj"></span>');
+    }
+  };
+  M.refreshRequestPage=function(){if(page)load(false);};
+  M.initRequestPage=function(){
+    if(!M.shared)M.transport.initLocal();
+    var q=new URLSearchParams(location.search),id=q.get('request');if(id)M.openRequestPage(id,{fromHistory:true,channel:q.get('channel')==='community'?'community':'coordination'});
+    window.addEventListener('popstate',function(){var q=new URLSearchParams(location.search),id=q.get('request');if(id){if(page?.id===id){var c=q.get('channel')==='community'?'community':'coordination';if(c!==page.channel)switchChannel(c,false);}else M.openRequestPage(id,{fromHistory:true,channel:q.get('channel')==='community'?'community':'coordination'});}else leave();});
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&page)load(false);});
+  };
 })(window.MIHENK=window.MIHENK||{});
 
 /* ===== scripts/demo.js ===== */

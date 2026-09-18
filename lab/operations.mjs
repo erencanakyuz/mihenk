@@ -4,20 +4,24 @@ const object=(properties={},required=Object.keys(properties))=>({type:'object',p
 const target={targetId:{...string(100),description:'Görünümdeki kaydın kimliği.'}};
 const location=object({known:{type:'boolean',description:'Konumdan emin olunmuyorsa false. Bilinen ilçe ve yer tarifi yine verilebilir.'},region:{type:['string','null'],maxLength:80},text:{...string(240),description:'Adres veya yakındaki belirgin yer. Konum belirsizken de korunur; tarif yoksa boş bırakılır.'}});
 const request={need:{type:'array',items:enumeration(['kurtarma','saglik','barinma','gida','ulasim']),minItems:1,maxItems:5},people:{type:['integer','null'],minimum:1},location};
+const visibility=enumeration(['public','private']);
+const message={channel:enumeration(['coordination','community']),visibility,parentId:{type:['string','null'],maxLength:100}};
+Object.assign(request,{details:string(2000),phone:string(40),publicLocationText:string(240),privacy:object({address:visibility,phone:visibility})});
 const tool=(name,description,parameters=object())=>({type:'function',function:{name,description,parameters:{...parameters,properties:{...parameters.properties,decisionNote:{type:'string',maxLength:240,description:'İsteğe bağlı kısa karar özeti (tek cümle).'}}}}});
 export const operations=[
   tool('read_view','Akışı oku veya filtrele.',object({filter:enumeration(['all','resmi','yardim','dogrulanmis','mine','following']),region:string(80),topic:enumeration(['','yardim','enkaz','kayip','nokta','resmi','durum']),search:string(200),authorId:{...string(100),description:'Paylaşımlarını görmek istediğiniz hesabın kimliği.'},offset:{type:'integer',minimum:0,maximum:100000}},[])),
-  tool('open_thread','Gönderinin ayrıntılarını ve herkese açık yanıtlarını aç. offset: en yeni mesajlardan kaçını atlayacağı; önceki sayfa için nextMessageOffset değerini kullan.',object({...target,offset:{type:'integer',minimum:0,maximum:100000}},['targetId'])),
+  tool('open_thread','Gönderinin ayrıntılarını ve herkese açık yanıtlarını aç. offset: en yeni mesajlardan kaçını atlayacağı; önceki sayfa için nextMessageOffset değerini kullan.',object({...target,offset:{type:'integer',minimum:0,maximum:100000},channel:message.channel},['targetId'])),
   tool('wait','İşlem yapmadan bekle.',object({seconds:{type:'integer',minimum:1,maximum:60}},[])),
   tool('post_remove','Görünen paylaşımı akıştan kaldırır. İşlem kaydı korunur.',object(target)),
   tool('account_ban','Görünen hesabın yeni paylaşım ve yanıt yazmasını engeller. Önceki paylaşımlar otomatik kaldırılmaz. targetId hesap kimliğidir.',object(target)),
-  tool('request_create','Yardım talebi paylaş. Bilinmeyen kişi sayısı null; belirsiz konum known:false. Bilinen ilçe veya yer tarifi korunur; hiç bilgi yoksa region:null, text:"".',object(request)),
+  tool('request_create','Yardım talebi paylaş. Bilinmeyen kişi sayısı null; belirsiz konum known:false. Bilinen ilçe veya yer tarifi korunur; hiç bilgi yoksa region:null, text:"".',object(request,['need','people','location'])),
   tool('post_create','Herkese açık gönderi paylaş. Kaynak: firsthand kendi gözlemi, relayed duyum, link bağlantı.',object({text:string(),tag:enumeration(['yardim','enkaz','kayip','nokta','resmi','durum']),location,source:object({kind:{type:['string','null'],enum:[null,'firsthand','relayed','link']},url:{type:['string','null'],maxLength:600}})})),
   tool('request_update','Kendi talebinin ayrıntılarını güncelle.',object({...target,...request},['targetId'])),
-  tool('request_close','Kendi talebini ihtiyaç karşılandı olarak kapat.',object(target)),
+  tool('request_manage','Yetkili talep moderatörü olarak topluluk yazımını veya kamusal erişimi düzenle.',object({...target,communityOpen:{type:'boolean'},publicAccess:enumeration(['public','restricted']),reason:string(240)},['targetId'])),
+  tool('request_close','Yetkin olan talebi bir nedenle kapat.',object({...target,reason:enumeration(['resolved','withdrawn','duplicate','other'])},['targetId'])),
   tool('request_reopen','Kendi kapalı talebini yeniden aç.',object(target)),
-  tool('reply_create','Gönderiye herkese açık yanıt yaz.',object({...target,text:string()})),
-  tool('offer_create','Başkasının açık talebine herkese açık destek önerisi gönder. Bu işlem talebi kapatmaz.',object({...target,text:string()})),
+  tool('reply_create','Gönderiye yanıt yaz. Koordinasyon için channel:coordination ve visibility seç. Varsayılan community/public.',object({...target,text:string(),...message},['targetId','text'])),
+  tool('offer_create','Başkasının açık talebine herkese açık destek önerisi gönder. Bu işlem talebi kapatmaz.',object({...target,text:string(),...message},['targetId','text'])),
   tool('offer_withdraw','Kendi destek önerini geri çek.',object(target)),
   tool('post_react','Gönderiyi beğen veya beğeniyi kaldır.',object({...target,active:{type:'boolean'}})),
   tool('post_repost','Gönderinin aslını referans alarak yeniden paylaş.',object(target)),

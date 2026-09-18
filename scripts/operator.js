@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const $=s=>document.querySelector(s),create=(tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node;};
-  const names={post_remove:'Paylaşımı kaldır',account_ban:'Hesabı engelle',read_view:'Akışı okudu',open_thread:'Yanıtları açtı',wait:'Beklemeyi seçti',request_create:'Yardım talebi paylaş',request_update:'Talebi güncelle',request_close:'Talebi kapat',request_reopen:'Talebi yeniden aç',reply_create:'Yanıt yaz',offer_create:'Destek öner',offer_withdraw:'Öneriyi geri çek',post_create:'Gönderi paylaş',post_react:'Beğeniyi değiştir',post_repost:'Yeniden paylaş',account_follow:'Takibi değiştir',observation_create:'Gözlem beyanı',report_create:'Gönderiyi bildir',click:'Tıkla',fill:'Metin yaz',select:'Seçenek seç',press:'Tuşa bas',scroll:'Kaydır',refresh:'Sayfayı yenile'};
+  const names={post_remove:'Paylaşımı kaldır',account_ban:'Hesabı engelle',read_view:'Akışı okudu',open_thread:'Yanıtları açtı',wait:'Beklemeyi seçti',request_create:'Yardım talebi paylaş',request_manage:'Talep erişimini yönet',request_update:'Talebi güncelle',request_close:'Talebi kapat',request_reopen:'Talebi yeniden aç',reply_create:'Yanıt yaz',offer_create:'Destek öner',offer_withdraw:'Öneriyi geri çek',post_create:'Gönderi paylaş',post_react:'Beğeniyi değiştir',post_repost:'Yeniden paylaş',account_follow:'Takibi değiştir',observation_create:'Gözlem beyanı',report_create:'Gönderiyi bildir',click:'Tıkla',fill:'Metin yaz',select:'Seçenek seç',press:'Tuşa bas',scroll:'Kaydır',refresh:'Sayfayı yenile'};
   const statusNames={running:'Devam ediyor',paused:'Duraklatıldı',stopped:'Sonlandırıldı',replay:'Kayıt tekrar oynatımı'};
   let key=new URLSearchParams(location.hash.slice(1)).get('key')||sessionStorage.getItem('mihenk:operator-key')||'';
   if(location.hash)history.replaceState(null,'',location.pathname+location.search);
@@ -55,7 +55,7 @@
     const host=$('#accounts');host.replaceChildren();
     for(const actor of actors){const button=create('button','account');button.type='button';button.setAttribute('aria-pressed',actor.id===selected);const text=create('span','account-text');text.append(create('b','',actor.name),create('small','',activity.some(r=>r.actorId===actor.id)?'Etkinlik kaydı var':'Henüz etkinlik yok'));button.append(create('span','avatar',actor.name.split(' ').map(s=>s[0]).slice(0,2).join('')),text);button.onclick=()=>{revision++;selected=actor.id;records=[];events=[];afterRecord=0;afterEvent=0;renderAccounts();renderTimeline();poll();};host.append(button);}
     const actor=actors.find(a=>a.id===selected),engine=activity.find(r=>r.actorId===selected)?.engine;$('#selected-name').textContent=actor?.name||'Bir hesap seç';
-    const role=actor?.access?.role,roleLabel={participant:'Katılımcı',moderator:'Moderatör',observer:'Gözlemci',disabled:'Erişim kapalı'}[role]||role;
+    const role=actor?.access?.role,roleLabel={participant:'Katılımcı',moderator:'Moderatör',request_moderator:'Talep moderatörü',observer:'Gözlemci',disabled:'Erişim kapalı'}[role]||role;
     $('#selected-detail').textContent=actor?'@'+actor.handle+' · '+(engine==='rule'?'Kurallı katılımcı':engine==='model'?'Model katılımcısı':'Harici hesap')+(roleLabel?' · '+roleLabel+' · '+actor.access.operations.length+' işlem izni':''):'Katılımcı bağlantısı bekleniyor.';
   }
   async function poll(){

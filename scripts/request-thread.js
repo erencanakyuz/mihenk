@@ -20,8 +20,9 @@
   };
   M.openThread=async function(id,offer){
     try{
-      var view=await M.transport.getView({thread:id}), thread=view.thread;
+      var view=await M.transport.getView({thread:id,channel:'coordination'}), thread=view.thread;
       if(!thread)return;
+      if(thread.post.kind==='request'&&M.openRequestPage){await M.openRequestPage(id,{view:view,offer:!!offer});return;}
       var p=thread.post, draft=read(id), mine=p.authorId===(M.actorId||'me');
       var canReply=!M.shared||p.actions.includes('reply.create'),canOffer=p.kind==='request'&&!mine&&p.status==='open'&&(!M.shared||p.actions.includes('offer.create'));
       if(offer&&!draft.pending)draft.kind='offer';

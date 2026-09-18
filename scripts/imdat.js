@@ -23,7 +23,7 @@
   var draft = st;
   var restored = false;
   function draftKey() { return 'mihenk:help:' + (M.sharedView ? M.sharedView.runId + ':' + M.actorId : 'offline'); }
-  function persist() { try { localStorage.setItem(draftKey(), JSON.stringify(st)); } catch (_) {} }
+  function persist() { try { sessionStorage.setItem(draftKey(), JSON.stringify(st)); } catch (_) {} }
   function showError(message) {
     var note = $('#flow-error');
     if (!note && $('#flowvp')) { note = el('<p class="flow-error" id="flow-error" role="alert"></p>'); $('#flowvp .flow__step:last-child .flow__body').appendChild(note); }
@@ -34,6 +34,7 @@
       M.CATALOG.regions.slice().sort(function(a,b) { return a.localeCompare(b, 'tr'); }).map(function (loc) { return '<option>' + esc(loc) + '</option>'; }).join('') + '</select></label>';
   }
 
+  function privacySelect(id,label,value){return '<label class="field"><span class="field__l">'+label+'</span><select id="'+id+'"><option value="private"'+(value!=='public'?' selected':'')+'>Yalnızca moderatörler</option><option value="public"'+(value==='public'?' selected':'')+'>Herkese açık</option></select></label>';}
   function stepHTML(i) {
     if (i === 0) {
       return '<h2 class="flow__q" id="flowq">Ne tür yardıma ihtiyacınız var?</h2>' +
@@ -47,8 +48,9 @@
       return '<h2 class="flow__q" id="flowq">Konumunuz</h2>' +
         '<p class="flow__hint">Mahalle, sokak veya yakınındaki belirgin bir yeri yaz.</p>' +
         '<div class="flow__body">' + regionsHTML() +
-        '<label class="field"><span class="field__l">Adres tarifi</span>' +
-        '<input type="text" id="addr" placeholder="Mahalle, sokak, bina tarifi" maxlength="240" autocomplete="off"></label><p class="field-hint">Bu bilgi talebinizle birlikte herkese görünür. Bir mahalle veya yakınınızdaki belirgin bir yer yeterli.</p>' +
+        '<label class="field"><span class="field__l">Herkese açık yer tarifi</span><input id="public-location" type="text" maxlength="240" placeholder="Mahalle veya yakındaki belirgin bir yer"></label>'+ 
+        '<details class="flow-private"><summary>Adres, telefon ve görünürlük (isteğe bağlı)</summary><label class="field"><span class="field__l">Ayrıntılı adres tarifi</span><input type="text" id="addr" placeholder="Sokak, bina ve ulaşım tarifi" maxlength="240" autocomplete="off"></label>'+privacySelect('address-privacy','Adresin görünürlüğü',st.privacy?.address)+
+        '<label class="field"><span class="field__l">Telefon (isteğe bağlı)</span><input type="tel" id="request-phone" maxlength="40" autocomplete="off" placeholder="Ulaşılabilecek telefon"></label>'+privacySelect('phone-privacy','Telefonun görünürlüğü',st.privacy?.phone)+'<p class="field-hint">Özel bilgileri yalnızca siz ve yetkili moderatörler görebilir.</p></details>'+ 
         '<button class="location-skip" type="button" data-flow="unknown-location">Konumdan emin değilim, devam et</button><p class="field-hint">Yazdığınız ilçe ve yer tarifi korunur.</p></div>';
     }
     if (i === 2) {
@@ -58,7 +60,7 @@
         '<button class="stepper__b" type="button" data-step="-1" aria-label="Azalt">' + icon('minus', 'ic--lg') + '</button>' +
         '<input class="stepper__v" id="peoplev" type="text" inputmode="numeric" aria-label="Kişi sayısı" placeholder="?" value="">' +
         '<button class="stepper__b" type="button" data-step="1" aria-label="Artır">' + icon('plus', 'ic--lg') + '</button>' +
-        '</div><p class="flow__hint">Biliyorsan toplam sayıyı yaz. Daha sonra güncelleyebilirsin.</p><button class="location-skip" type="button" data-flow="unknown-people">Kişi sayısını bilmiyorum, devam et</button></div>';
+        '</div><label class="field"><span class="field__l">Beyanınız (herkese açık, isteğe bağlı)</span><textarea id="request-details" rows="3" maxlength="2000" placeholder="İhtiyacınızı açıklayın. Özel adres ve telefonu buraya yazmayın."></textarea></label><p class="flow__hint">Biliyorsan toplam sayıyı yaz. Daha sonra güncelleyebilirsin.</p><button class="location-skip" type="button" data-flow="unknown-people">Kişi sayısını bilmiyorum, devam et</button></div>';
     }
     if (i === 3) {
       return '<h2 class="flow__q" id="flowq">Çağrınızı gözden geçirin</h2>' +
@@ -113,11 +115,14 @@
       });
     }
     if (st.step === 1) {
+      [['public-location','publicLocationText'],['request-phone','phone']].forEach(function(pair){var n=$('#'+pair[0]);n.value=st[pair[1]]||'';n.oninput=function(){st[pair[1]]=n.value;};});
+      st.privacy=st.privacy||{address:'private',phone:'private'};
+      [['address-privacy','address'],['phone-privacy','phone']].forEach(function(pair){$('#'+pair[0]).onchange=function(){st.privacy[pair[1]]=this.value;};});
       var a = $('#addr'); if (a) { a.value = st.addr; a.addEventListener('input', function () { st.addr = a.value; st.locationKnown = !!(st.addr.trim() || st.region); }); }
       var region = $('#request-region'); region.value = st.region || '';
       region.addEventListener('change', function () { st.region = region.value; st.locationKnown = !!(st.addr.trim() || st.region); });
     }
-    if (st.step === 2) { var v = $('#peoplev'); if (v) { v.value = st.people === null ? '' : st.people; v.addEventListener('input', function () { st.people = v.value.trim() === '' ? null : v.value; }); } }
+    if (st.step === 2) { var details=$('#request-details');details.value=st.details||'';details.oninput=function(){st.details=details.value;};var v = $('#peoplev'); if (v) { v.value = st.people === null ? '' : st.people; v.addEventListener('input', function () { st.people = v.value.trim() === '' ? null : v.value; }); } }
     if (st.step === 3) {
       var names = st.need.map(function (n) {
         return (NEEDS.filter(function (x) { return x.id === n; })[0] || {}).label;
@@ -126,6 +131,9 @@
         row('İhtiyaç', names.length ? names.join(', ') : 'Belirtilmedi') +
         row('Konum', (st.region ? st.region + ' · ' : '') + (st.addr || (st.region ? '' : 'Konum belirtilmedi')) + (!st.locationKnown && (st.addr || st.region) ? ' · Konum kesin değil' : '')) +
         row('Kişi sayısı', st.people === null ? 'Henüz bilinmiyor' : st.people + ' kişi') +
+        row('Beyan',st.details||'İhtiyaç özeti kullanılacak')+
+        row('Adres görünürlüğü',st.privacy?.address==='public'?'Herkese açık':'Yalnızca moderatörler')+
+        row('Telefon görünürlüğü',st.phone?(st.privacy?.phone==='public'?'Herkese açık':'Yalnızca moderatörler'):'Telefon eklenmedi')+
         row('Görünürlük', 'Kriz Var akışı · Doğrulanmamış olarak başlar');
     }
     if (st.step === 4) runChain();
@@ -147,13 +155,13 @@
 
   M.openImdat = function (opts) {
     opts = opts || {};
-    if (!restored) { try { var saved = JSON.parse(localStorage.getItem(draftKey())); if(saved && Array.isArray(saved.need) && Number.isInteger(saved.step) && saved.step < 4) { st=saved; st.sending=false; draft=st; } } catch(_){} restored=true; }
+    if (!restored) { try { var saved = JSON.parse(sessionStorage.getItem(draftKey())); if(saved && Array.isArray(saved.need) && Number.isInteger(saved.step) && saved.step < 4) { st=saved; st.sending=false; draft=st; } } catch(_){} restored=true; }
     if(st.pending&&opts.editId!==st.editId)opts=st.editId?{editId:st.editId}:{};
     if (opts.editId) {
       var original = M.getPost(opts.editId);
       if (!original || original.uid !== 'me' || !original.need) return;
       if (!st.editId) draft = st;
-      if(st.editId!==original.id || st.step===4)st = { need: original.need.slice(), addr: original.location ? original.location.text : original.loc, people: original.people == null ? null : original.people, region: original.region || '', locationKnown: original.location ? original.location.known : true, step: 1, editId: original.id, version: original.version };
+      if(st.editId!==original.id || st.step===4)st = { need: original.need.slice(), addr: original.location ? original.location.text : original.loc, people: original.people == null ? null : original.people, region: original.region || '', locationKnown: original.location ? original.location.known : true, step: 1, editId: original.id, version: original.version, details:original.details||'',phone:original.phone||'',publicLocationText:original.publicLocationText||'',privacy:original.privacy||{address:'public',phone:'private'} };
     } else {
       if (st.editId && !st.pending) st = draft;
       if (st.step === 4 || (opts.need && !st.pending)) st = { need: opts.need || [], addr: '', people: null, step: 0, editId: null, region: '', locationKnown: false };
@@ -195,6 +203,7 @@
       if (f.dataset.flow === 'unknown-location') { st.locationKnown = false; st.step = 2; render(1); return; }
       if (f.dataset.flow === 'unknown-people') { st.people = null; st.step = 3; render(1); return; }
       if (f.dataset.flow === 'requests') {
+        if(st.savedId){M.closeModal();M.openRequestPage(st.savedId);return;}
         M.closeModal(); M.setTabInstant('crisis');
         $('.chip[data-filter="mine"]').click();
         return;
@@ -202,7 +211,7 @@
       if (f.dataset.flow === 'prev') { st.step = Math.max(0, st.step - 1); render(-1); return; }
       if (f.dataset.flow === 'next') {
         var error = st.step === 0 && !st.need.length ? 'Devam etmek için bir ihtiyaç seçin.' :
-          st.step === 1 && !st.addr.trim() && !st.region ? 'Bir yer tarifi yazın veya Konumdan emin değilim ile devam edin.' :
+          st.step === 1 && !st.addr.trim() && !st.region && !(st.publicLocationText||'').trim() ? 'Bir yer tarifi yazın veya Konumdan emin değilim ile devam edin.' :
           st.step === 2 && st.people !== null && (!/^\d+$/.test(String(st.people)) || !Number.isSafeInteger(Number(st.people)) || Number(st.people) < 1) ? 'Pozitif bir tam sayı yazın veya Kişi sayısını bilmiyorum ile devam edin.' : '';
         if (error) {
           var note = $('#flow-error');
@@ -213,7 +222,7 @@
         if (st.step === 3) {
           var submitting=st;
           if(M.shared || M.transport) {
-            st.pending=st.pending || {commandId:crypto.randomUUID(),type:st.editId?'request.update':'request.create',payload:{need:st.need.slice(),people:st.people===null?null:Number(st.people),location:{text:st.addr.trim(),region:st.region||null,known:st.locationKnown}}};
+            st.pending=st.pending || {commandId:crypto.randomUUID(),type:st.editId?'request.update':'request.create',payload:{details:st.details||'',phone:st.phone||'',publicLocationText:st.publicLocationText||'',privacy:st.privacy||{address:'private',phone:'private'},need:st.need.slice(),people:st.people===null?null:Number(st.people),location:{text:st.addr.trim(),region:st.region||null,known:st.locationKnown}}};
             if(st.editId){st.pending.targetId=st.editId;st.pending.expectedVersion=st.version;}
             st.sending=true;persist();f.disabled=true;f.textContent='Gönderiliyor…';
             var result=await M.transport.send(st.pending);submitting.sending=false;
@@ -236,6 +245,7 @@
               }return;
             }
             delete submitting.pending;submitting.savedId=result.entityId;submitting.step=4;persist();
+            if(M.requestPageActive)M.refreshRequestPage();
             if(M.shared)M.refreshShared(true);else if(M.renderCrisisList)M.renderCrisisList();
             if(st===submitting && node.isConnected)render(1);return;
           }

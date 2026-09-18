@@ -2,10 +2,11 @@ import { operations } from '../lab/operations.mjs';
 
 const names=operations.map(t=>t.function.name);
 const read=['read_view','open_thread','wait'];
-const moderation=['post_remove','account_ban'];
+const moderation=['post_remove','account_ban','request_manage'];
 export const roles=Object.freeze({
   participant:{role:'participant',operations:names.filter(n=>!moderation.includes(n)),scope:{posts:'public',regions:null}},
-  moderator:{role:'moderator',operations:[...read,...moderation],scope:{posts:'public',regions:null}},
+  moderator:{role:'moderator',operations:[...read,'post_remove','account_ban'],scope:{posts:'public',regions:null}},
+  request_moderator:{role:'request_moderator',operations:[...read,'request_manage','reply_create','request_close','request_reopen'],scope:{posts:'public',regions:null}},
   observer:{role:'observer',operations:read,scope:{posts:'public',regions:null}}
 });
 const plain=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -28,9 +29,17 @@ export function accessFor(actor){
   catch{return {role:'disabled',operations:[],scope:{posts:'own',regions:[]}};}
 }
 export const permits=(actor,operation)=>accessFor(actor).operations.includes(operation.replace('.','_'));
+export const requestModerator=actor=>permits(actor,'request.manage');
+export const privateRequestAccess=(state,actorId,p)=>p.authorId===actorId||requestModerator(state.actors[actorId]);
+export const messageChannel=m=>m.channel||'community';
+export function canReadMessage(state,actorId,m){
+  const p=state.posts[m.targetId];
+  return !!p&&!p.removed&&canSeePost(state,actorId,p)&&(m.visibility!=='private'||privateRequestAccess(state,actorId,p));
+}
 export function canSeePost(state,actorId,entry){
   const actor=state.actors[actorId],policy=accessFor(actor),post=entry?.originalId?state.posts[entry.originalId]:entry;
   if(!post||!policy.operations.includes('read_view'))return false;
+  if(post.kind==='request'&&post.publicAccess==='restricted'&&!privateRequestAccess(state,actorId,post))return false;
   if(policy.scope.posts==='own'&&post.authorId!==actorId)return false;
   return policy.scope.regions===null||policy.scope.regions.includes(post.location?.known?post.location.region:'unknown');
 }
@@ -40,6 +49,6 @@ export function canTarget(state,actorId,id){
   // Removal changes feed visibility, not the scope of an already observed account.
   // The command service still requires this session to have seen the target.
   if(Object.hasOwn(state.actors,id))return Object.values(state.posts).some(p=>p.authorId===id&&canSeePost(state,actorId,p))||
-    [...Object.values(state.replies),...Object.values(state.offers)].some(m=>m.authorId===id&&canSeePost(state,actorId,state.posts[m.targetId]));
+    [...Object.values(state.replies),...Object.values(state.offers)].some(m=>m.authorId===id&&canReadMessage(state,actorId,m));
   return false;
 }

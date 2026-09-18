@@ -173,7 +173,7 @@
       if (shell) shell.inert = false;
       $$('.bottombar, .fab').forEach(function (n) { n.inert = false; });
       var restore=lastFocus&&document.contains(lastFocus)?lastFocus:lastFocusSelector?$$(lastFocusSelector).find(function(n){return n.offsetParent!==null;}):null;
-      restore=restore||$('.tab[aria-selected="true"]');if(restore)restore.focus({preventScroll:true});
+      restore=restore||$('#request-page h1')||$('.tab[aria-selected="true"]');if(restore)restore.focus({preventScroll:true});
     }, motionOff() ? 0 : 160);
   }
   M.openModal = openModal; M.closeModal = closeModal;
@@ -645,6 +645,7 @@
     requestAnimationFrame(function () { moveUnderline(false); });
 
     document.documentElement.dataset.tab = state.tab;
+    if (!M.shared && M.transport && M.transport.initLocal) M.transport.initLocal();
     var initial = routeFromLocation();
     if (initial === 'following') M.setTabInstant('following');
     if (M.shared || initial === 'crisis') { M.activateCrisis({ immediate: true }); M.setTabInstant(initial); }
@@ -652,6 +653,7 @@
     if (!M.shared && M.initDemo) M.initDemo();
     if (!M.shared && M.initSimulation) M.initSimulation();
     if (M.shared && M.initShared) M.initShared();
+    if (M.initRequestPage) M.initRequestPage();
   }
 
   function boot() { if (M.shared) M.transport.ready().then(init).catch(function(error){ console.error('Application startup failed',error); var screen=document.getElementById('connection-screen'); if(screen)screen.textContent='Akış açılamadı. Sayfayı yenileyerek tekrar deneyin.'; }); else init(); }
