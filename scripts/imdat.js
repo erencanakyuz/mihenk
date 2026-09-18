@@ -115,12 +115,12 @@
       });
     }
     if (st.step === 1) {
-      [['public-location','publicLocationText'],['request-phone','phone']].forEach(function(pair){var n=$('#'+pair[0]);n.value=st[pair[1]]||'';n.oninput=function(){st[pair[1]]=n.value;};});
+      [['public-location','publicLocationText'],['request-phone','phone']].forEach(function(pair){var n=$('#'+pair[0]);n.value=st[pair[1]]||'';n.oninput=function(){st[pair[1]]=n.value;if(pair[1]==='publicLocationText')st.locationKnown=!!((st.addr||'').trim()||st.region||n.value.trim());};});
       st.privacy=st.privacy||{address:'private',phone:'private'};
       [['address-privacy','address'],['phone-privacy','phone']].forEach(function(pair){$('#'+pair[0]).onchange=function(){st.privacy[pair[1]]=this.value;};});
-      var a = $('#addr'); if (a) { a.value = st.addr; a.addEventListener('input', function () { st.addr = a.value; st.locationKnown = !!(st.addr.trim() || st.region); }); }
+      var a = $('#addr'); if (a) { a.value = st.addr; a.addEventListener('input', function () { st.addr = a.value; st.locationKnown = !!(st.addr.trim() || st.region || (st.publicLocationText || '').trim()); }); }
       var region = $('#request-region'); region.value = st.region || '';
-      region.addEventListener('change', function () { st.region = region.value; st.locationKnown = !!(st.addr.trim() || st.region); });
+      region.addEventListener('change', function () { st.region = region.value; st.locationKnown = !!(st.addr.trim() || st.region || (st.publicLocationText || '').trim()); });
     }
     if (st.step === 2) { var details=$('#request-details');details.value=st.details||'';details.oninput=function(){st.details=details.value;};var v = $('#peoplev'); if (v) { v.value = st.people === null ? '' : st.people; v.addEventListener('input', function () { st.people = v.value.trim() === '' ? null : v.value; }); } }
     if (st.step === 3) {
@@ -129,11 +129,11 @@
       }).filter(Boolean);
       $('#review').innerHTML =
         row('İhtiyaç', names.length ? names.join(', ') : 'Belirtilmedi') +
-        row('Konum', (st.region ? st.region + ' · ' : '') + (st.addr || (st.region ? '' : 'Konum belirtilmedi')) + (!st.locationKnown && (st.addr || st.region) ? ' · Konum kesin değil' : '')) +
+        row('Herkese açık konum', ([st.region, (st.publicLocationText || '').trim()].filter(Boolean).join(' · ') || 'Belirtilmedi') + (!st.locationKnown && (st.addr || st.region || st.publicLocationText) ? ' · Konum kesin değil' : '')) +
+        row('Adres tarifi', st.addr ? st.addr + ' · ' + (st.privacy?.address === 'public' ? 'Herkese açık' : 'Yalnızca moderatörler') : 'Eklenmedi') +
+        row('Telefon', st.phone ? st.phone + ' · ' + (st.privacy?.phone === 'public' ? 'Herkese açık' : 'Yalnızca moderatörler') : 'Eklenmedi') +
         row('Kişi sayısı', st.people === null ? 'Henüz bilinmiyor' : st.people + ' kişi') +
         row('Beyan',st.details||'İhtiyaç özeti kullanılacak')+
-        row('Adres görünürlüğü',st.privacy?.address==='public'?'Herkese açık':'Yalnızca moderatörler')+
-        row('Telefon görünürlüğü',st.phone?(st.privacy?.phone==='public'?'Herkese açık':'Yalnızca moderatörler'):'Telefon eklenmedi')+
         row('Görünürlük', 'Kriz Var akışı · Doğrulanmamış olarak başlar');
     }
     if (st.step === 4) runChain();

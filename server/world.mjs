@@ -16,12 +16,13 @@ function text(value,limit,required=false,field='text') {
   if (typeof value !== 'string' || value.length>limit || (required&&!value.trim())) reject('validation','Metni kontrol edin.',field);
   return value.trim();
 }
-function location(value) {
+function location(value,landmark=false) {
   fields(value,['region','text','known']);
   if (typeof value.known!=='boolean') reject('validation','Konum durumunu belirtin.','location');
   const region = value.region == null ? null : text(value.region,80,false,'location');
   const description = text(value.text??'',240,false,'location');
-  if (value.known && !region && !description) reject('validation','Bir yer tarifi yazın veya konumu bilinmiyor olarak belirtin.','location');
+  // A public landmark (publicLocationText) also counts as a known location.
+  if (value.known && !region && !description && !landmark) reject('validation','Bir yer tarifi yazın veya konumu bilinmiyor olarak belirtin.','location');
   // Uncertainty does not erase a useful district or landmark description.
   return {region:region||null,text:description,known:value.known};
 }
@@ -50,7 +51,7 @@ function requestFields(payload,partial=false) {
     if (payload.people!==null&&(!Number.isSafeInteger(payload.people)||payload.people<1)) reject('validation','Kişi sayısı pozitif tam sayı veya bilinmiyor olmalı.','people');
     out.people=payload.people;
   }
-  if (!partial || 'location' in payload) out.location=location(payload.location);
+  if (!partial || 'location' in payload) out.location=location(payload.location,typeof payload.publicLocationText==='string'&&!!payload.publicLocationText.trim());
   for(const [name,max] of [['details',2000],['phone',40],['publicLocationText',240]])
     if(name in payload)out[name]=text(payload[name],max,false,name);
   if('privacy' in payload){

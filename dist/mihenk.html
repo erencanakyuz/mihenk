@@ -21,7 +21,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~305 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~306 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -1547,6 +1547,42 @@ ul { list-style: none; margin: 0; padding: 0; }
 .crisis-actions #crisis-write .ic { width: 22px; height: 22px; }
 :root[data-plain="1"] .crisis-actions #crisis-write { background: none; border: 2px solid var(--c-accent); color: var(--c-accent); }
 
+/* ==========================================================================
+   "Kriz Var" head as a card · sibling of the pinned .pin card
+   Same hairline border, 16px radius, thin blue left accent and blue label
+   treatment as .pin, one notch warmer: a soft lift off the page, roomier
+   padding and the two action buttons sitting inside the card.
+   ========================================================================== */
+.crisis-card {
+  margin: 14px var(--pad-x) 12px;
+  border: 1px solid var(--c-border);
+  border-left: 1px solid var(--c-accent);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--c-bg-3) 0%, var(--c-bg-2) 58%);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+  overflow: hidden;
+}
+.crisis-card .crisis-intro { padding: 18px 18px 0; }
+.crisis-card .scenario-label { font-weight: 700; letter-spacing: .01em; }
+.crisis-card .crisis-intro h1 { font-size: 23px; margin: 8px 0 5px; }
+/* the shared read-only view keeps its bigger headline */
+[data-shared="1"] .crisis-card .crisis-intro h1 { font-size: clamp(24px, 5vw, 32px); }
+.crisis-card .crisis-intro p { font-size: 14px; line-height: 21px; }
+.crisis-card .crisis-actions {
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 10px;
+  padding: 15px 18px 18px;
+}
+@media (max-width: 700px) {
+  .crisis-card { margin: 12px; border-radius: 14px; }
+  .crisis-card .crisis-intro { padding: 16px 15px 0; }
+  .crisis-card .crisis-intro h1 { font-size: 21px; }
+  .crisis-card .crisis-actions { gap: 8px; padding: 14px 15px 15px; }
+  .crisis-card .crisis-actions .sos { font-size: 14px; }
+}
+/* Low-bandwidth mode keeps the flat black block: no card chrome at all. */
+:root[data-plain="1"] .crisis-card { margin: 0; border: 0; border-bottom: 1px solid #666; background: #000; }
+
 /* ===== styles/plain.css ===== */
 /* ==========================================================================
    MİHENK - düşük bant genişliği modu (low-bandwidth / plain HTML mode)
@@ -2172,16 +2208,25 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     if(cmd.type==='request.create'||cmd.type==='request.update') {
       if(!p){p={id:id,uid:'me',tag:'yardim',v:'unverified'};M.state.extraCrisis.unshift(p);}
       ['need','people','location','details','phone','privacy','publicLocationText'].forEach(function(name){if(name in payload)p[name]=payload[name];});
+      // A partial update keeps the fields it omits; a seed post may carry no location object at all.
+      if(!p.location)p.location={known:!!p.loc,region:p.region||null,text:''};
+      if(!Array.isArray(p.need)||!p.need.length)return {ok:false,error:{code:'validation',message:'En az bir ihtiyaç seçin.',field:'need'}};
       p.region=p.location.region||'';p.loc=p.publicLocationText||p.region||p.location.text||'Konum henüz belirtilmedi';p.t='şimdi';
       p.text=p.need.map(function(n){return {kurtarma:'Arama kurtarma',saglik:'Sağlık / ilk yardım',barinma:'Barınma ve ısınma',gida:'Gıda ve su',ulasim:'Ulaşım'}[n];}).join(', ')+' ihtiyacı var. '+(p.people===null?'Kişi sayısı bilinmiyor.':p.people+' kişi.');
-    } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){p.resolved=cmd.type==='request.close';p.closeReason=p.resolved?(payload.reason||'other'):null;}
+    } else if(cmd.type==='request.close'||cmd.type==='request.reopen'){
+      if(!p)return {ok:false,error:{code:'not_found',message:'Talep bulunamadı.'}};
+      if(p.resolved===(cmd.type==='request.close'))return {ok:false,error:{code:'conflict',message:p.resolved?'Bu talep zaten kapalı.':'Bu talep zaten açık.'}};
+      p.resolved=cmd.type==='request.close';p.closeReason=p.resolved?(payload.reason||'other'):null;}
     else if(cmd.type==='reply.create'||cmd.type==='offer.create'){
       if(!p||p.resolved)return {ok:false,error:{code:'conflict',message:'Bu talep kapalı.'}};if(!p.need&&p.v==='official')return {ok:false,error:{code:'validation',message:'Kurumsal duyurulara yorum yazılamaz.'}};
       if(payload.channel==='coordination'&&p.uid!=='me')return {ok:false,error:{code:'unauthorized',message:'Bu alana yalnızca talep sahibi ve moderatörler yazabilir.'}};
-      var m={channel:payload.channel||'community',visibility:payload.visibility||'public',parentId:payload.parentId||null,id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
+      // Community messages are public on the server, so the local adapter cannot store a private one.
+      var m={channel:payload.channel||'community',visibility:(payload.channel==='coordination'?payload.visibility:'public')||'public',parentId:payload.parentId||null,id:id,targetId:p.id,text:payload.text,authorId:'me',author:M.SEED.me,version:1,createdAt:new Date().toISOString(),withdrawn:false,kind:cmd.type==='offer.create'?'offer':'reply',canWithdraw:cmd.type==='offer.create'};
       (m.kind==='offer'?offlineOffers:offlineMessages).push(m);p[m.kind==='offer'?'offers':'replies']=(p[m.kind==='offer'?'offers':'replies']||0)+1;if(m.channel==='coordination')p.updates=(p.updates||0)+1;else p.support=(p.support||0)+1;
       return {ok:true,entityId:id,entityVersion:1};
-    } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});offer.withdrawn=true;offer.canWithdraw=false;var host=offlinePost(offer.targetId);if(host){host.offers=Math.max(0,(host.offers||0)-1);host.support=Math.max(0,(host.support||0)-1);}return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
+    } else if(cmd.type==='offer.withdraw'){var offer=offlineOffers.find(function(x){return x.id===cmd.targetId;});
+      if(!offer)return {ok:false,error:{code:'not_found',message:'Destek önerisi bulunamadı.'}};
+      offer.withdrawn=true;offer.canWithdraw=false;var host=offlinePost(offer.targetId);if(host){host.offers=Math.max(0,(host.offers||0)-1);host.support=Math.max(0,(host.support||0)-1);}return {ok:true,entityId:offer.id,entityVersion:++offer.version};}
     else if(cmd.type==='report.create'){
       try { var reports=JSON.parse(localStorage.getItem('mihenk:offline-reports')||'[]');reports.push({id:id,targetId:p.id,reason:payload.reason,details:payload.details,at:new Date().toISOString()});localStorage.setItem('mihenk:offline-reports',JSON.stringify(reports)); }
       catch(_){return {ok:false,error:{code:'unavailable',message:'Bildirim bu cihazda kaydedilemedi. Yeniden deneyin.'}};}
@@ -2218,9 +2263,12 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     getView:async function(query){
       if(!M.shared){
         var p=query&&query.thread?offlinePost(query.thread):null,channel=query?.channel||'community';
-        var messages=offlineMessages.concat(offlineOffers.filter(function(o){return !o.withdrawn;})).filter(function(m){return p&&m.targetId===p.id&&(!(p.need||p.tag==='yardim')||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
+        // Same help test as the server: an official announcement has no channels.
+        var help=!!p&&(!!p.need||(p.tag==='yardim'&&p.v!=='official'));
+        var messages=offlineMessages.concat(offlineOffers.filter(function(o){return !o.withdrawn;})).filter(function(m){return p&&m.targetId===p.id&&(!help||(m.channel||'community')===channel)&&(m.visibility!=='private'||p.uid==='me');});
         var end=Math.max(0,messages.length-(query?.messageOffset||0)),start=Math.max(0,end-40);
-        return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:messages.slice(start,end),parents:messages.filter(function(m){return messages.slice(start,end).some(function(c){return c.parentId===m.id;});}),earlierCount:start,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
+        var slice=messages.slice(start,end),shown={};slice.forEach(function(m){shown[m.id]=1;});
+        return {me:{id:'me'},thread:p?{post:publicOffline(p),channel:channel,messages:slice,parents:messages.filter(function(m){return !shown[m.id]&&slice.some(function(c){return c.parentId===m.id;});}),earlierCount:start,newerCount:messages.length-end,nextMessageOffset:start?(query?.messageOffset||0)+40:null}:null};
       }
       query=Object.assign({},currentQuery,query||{});
       if(!query.thread)currentQuery=Object.assign({},query);
@@ -3207,7 +3255,9 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var needs = (p.need || []).map(function (n) { return '<span class="cpost__need">' + esc(NEEDLABEL[n] || n) + '</span>'; }).join('');
     var facts = [];
     if (p.need) facts.push(icon('people', 'ic--sm') + '<span>' + (p.people == null ? 'Kişi sayısı bilinmiyor' : esc(p.people) + ' kişi') + '</span>');
-    if (p.location && !p.location.known && (p.location.text || p.location.region)) facts.push(icon('questionc', 'ic--sm') + '<span>Konum kesin değil</span>');
+    // Uncertainty is a property of the request, not of the fields this viewer may read:
+    // a private address must not silently remove the note for outsiders.
+    if (p.location && !p.location.known && (p.need || p.location.text || p.location.region)) facts.push(icon('questionc', 'ic--sm') + '<span>Konum kesin değil</span>');
     if (!needs && !facts.length) return '';
     return '<div class="cpost__request">' + (needs ? '<div class="cpost__needs">' + needs + '</div>' : '') +
       (facts.length ? '<div class="cpost__facts">' + facts.map(function (f) { return '<span>' + f + '</span>'; }).join('') + '</div>' : '') + '</div>';
@@ -3243,7 +3293,9 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
             (state.corroborations[p.id] ? ' data-done="1"' : '') + '>' +
             icon('checkc', 'ic--sm') + '<span>' + (state.corroborations[p.id] ? 'Beyanın alındı' : 'Ben de gördüm') + '</span></button>' : '') +
         '</div>' +
-      (M.cardActions ? M.cardActions(p) : '') + '</div></article>';
+      // The actions read the same effective verification as data-help, so the card body
+      // and the entry button never disagree after a local verification change.
+      (M.cardActions ? M.cardActions(v === p.v ? p : Object.assign({}, p, { v: v })) : '') + '</div></article>';
   }
 
   M.crisisPostHTML = cpostHTML;
@@ -3284,12 +3336,14 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
 
     var head = el(
       '<div class="crisis-head">' +
+        '<div class="crisis-card">' +
         '<div class="crisis-intro"><span class="scenario-label">' + icon('shield', 'ic--sm') + 'Kriz bilgi merkezi</span>' +
         '<h1>' + (M.shared ? esc(M.sharedView.title) : 'Kahramanmaraş depremi') + '</h1><p>Bölgeni seç, güvenilir bilgiyi takip et.</p></div>' +
         '<div class="crisis-actions">' +
         '<button class="sos" id="sos" type="button">' + icon('sos') +
           '<span>Yardım talebi oluştur</span></button>' +
         '<button class="btn btn--ghost" type="button" id="crisis-write">' + icon('quill') + 'Bilgi paylaş</button></div>' +
+        '</div>' +
         '<button class="my-requests" type="button" id="my-requests" hidden></button>' +
         '<div class="composer" id="ccomposer" hidden>' +
           '<span class="av">' + S.me.avatar + '</span>' +
@@ -3962,12 +4016,12 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       });
     }
     if (st.step === 1) {
-      [['public-location','publicLocationText'],['request-phone','phone']].forEach(function(pair){var n=$('#'+pair[0]);n.value=st[pair[1]]||'';n.oninput=function(){st[pair[1]]=n.value;};});
+      [['public-location','publicLocationText'],['request-phone','phone']].forEach(function(pair){var n=$('#'+pair[0]);n.value=st[pair[1]]||'';n.oninput=function(){st[pair[1]]=n.value;if(pair[1]==='publicLocationText')st.locationKnown=!!((st.addr||'').trim()||st.region||n.value.trim());};});
       st.privacy=st.privacy||{address:'private',phone:'private'};
       [['address-privacy','address'],['phone-privacy','phone']].forEach(function(pair){$('#'+pair[0]).onchange=function(){st.privacy[pair[1]]=this.value;};});
-      var a = $('#addr'); if (a) { a.value = st.addr; a.addEventListener('input', function () { st.addr = a.value; st.locationKnown = !!(st.addr.trim() || st.region); }); }
+      var a = $('#addr'); if (a) { a.value = st.addr; a.addEventListener('input', function () { st.addr = a.value; st.locationKnown = !!(st.addr.trim() || st.region || (st.publicLocationText || '').trim()); }); }
       var region = $('#request-region'); region.value = st.region || '';
-      region.addEventListener('change', function () { st.region = region.value; st.locationKnown = !!(st.addr.trim() || st.region); });
+      region.addEventListener('change', function () { st.region = region.value; st.locationKnown = !!(st.addr.trim() || st.region || (st.publicLocationText || '').trim()); });
     }
     if (st.step === 2) { var details=$('#request-details');details.value=st.details||'';details.oninput=function(){st.details=details.value;};var v = $('#peoplev'); if (v) { v.value = st.people === null ? '' : st.people; v.addEventListener('input', function () { st.people = v.value.trim() === '' ? null : v.value; }); } }
     if (st.step === 3) {
@@ -3976,11 +4030,11 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
       }).filter(Boolean);
       $('#review').innerHTML =
         row('İhtiyaç', names.length ? names.join(', ') : 'Belirtilmedi') +
-        row('Konum', (st.region ? st.region + ' · ' : '') + (st.addr || (st.region ? '' : 'Konum belirtilmedi')) + (!st.locationKnown && (st.addr || st.region) ? ' · Konum kesin değil' : '')) +
+        row('Herkese açık konum', ([st.region, (st.publicLocationText || '').trim()].filter(Boolean).join(' · ') || 'Belirtilmedi') + (!st.locationKnown && (st.addr || st.region || st.publicLocationText) ? ' · Konum kesin değil' : '')) +
+        row('Adres tarifi', st.addr ? st.addr + ' · ' + (st.privacy?.address === 'public' ? 'Herkese açık' : 'Yalnızca moderatörler') : 'Eklenmedi') +
+        row('Telefon', st.phone ? st.phone + ' · ' + (st.privacy?.phone === 'public' ? 'Herkese açık' : 'Yalnızca moderatörler') : 'Eklenmedi') +
         row('Kişi sayısı', st.people === null ? 'Henüz bilinmiyor' : st.people + ' kişi') +
         row('Beyan',st.details||'İhtiyaç özeti kullanılacak')+
-        row('Adres görünürlüğü',st.privacy?.address==='public'?'Herkese açık':'Yalnızca moderatörler')+
-        row('Telefon görünürlüğü',st.phone?(st.privacy?.phone==='public'?'Herkese açık':'Yalnızca moderatörler'):'Telefon eklenmedi')+
         row('Görünürlük', 'Kriz Var akışı · Doğrulanmamış olarak başlar');
     }
     if (st.step === 4) runChain();
@@ -4002,7 +4056,9 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
 
   M.openImdat = function (opts) {
     opts = opts || {};
-    if (!restored) { try { var saved = JSON.parse(sessionStorage.getItem(draftKey())); if(saved && Array.isArray(saved.need) && Number.isInteger(saved.step) && saved.step < 4) { st=saved; st.sending=false; draft=st; } } catch(_){} restored=true; }
+    // Help drafts moved to sessionStorage because they hold a private address and phone.
+    // Drop any copy an earlier build left in localStorage instead of leaving it on the device.
+    if (!restored) { try { localStorage.removeItem(draftKey()); } catch(_){} try { var saved = JSON.parse(sessionStorage.getItem(draftKey())); if(saved && Array.isArray(saved.need) && Number.isInteger(saved.step) && saved.step < 4) { st=saved; st.sending=false; draft=st; } } catch(_){} restored=true; }
     if(st.pending&&opts.editId!==st.editId)opts=st.editId?{editId:st.editId}:{};
     if (opts.editId) {
       var original = M.getPost(opts.editId);
@@ -4257,7 +4313,11 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     }
     var open=e.target.closest('[data-open-request]');if(open){M.openRequestPage(open.dataset.openRequest);return;}
     var card=e.target.closest('.cpost[data-help]');
-    if(card&&!e.target.closest('button,a,select,input,textarea,details')&&!String(window.getSelection?window.getSelection():'')){M.openRequestPage(card.dataset.id);return;}
+    // Only a live selection inside this card blocks the body click; a leftover selection
+    // elsewhere on the page must not make the card unopenable.
+    var picked=window.getSelection?window.getSelection():null;
+    var selecting=!!card&&!!picked&&!picked.isCollapsed&&!!picked.anchorNode&&card.contains(picked.anchorNode);
+    if(card&&!e.target.closest('button,a,select,input,textarea,details')&&!selecting){M.openRequestPage(card.dataset.id);return;}
     var thread=e.target.closest('[data-thread]'),offer=e.target.closest('[data-offer]'),report=e.target.closest('[data-report]'),react=e.target.closest('[data-react]'),repost=e.target.closest('[data-repost]');
     if(thread){M.openThread(thread.dataset.thread);return;}if(offer){M.openThread(offer.dataset.offer,true);return;}if(report){M.openReport(report.dataset.report,Number(report.closest('[data-version]')?.dataset.version)||undefined);return;}
     var control=react||repost;if(!control)return;
@@ -4342,7 +4402,9 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var p=page.thread.post,c=p.capabilities;
     if(p.removed){unavailable('Bu talep kaldırıldı.');return;}
     document.title=pageTitle(p)+' · MİHENK';
-    var d=draft();if(d.parentId&&!parent()){d.parentId=null;delete d.pending;persist();}
+    // A parent that is not in the loaded window only drops the reply target. A pending
+    // command keeps its own frozen parentId so an uncertain retry reuses the same command ID.
+    var d=draft();if(d.parentId&&!parent()){d.parentId=null;persist();}
     page.node.innerHTML='<header class="rp-header"><button class="rp-back" data-request-back aria-label="Akışa dön">'+glyph('chevl')+'<span>Akışa dön</span></button><div><h1 tabindex="-1">'+pageTitle(p)+'</h1><span class="rp-id">#'+esc(p.id.slice(0,8))+'</span></div>'+(p.kind==='request'?'<span class="rp-state">'+glyph(p.status==='closed'?'lock':'clock')+(p.status==='closed'?'Talep kapalı'+({resolved:' · İhtiyaç karşılandı',withdrawn:' · Geri çekildi',duplicate:' · Mükerrer'}[p.closeReason]||''):'Talep açık')+'</span>':'')+'</header>'+statement(p)+
       (p.publicAccess==='restricted'?'<p class="rp-notice">'+glyph('lock')+'Bu talep yalnızca size ve yetkili moderatörlere açık.</p>':'')+
       '<div class="rp-tabs" role="tablist" aria-label="Talep konuşmaları">'+Object.keys(labels).map(function(channel){return '<button role="tab" id="rp-tab-'+channel+'" aria-controls="rp-panel" aria-selected="'+(page.channel===channel)+'" tabindex="'+(page.channel===channel?'0':'-1')+'" data-request-channel="'+channel+'">'+glyph(channel==='coordination'?'shield':'people')+'<span>'+labels[channel]+'</span>'+(page.unread[channel]?'<span class="rp-new-dot" aria-label="Yeni mesaj"></span>':'')+'</button>';}).join('')+'</div>'+
@@ -4366,6 +4428,8 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     else if(result.error.code!=='unavailable'||result.error.retryable===false)delete d.pending;
     if(page===current){try{sessionStorage.setItem(key(channel),JSON.stringify(d));}catch(_){}if(current.channel===channel){
       if(result.ok){await load(false);if(page===current){var input=page.node.querySelector('#rp-text');input?.focus({preventScroll:true});}}
+      // A refresh during the send detaches this composer; rebuild it so the error is still shown.
+      else if(!form.isConnected){render();M.toast(result.error.message);}
       else{form.elements.text.readOnly=!!d.pending;button.disabled=false;button.textContent=d.pending?'Gönderimi yeniden dene':'Gönder';error.hidden=false;error.textContent=result.error.message;if(result.error.code==='conflict')page.node.querySelector('[data-refresh-request]').hidden=false;}
     }}
   }
@@ -4426,7 +4490,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     if(button.dataset.replyTo||button.hasAttribute('data-cancel-reply')){
       capture();if(draft().pending){M.toast('Önce bekleyen mesajın gönderimini tamamlayın.');return;}
       draft().parentId=button.dataset.replyTo||null;if(parent()?.visibility==='private')draft().visibility='private';persist();
-      var form=page.node.querySelector('.rp-compose');if(form){var replacement=M.el(composer());form.replaceWith(replacement);replacement.addEventListener('input',capture);replacement.addEventListener('change',capture);replacement.onsubmit=send;replacement.querySelector('textarea').focus();}return;
+      var form=page.node.querySelector('.rp-compose');if(form){var replacement=M.el(composer());form.replaceWith(replacement);replacement.addEventListener('input',capture);replacement.addEventListener('change',capture);replacement.onsubmit=send;replacement.querySelector('textarea')?.focus();}return;
     }
     if(button.dataset.withdrawOffer){
       var msg=allMessages().find(function(m){return m.id===button.dataset.withdrawOffer;});if(!msg)return;
@@ -4452,8 +4516,11 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     var channels=change.channels?.[page.id]||[];
     if(channels.includes(page.channel)){var b=page.node.querySelector('[data-refresh-request]');if(b)b.hidden=false;}
     // The requester always learns about coordination; only moderators get a community dot.
-    var other=page.channel==='coordination'?'community':'coordination';
-    if(channels.includes(other)&&(other==='coordination'||page.thread?.post.capabilities.canManagePublicAccess)){
+    // Moderators are recognised by private access on a request they do not own, so help
+    // calls (which have no management controls) mark their moderators too.
+    var other=page.channel==='coordination'?'community':'coordination',post=page.thread?.post;
+    var moderating=!!post&&post.capabilities.canReadPrivate&&post.authorId!==(M.actorId||'me');
+    if(channels.includes(other)&&(other==='coordination'||moderating)){
       page.unread[other]=true;var tab=page.node.querySelector('[data-request-channel="'+other+'"]');if(tab&&!tab.querySelector('.rp-new-dot'))tab.insertAdjacentHTML('beforeend','<span class="rp-new-dot" aria-label="Yeni mesaj"></span>');
     }
   };

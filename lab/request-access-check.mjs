@@ -214,6 +214,10 @@ try{
   const plain=await neighbor.send({type:'post.create',payload:{text:'Yol açıldı.',tag:'durum'}});
   const plainCoordination=await neighbor.send({type:'reply.create',targetId:plain.entityId,payload:{text:'Deneme',channel:'coordination',visibility:'private',parentId:null}});
   ok('ordinary posts have no coordination channel',!plainCoordination.ok&&plainCoordination.error.code==='validation',code(plainCoordination));
+  // 10a. A public landmark alone makes the location known, without a private address.
+  const landmarkOnly=await neighbor.send({type:'request.create',payload:{need:['gida'],people:null,location:{known:true,region:null,text:''},details:'',phone:'',publicLocationText:'Çınar Parkı girişi',privacy:{address:'private',phone:'private'}}});
+  ok('a request with only a public landmark is accepted as a known location',landmarkOnly.ok&&(await neighbor.thread(landmarkOnly.entityId)).thread.post.location.known===true,code(landmarkOnly));
+
   // 10b. Chat messages are capped at 1000 characters with a clear message.
   const tooLong=await neighbor.send({type:'reply.create',targetId:C,payload:{text:'x'.repeat(1001),channel:'community',visibility:'public',parentId:null}});
   ok('messages longer than 1000 characters are rejected',!tooLong.ok&&tooLong.error.code==='validation'&&/1000/.test(tooLong.error.message),code(tooLong));
