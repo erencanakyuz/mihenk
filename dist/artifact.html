@@ -1574,6 +1574,23 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* Low-bandwidth mode keeps the flat black block: no card chrome at all. */
 :root[data-plain="1"] .crisis-card { margin: 0; border: 0; border-bottom: 1px solid #666; background: #000; }
 
+/* Wizard: the optional private-details section is a proper box, and the statement is a real text area. */
+.flow-private { margin-top: 18px; border: 1px solid var(--c-border); border-radius: 12px; padding: 0 14px 4px; background: var(--c-bg-2); }
+.flow-private > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 10px 0; font-size: 14px; font-weight: 700; color: var(--c-text); }
+.flow-private > summary::-webkit-details-marker { display: none; }
+.flow-private > summary::after { content: ""; flex: none; width: 9px; height: 9px; margin: -4px 6px 0 0; border-right: 2px solid var(--c-text-2); border-bottom: 2px solid var(--c-text-2); transform: rotate(45deg); transition: transform 150ms var(--ease-out); }
+.flow-private[open] > summary { border-bottom: 1px solid var(--c-border); }
+.flow-private[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.flow-private > .field { margin-top: 12px; }
+.flow-private > .field-hint { margin: 12px 0 10px; }
+.flow-private .field input { background: var(--c-bg); }
+.flow-private .field select { background: var(--c-bg); }
+.flow-private + .location-skip { margin-top: 14px; }
+.field textarea { display: block; width: 100%; min-height: 112px; padding: 12px 14px; background: var(--c-bg-2); border: 1px solid var(--c-border); border-radius: 10px; color: var(--c-text); font-size: 16px; line-height: 1.5; resize: vertical; transition: border-color 140ms; }
+.field textarea:focus { border-color: var(--c-accent); }
+.field textarea::placeholder { color: var(--c-text-2); }
+@media (prefers-reduced-motion: reduce) { .flow-private > summary::after { transition: none; } }
+
 /* ===== styles/plain.css ===== */
 /* ==========================================================================
    MİHENK - düşük bant genişliği modu (low-bandwidth / plain HTML mode)
@@ -4033,7 +4050,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
         '<label class="field"><span class="field__l">Herkese açık yer tarifi</span><input id="public-location" type="text" maxlength="240" placeholder="Mahalle veya yakındaki belirgin bir yer"></label>'+
         '<details class="flow-private"><summary>Özel bilgiler ve görünürlük (isteğe bağlı)</summary><label class="field"><span class="field__l">Ayrıntılı adres</span><input type="text" id="addr" placeholder="Sokak, bina ve ulaşım tarifi" maxlength="240" autocomplete="off"></label>'+privacySelect('address-privacy','Adresin görünürlüğü',st.privacy?.address)+
         '<label class="field"><span class="field__l">Telefon (isteğe bağlı)</span><input type="tel" id="request-phone" maxlength="40" autocomplete="off" placeholder="Ulaşılabilecek telefon"></label>'+privacySelect('phone-privacy','Telefonun görünürlüğü',st.privacy?.phone)+'<p class="field-hint">Özel bilgileri yalnızca siz ve yetkili moderatörler görebilir.</p></details>'+ 
-        '<button class="location-skip" type="button" data-flow="unknown-location">Konumdan emin değilim, devam et</button><p class="field-hint">Yazdığınız ilçe ve yer tarifi korunur.</p></div>';
+        '<button class="location-skip" type="button" data-flow="unknown-location">Konumdan emin değilim, devam et</button></div>';
     }
     if (i === 2) {
       return '<h2 class="flow__q" id="flowq">Kaç kişisiniz?</h2>' +
@@ -4161,7 +4178,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     }
     var node = el(
       '<div class="modal">' +
-        '<div class="flow__close"><span>' + (M.shared ? (opts.editId ? 'Talebi düzenle' : 'Yardım talebi oluştur') : 'Tatbikat · Gerçek yardım iletilmez') + '</span><button type="button" data-flow="close" aria-label="Formu kapat">' + icon('close') + '</button></div>' +
+        '<div class="flow__close"><span>' + (opts.editId ? 'Talebi düzenle' : 'Yardım talebi oluştur') + '</span><button type="button" data-flow="close" aria-label="Formu kapat">' + icon('close') + '</button></div>' +
         '<p class="flow__progress" id="flow-progress">Adım 1 / 4</p>' +
         '<div class="flow"><div class="flow__dots">' +
           [0, 1, 2, 3, 4].map(function (k) { return '<span class="flow__dot" data-on="' + (k ? '' : '1') + '"></span>'; }).join('') +

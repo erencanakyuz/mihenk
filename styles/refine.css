@@ -244,3 +244,20 @@
 }
 /* Low-bandwidth mode keeps the flat black block: no card chrome at all. */
 :root[data-plain="1"] .crisis-card { margin: 0; border: 0; border-bottom: 1px solid #666; background: #000; }
+
+/* Wizard: the optional private-details section is a proper box, and the statement is a real text area. */
+.flow-private { margin-top: 18px; border: 1px solid var(--c-border); border-radius: 12px; padding: 0 14px 4px; background: var(--c-bg-2); }
+.flow-private > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 10px 0; font-size: 14px; font-weight: 700; color: var(--c-text); }
+.flow-private > summary::-webkit-details-marker { display: none; }
+.flow-private > summary::after { content: ""; flex: none; width: 9px; height: 9px; margin: -4px 6px 0 0; border-right: 2px solid var(--c-text-2); border-bottom: 2px solid var(--c-text-2); transform: rotate(45deg); transition: transform 150ms var(--ease-out); }
+.flow-private[open] > summary { border-bottom: 1px solid var(--c-border); }
+.flow-private[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.flow-private > .field { margin-top: 12px; }
+.flow-private > .field-hint { margin: 12px 0 10px; }
+.flow-private .field input { background: var(--c-bg); }
+.flow-private .field select { background: var(--c-bg); }
+.flow-private + .location-skip { margin-top: 14px; }
+.field textarea { display: block; width: 100%; min-height: 112px; padding: 12px 14px; background: var(--c-bg-2); border: 1px solid var(--c-border); border-radius: 10px; color: var(--c-text); font-size: 16px; line-height: 1.5; resize: vertical; transition: border-color 140ms; }
+.field textarea:focus { border-color: var(--c-accent); }
+.field textarea::placeholder { color: var(--c-text-2); }
+@media (prefers-reduced-motion: reduce) { .flow-private > summary::after { transition: none; } }

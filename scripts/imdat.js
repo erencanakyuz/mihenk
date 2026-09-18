@@ -54,7 +54,7 @@
         '<label class="field"><span class="field__l">Herkese açık yer tarifi</span><input id="public-location" type="text" maxlength="240" placeholder="Mahalle veya yakındaki belirgin bir yer"></label>'+
         '<details class="flow-private"><summary>Özel bilgiler ve görünürlük (isteğe bağlı)</summary><label class="field"><span class="field__l">Ayrıntılı adres</span><input type="text" id="addr" placeholder="Sokak, bina ve ulaşım tarifi" maxlength="240" autocomplete="off"></label>'+privacySelect('address-privacy','Adresin görünürlüğü',st.privacy?.address)+
         '<label class="field"><span class="field__l">Telefon (isteğe bağlı)</span><input type="tel" id="request-phone" maxlength="40" autocomplete="off" placeholder="Ulaşılabilecek telefon"></label>'+privacySelect('phone-privacy','Telefonun görünürlüğü',st.privacy?.phone)+'<p class="field-hint">Özel bilgileri yalnızca siz ve yetkili moderatörler görebilir.</p></details>'+ 
-        '<button class="location-skip" type="button" data-flow="unknown-location">Konumdan emin değilim, devam et</button><p class="field-hint">Yazdığınız ilçe ve yer tarifi korunur.</p></div>';
+        '<button class="location-skip" type="button" data-flow="unknown-location">Konumdan emin değilim, devam et</button></div>';
     }
     if (i === 2) {
       return '<h2 class="flow__q" id="flowq">Kaç kişisiniz?</h2>' +
@@ -182,7 +182,7 @@
     }
     var node = el(
       '<div class="modal">' +
-        '<div class="flow__close"><span>' + (M.shared ? (opts.editId ? 'Talebi düzenle' : 'Yardım talebi oluştur') : 'Tatbikat · Gerçek yardım iletilmez') + '</span><button type="button" data-flow="close" aria-label="Formu kapat">' + icon('close') + '</button></div>' +
+        '<div class="flow__close"><span>' + (opts.editId ? 'Talebi düzenle' : 'Yardım talebi oluştur') + '</span><button type="button" data-flow="close" aria-label="Formu kapat">' + icon('close') + '</button></div>' +
         '<p class="flow__progress" id="flow-progress">Adım 1 / 4</p>' +
         '<div class="flow"><div class="flow__dots">' +
           [0, 1, 2, 3, 4].map(function (k) { return '<span class="flow__dot" data-on="' + (k ? '' : '1') + '"></span>'; }).join('') +
