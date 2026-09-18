@@ -6,10 +6,12 @@
   function save(id,value){try{localStorage.setItem(key(id),JSON.stringify(value));}catch(_){}}
   function helpActions(p,id){
     var mine=p.uid==='me',request=!!p.need,offer=request&&!mine&&!p.resolved&&(!M.shared||p.actions.includes('offer.create'));
-    var counts=[];if(p.updates)counts.push(p.updates+' güncelleme');if(p.support)counts.push(p.support+' topluluk mesajı');
+    /* Counts are named after the tabs they open, so the card and the page use one vocabulary. */
+    var counts=[];if(p.updates)counts.push('Yetkililerle iletişim: '+p.updates);if(p.support)counts.push('Topluluk desteği: '+p.support);
     return '<div class="request-actions request-actions--entry"><button class="open-request" type="button" data-open-request="'+esc(id)+'">'+(request?'Talebi aç':'Çağrıyı aç')+'</button>'+
-      (offer?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':'')+
-      '<span class="request-counts">'+esc(counts.length?counts.join(' · '):'Henüz mesaj yok')+'</span>'+
+      (offer?'<button class="offer-action" type="button" data-offer="'+esc(id)+'">'+M.icon('people','ic--sm')+'Destek öner</button>':
+        mine?'':'<button class="offer-action" type="button" data-open-request="'+esc(id)+'" data-channel="community">'+M.icon('people','ic--sm')+'Topluluk desteği</button>')+
+      '<span class="request-counts">'+esc(counts.length?counts.join(' · '):p.resolved?'Mesaj yok':'Henüz mesaj yok')+'</span>'+
       (M.shared?(p.actions.includes('post.remove')?'<button type="button" data-remove-post="'+esc(id)+'" data-version="'+p.version+'">'+M.icon('close','ic--sm')+'Kaldır</button>':'')+
         (p.actions.includes('account.ban')?'<button type="button" data-ban-account="'+esc(p.authorId)+'">Hesabı engelle</button>':'')+
         (p.actions.includes('post.react')?'<button type="button" data-react="'+esc(id)+'" aria-label="Beğen" aria-pressed="'+!!p.liked+'">'+M.icon('heart','ic--sm')+'<span>'+p.likes+'</span></button>':''):'')+
@@ -126,7 +128,7 @@
       M.openModal(confirm,{labelledBy:'action-title'});confirm.querySelector('[data-cancel]').onclick=M.closeModal;
       confirm.querySelector('[data-confirm]').onclick=async function(){this.disabled=true;var result=await M.transport.send({type:remove?'post.remove':'account.ban',targetId:targetId,...(remove?{expectedVersion:Number(remove.dataset.version)}:{}),payload:{}});if(result.ok){M.closeModal();M.refreshShared(true);if(remove)M.openThread(targetId);M.toast(remove?'Paylaşım kaldırıldı.':'Hesabın yeni paylaşım yapması engellendi.');}else{this.disabled=false;var error=confirm.querySelector('[role="alert"]');error.hidden=false;error.textContent=result.error.message;}};return;
     }
-    var open=e.target.closest('[data-open-request]');if(open){M.openRequestPage(open.dataset.openRequest);return;}
+    var open=e.target.closest('[data-open-request]');if(open){M.openRequestPage(open.dataset.openRequest,{channel:open.dataset.channel==='community'?'community':'coordination'});return;}
     var card=e.target.closest('.cpost[data-help]');
     // Only a live selection inside this card blocks the body click; a leftover selection
     // elsewhere on the page must not make the card unopenable.

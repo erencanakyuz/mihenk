@@ -41,7 +41,7 @@
   function requestBlock(p) {
     var needs = (p.need || []).map(function (n) { return '<span class="cpost__need">' + esc(NEEDLABEL[n] || n) + '</span>'; }).join('');
     var facts = [];
-    if (p.need) facts.push(icon('people', 'ic--sm') + '<span>' + (p.people == null ? 'Kişi sayısı bilinmiyor' : esc(p.people) + ' kişi') + '</span>');
+    if (p.need) facts.push(icon('people', 'ic--sm') + '<span>' + (p.people == null ? 'Kişi sayısı henüz bilinmiyor' : esc(p.people) + ' kişi') + '</span>');
     // Uncertainty is a property of the request, not of the fields this viewer may read:
     // a private address must not silently remove the note for outsiders.
     if (p.location && !p.location.known && (p.need || p.location.text || p.location.region)) facts.push(icon('questionc', 'ic--sm') + '<span>Konum kesin değil</span>');
@@ -69,7 +69,8 @@
         '</div>' +
         '<span class="vpill vpill--' + v + '">' + icon(VICON[v]) +
           '<span class="vpill__t">' + esc(vl.label) + '</span></span>' +
-        '<div class="cpost__body">' + esc(p.text) + '</div>' +
+        /* A help card shows the requester's own words; the need chips below already carry the generated summary. */
+        '<div class="cpost__body">' + esc(help && p.details && String(p.details).trim() ? p.details : p.text) + '</div>' +
         sourceHTML(p) +
         (p.corrects?'<button class="text-action" type="button" data-thread="'+esc(p.corrects)+'">İlgili önceki gönderi</button>':'')+        (help ? requestBlock(p) : '') +
         '<div class="cpost__meta">' +
@@ -78,7 +79,7 @@
             icon('questionc', 'ic--sm') + '<span>Gerekçe</span></button>' +
           (p.uid !== 'me' && (!M.shared||p.actions.includes('observation.create')) ? '<button class="cpost__verify" type="button" data-verify="' + p.id + '"' +
             (state.corroborations[p.id] ? ' data-done="1"' : '') + '>' +
-            icon('checkc', 'ic--sm') + '<span>' + (state.corroborations[p.id] ? 'Beyanın alındı' : 'Ben de gördüm') + '</span></button>' : '') +
+            icon('checkc', 'ic--sm') + '<span>' + (state.corroborations[p.id] ? 'Beyanınız alındı' : 'Ben de gördüm') + '</span></button>' : '') +
         '</div>' +
       // The actions read the same effective verification as data-help, so the card body
       // and the entry button never disagree after a local verification change.

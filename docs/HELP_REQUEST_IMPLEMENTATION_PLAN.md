@@ -846,3 +846,57 @@ PASS; `node lab/request-access-check.mjs` 63 of 63; `npm run verify` 23 of 24 wi
 pre-existing byte-chip failure; the visual tour (feed, crisis tab, filters, wizard, old
 modal, request page open/closed, shared moderator and owner views) at 1440 and 390 px shows
 no console errors.
+
+## 23. UX and copy review fixes (18 September 2026)
+
+Review: `docs/reviews/2026-09-18-ux-copy-review.md` (63 findings). Applied on branch
+`fix/request-ux-copy`; finding ids below refer to that file.
+
+- **Safety and privacy.** The three management actions now confirm in a modal before
+  sending, matching offer withdrawal (F20). Labels return to the approved
+  `Topluluk mesajlarını durdur` / `Talebi herkese kapat` / `Talebi kapat` and the heading
+  `Kamusal erişim` becomes `Herkese açık erişim` (F21, F22). The close reason no longer
+  defaults to `Diğer`: `Kapatma nedenini seçin` is required (F23). The private-fields
+  padlock and its promise now follow the actual per-field visibility, and a public field
+  gets its own sentence (F16). The wizard review lists `İlçe`,
+  `Herkese açık yer tarifi`, `Ayrıntılı adres` and `Telefon` separately with their
+  audience, instead of printing the private address as `Konum` (F46); the public-location
+  hint stops asking for a street (F45); a public landmark now counts as known location
+  (F47).
+- **Hierarchy.** The collapsed statement carries a two-line preview (F13); a request with
+  no statement says `Beyan eklenmedi` instead of repeating the need summary (F14); the
+  requester gets a visible `İhtiyacım karşılandı` and `Talep bilgilerini düzenle` row
+  (F24, F17); closure, community pause and public restriction render as notices above the
+  tabs and the header chip stops abbreviating the reason (F42); the management disclosure
+  collapses after a successful action (F25). Help cards show the requester's own statement
+  (4-line clamp) instead of the generated need sentence, counts are named after the tabs,
+  and non-owners get a `Topluluk desteği` entry button (F1, F2, F4). `Destek öner` now
+  lands on the composer (F5).
+- **Copy.** Kind-aware `talep` / `çağrı` strings (F27); community empty state
+  `Henüz topluluk mesajı yok` with viewer-specific bodies, coordination empty states split
+  between requester and moderator, and no invitation to a channel the viewer cannot write
+  in (F28–F32); the refresh button is labelled by cause instead of always claiming
+  `Yeni mesajlar` (F41); loading no longer reuses the error screen (F40); one retry label
+  (F36); the wizard is formal throughout, its close control is `Formu kapat`, and its
+  success screen distinguishes create from edit (F44, F49–F51); `Tatbikat` replaces
+  `Yerel prototip` (F55).
+- **Accessibility.** Clicking a tab keeps focus on it (F57); a refresh restores focus and
+  caret (F58); the unread dot is `role="img"` (F59); 44 px targets for the mobile back
+  control and message actions (F60); the accent focus ring replaces the UA ring on the
+  title (F10); the community channel drops the per-message `Herkese açık` badge (F34); a
+  private parent shows static text instead of a disabled dropdown (F37).
+
+Not applied, by decision: F52 (the statement needs its own wizard step, which changes the
+step count `scripts/demo.js` drives), F9 (relative timestamps), F26 (a role-dependent
+coordination tab label), F8 (the `#id` chip) and F62 (heading levels on the unavailable
+screen). F7 is partly addressed: a help call still has no `h2`, but the verification chip
+now joins the fact row, so there is no orphan title row. Every other finding in the review
+is applied.
+
+Verification: `npm run check:syntax` passes, `npm run contrast` reports ALL PASS,
+`node lab/request-access-check.mjs` passes 63 of 63, `npm run bundle` regenerated `dist/`.
+Playwright captures in local and shared modes at 1440, 390 and 320 px: statement preview,
+owner action row, closure notice, management labels, both confirmation modals, the blocked
+close without a reason, focus on the clicked tab, no per-message audience badge in
+community, 44 px back control, no horizontal scroll, no private strings in the outsider
+page, no console errors.
