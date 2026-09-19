@@ -65,6 +65,13 @@
 :root[data-plain="1"] :is(.crisis-filters label, .crisis-filters button) { min-height: 44px; border: 1px solid #bdbdbd; }
 :root[data-plain="1"] .crisis-filters button { width: auto; padding: 0 12px; }
 
+/* the compose box. The floating button that opens it on a phone is one of the
+   visuals this mode drops, so the box itself stays open at the top of the feed:
+   otherwise a narrow screen is left with no way to write a post at all. */
+@media (max-width: 700px) {
+  :root[data-plain="1"]:not([data-tab="crisis"]) #composer { display: flex; }
+}
+
 /* crisis head: label, title, one amber row, one ruled row */
 :root[data-plain="1"] .crisis-card { margin: 0; border: 0; background: #000; }
 :root[data-plain="1"] .crisis-intro { padding: 16px var(--pad-x) 0; }
