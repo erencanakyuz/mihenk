@@ -11,15 +11,72 @@
   var TAGLABEL = {};
   S.TAGS.forEach(function (t) { TAGLABEL[t.id] = t.label; });
 
-  var KEYWORDS = ['deprem', 'enkaz', 'yardım', 'yardim', 'kayıp', 'kayip', 'afad', 'göçük',
-    'gocuk', 'kurtarma', 'acil', 'imdat', 'yaralı', 'yarali', 'çadır', 'cadir', 'battaniye',
-    'kızılay', 'kizilay', 'artçı', 'artci', 'sarsıntı', 'sarsinti', 'hasar', 'afet',
-    'toplanma', 'barınma', 'barinma', 'kriz'];
+  /* ------------------------------------------------------- crisis keywords
+     What decides whether the composer offers to move a post to the crisis
+     tab. The text and the word list run through the same normaliser, so the
+     list is written once in ordinary Turkish: normalize() folds the Turkish
+     letters to ASCII (no more yardım / yardim pairs to maintain) and squeezes
+     repeated letters, which is what lets "DEPREEEEM!!!" and "yardiiim" land
+     on the same stem as the calm spelling.
 
-  M.isCrisisText = function (t) {
-    var s = (t || '').toLocaleLowerCase('tr-TR');
-    return KEYWORDS.some(function (k) { return s.indexOf(k) >= 0; });
-  };
+     ROOTS match from a word boundary onwards, so Turkish suffixes ride along
+     for free: "deprem" also catches depremde, depremin, depremzede. WHOLE is
+     for the short words that would otherwise fire inside an unrelated word -
+     "sel" inside "selam", "çığ" inside "ciğer" - and matches whole words. */
+  var FOLD = { 'ı': 'i', 'İ': 'i', 'ş': 's', 'ğ': 'g', 'ü': 'u', 'ö': 'o', 'ç': 'c',
+    'â': 'a', 'î': 'i', 'û': 'u' };
+
+  var ROOTS = [
+    /* olay */
+    'deprem', 'zelzele', 'artçı', 'sarsıntı', 'tsunami', 'heyelan', 'toprak kayması',
+    'yangın', 'patlama', 'infilak', 'kasırga', 'fırtına', 'afet', 'felaket', 'kriz',
+    'acil', 'olağanüstü hal', 'tahliye', 'afetzede', 'depremzede',
+    /* hasar */
+    'enkaz', 'moloz', 'göçük', 'yıkıl', 'yıkık', 'harabe', 'hasar', 'çatlak',
+    /* insan */
+    'arama kurtarma', 'kurtar', 'mahsur', 'yaral', 'cenaze', 'kayıp', 'kaybol',
+    'ulaşamıyor', 'haber alamıyor', 'sesimi duyan', 'imdat', 'yardım',
+    /* barınma ve ısınma */
+    'barınma', 'barınak', 'çadır', 'çadırkent', 'konteyner', 'battaniye', 'uyku tulumu',
+    'ısıtıcı', 'soba', 'jeneratör', 'powerbank', 'şarj', 'kıyafet', 'toplanma',
+    /* gıda ve sağlık */
+    'gıda', 'susuz', 'içme suyu', 'mama', 'ilaç', 'ilk yardım', 'sağlık', 'ambulans',
+    'hastane', 'revir', 'kan bağış',
+    /* koordinasyon */
+    'afad', 'akut', 'kızılay', 'ahbap', 'valilik', 'kaymakamlık', 'jandarma', 'itfaiye',
+    'meteoroloji', 'koordinasyon', 'gönüllü', 'bağış', 'dağıtım nokta', 'yardım nokta',
+    'güvenli bölge',
+    /* altyapı */
+    'elektrik kesint', 'su kesint', 'doğalgaz', 'gaz kaçağ', 'şebeke', 'baz istasyon',
+    'iletişim yok', 'sinyal yok'
+  ];
+
+  var WHOLE = ['sel', 'çığ', 'çöktü', 'çöken', 'çökme', 'çökmüş', 'göçtü',
+    'ölü', 'ölüm', 'ölen', 'yol kapalı', 'yol kapandı', '112'];
+
+  function normalize(text) {
+    return (text || '').toLocaleLowerCase('tr-TR')
+      .replace(/[ıİşğüöçâîû]/g, function (ch) { return FOLD[ch] || ch; })
+      .replace(/[^a-z0-9]+/g, ' ')
+      .replace(/([a-z])\1+/g, '$1')
+      .trim();
+  }
+
+  /* Normalising the list the same way collapses the doubled letters in it too
+     ("battaniye" becomes "bataniye" on both sides), so the two always agree. */
+  function alternation(words) {
+    var seen = {};
+    return words.map(normalize).filter(function (w) {
+      if (!w || seen[w]) return false;
+      seen[w] = 1;
+      return true;
+    }).join('|');
+  }
+
+  var CRISIS_RE = new RegExp(
+    '(?:^| )(?:(?:' + alternation(ROOTS) + ')|(?:' + alternation(WHOLE) + ')(?= |$))');
+
+  M.isCrisisText = function (t) { return CRISIS_RE.test(normalize(t)); };
 
   function sourceHTML(p) {
     if (!p.source) return '';
