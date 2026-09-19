@@ -12,7 +12,7 @@
     <h1>MİHENK</h1>
     <p class="nojs__note">Düz metin sürümü. JavaScript kapalı olduğu için yalnızca doğrulama durumu,
     metin, zaman ve konum gösteriliyor. Bu sürüm kasıtlı olarak sadedir ve tam olarak çalışır.<br>
-    Tam sürüm: ~321 KB · Düz mod: ~11 KB</p>
+    Tam sürüm: ~325 KB · Düz mod: ~11 KB</p>
 
     <h2>⚠ KRİZ VAR · Kahramanmaraş · 7.4 büyüklüğünde deprem</h2>
     <p class="nojs__note">Doğrulanmış bilgi ve yardım çağrıları. Doğrulanmamış içerik gizlenmez, işaretlenir.</p>
@@ -200,7 +200,7 @@
       </article>
       <article>
         <div class="who"><b>Onur Çetin</b> @onurcetin · 1 sa</div>
-        <p>Elektrik kesintisinde en çok özlediğim şey ışık değil, buzdolabının sesi.</p>
+        <p>Kahve makinesinin kablosunu tamir ettim. Evdeki itibarım üç kat arttı.</p>
       </article>
 
     <p class="meta" style="margin-top:24px">Tüm hesaplar kurgusal şablon hesaplardır. Prototip.</p>
@@ -1732,6 +1732,13 @@ ul { list-style: none; margin: 0; padding: 0; }
 :root[data-plain="1"] :is(.crisis-filters label, .crisis-filters button) { min-height: 44px; border: 1px solid #bdbdbd; }
 :root[data-plain="1"] .crisis-filters button { width: auto; padding: 0 12px; }
 
+/* the compose box. The floating button that opens it on a phone is one of the
+   visuals this mode drops, so the box itself stays open at the top of the feed:
+   otherwise a narrow screen is left with no way to write a post at all. */
+@media (max-width: 700px) {
+  :root[data-plain="1"]:not([data-tab="crisis"]) #composer { display: flex; }
+}
+
 /* crisis head: label, title, one amber row, one ruled row */
 :root[data-plain="1"] .crisis-card { margin: 0; border: 0; background: #000; }
 :root[data-plain="1"] .crisis-intro { padding: 16px var(--pad-x) 0; }
@@ -1760,6 +1767,21 @@ ul { list-style: none; margin: 0; padding: 0; }
 :root[data-plain="1"] :is(.chip[aria-pressed="true"], .chip[data-on="1"]) { background: none; color: #fff; font-weight: 700; }
 :root[data-plain="1"] :is(.chip[aria-pressed="true"], .chip[data-on="1"])::before { content: "[x] "; }
 :root[data-plain="1"] .chip__n { opacity: 1; margin-left: 4px; }
+
+/* need chips carry the same [ ] / [x] marker, and the box belongs to the rows
+   that are chosen. Left to the shared rule the pressed chip paints its border
+   in the accent fill, which is the page background here, so the box fell off
+   exactly the rows it was meant to mark. */
+:root[data-plain="1"] .big-chip {
+  min-height: 44px; margin-bottom: 4px; padding: 0; gap: 0;
+  border: 0; background: none; color: #bdbdbd;
+  font-size: 16px; font-weight: 400; white-space: pre;
+}
+:root[data-plain="1"] .big-chip::before { content: "[ ] "; }
+:root[data-plain="1"] .big-chip[aria-pressed="true"] {
+  padding: 0 12px; border: 1px solid #fff; background: none; color: #fff; font-weight: 700;
+}
+:root[data-plain="1"] .big-chip[aria-pressed="true"]::before { content: "[x] "; }
 
 /* posts: ruled rows, no cards */
 :root[data-plain="1"] :is(.post, .cpost) { display: block; margin: 0; padding: 16px var(--pad-x); background: #000; border: 0; border-bottom: 1px solid #fff; }
@@ -1987,7 +2009,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .rp-parent { display:inline-block; font-size:12px; margin-top:5px; color:var(--c-text-2); text-decoration:underline; text-underline-offset:3px; }
 .rp-offer { display:block; color:var(--c-accent); font-size:12px; margin-top:6px; }
 /* Community note: the comment the community stands behind, read before the thread. */
-.rp-note { margin:16px 0 4px; padding:14px 16px; border:1px solid var(--c-border); border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
+.rp-note { margin:16px 0 4px; padding:14px 16px; border:1px solid var(--c-border); border-radius:10px; background:var(--c-bg-2); }
 .rp-note-k { display:flex; align-items:center; gap:8px; margin:0; color:var(--v-verified); font-size:12px; font-weight:700; }
 .rp-note-b { margin:8px 0 0; font-size:15px; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
 .rp-note-m { margin:6px 0 0; color:var(--c-text-2); font-size:12px; }
@@ -2378,7 +2400,7 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     P('n7','u9','52 dk','Bir cümleyi kısaltmak, uzatmaktan her zaman daha çok zaman alıyor.',889,131,27),
     P('n8','u8','1 sa','Maket bıçağını üçüncü kez kaybettim. Muhtemelen maketin içinde.',432,21,44),
     P('n9','u1','1 sa','Şehirdeki her boş arsa aslında bir soru: gölge mi istiyoruz, otopark mı?',1673,388,141,{ media: 'arsa' }),
-    P('n10','u12','1 sa','Elektrik kesintisinde en çok özlediğim şey ışık değil, buzdolabının sesi.',2044,297,88),
+    P('n10','u12','1 sa','Kahve makinesinin kablosunu tamir ettim. Evdeki itibarım üç kat arttı.',2044,297,88),
     P('n11','u7','2 sa','Gece vardiyası bitti. Sabah kahvesi bugün fazlasıyla hak edilmiş durumda.',760,42,19),
     P('n12','u10','2 sa','Öğrenciler “tarih ezberdir” diyor, ben “tarih tartışmadır” diyorum. Zil çalıyor, tartışma yarıya kalıyor.',1512,246,73),
     P('n13','u2','2 sa','Kod incelemesinde en sevdiğim yorum: “bu neden çalışıyor?” Cevabı olmayan tek soru.',998,164,52),
@@ -2398,7 +2420,23 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     P('n27','u5','14 sa','Ortalama, tek başına neredeyse hiçbir şey anlatmıyor. Yine de en çok o paylaşılıyor.',2530,604,77),
     P('n28','u6','16 sa','Metronomla çalışmayı sevmiyorum ama metronom haklı.',693,71,18),
     P('n29','u4','18 sa','Aynı sokağı üç yıldır çekiyorum. Sokak değişmiyor, ben değişiyorum.',4180,893,152,{ media: 'sokak' }),
-    P('n30','u3','20 sa','Kütüphaneye yeni gelen kitapların kokusu diye bir şey var ve bilimsel olarak kanıtlanmalı.',1487,192,58)
+    P('n30','u3','20 sa','Kütüphaneye yeni gelen kitapların kokusu diye bir şey var ve bilimsel olarak kanıtlanmalı.',1487,192,58),
+    P('n31','u9','21 sa','Akşam yemeği için üç tarif açtım, sonunda makarna yaptım. Klasik.',864,77,53),
+    P('n32','u1','22 sa','Mahalledeki ıhlamurlar çiçek açmış. Bütün sokak kokuyor, kimse fotoğrafını çekmiyor.',2765,502,64,{ media: 'ihlamur' }),
+    P('n33','u8','23 sa','Arkadaşlar, İzmir’de iyi bir maket malzemecisi öneriniz var mı? Yıllardır gittiğim yer kapandı.',318,46,97),
+    P('n34','u12','1 g','Servis yirmi dakika geç kaldı, ben de yürüdüm. Aynı sürede varmışım ve bu beni rahatsız etti.',1129,131,42),
+    P('n35','u7','1 g','Nöbette kucağıma kedi yavrusu bıraktılar. Burası veteriner değil demeyi üçüncü kişide bıraktım.',4512,806,187),
+    P('n36','u5','1 g','Pazar günü kurduğum tabloyu pazartesi anlamıyorum. Geleceğe not bırakmayı öğrenmem lazım.',1893,398,61),
+    P('n37','u10','1 g','Derste bir öğrenci “yani Osmanlı da mı borçlanmış” dedi ve sınıf sustu. Güzel bir sessizlikti.',3277,691,143),
+    P('n38','u6','1 g','Albümün adını sonunda buldum. Şarkılar üç aydır hazırdı, isim yoktu.',1406,163,88),
+    P('n39','u2','1 g','Ofiste kahve makinesi bozuldu. Verimlilik üzerine doğal bir deney başlatmış olduk.',2618,489,112),
+    P('n40','u11','2 g','Bir logoyu küçülttüğünüzde hâlâ anlaşılıyorsa logodur. Anlaşılmıyorsa resimdir.',3845,921,74),
+    P('n41','u4','2 g','Bisikletle kırk kilometre. Dizlerim itiraz ediyor, geri kalan her şey memnun.',1974,212,66,{ media: 'bisiklet' }),
+    P('n42','u3','2 g','Sınıfa kitap kutusu geldi. Çocuklar kutuyu açmaya benden hevesliydi, bu iyiye işaret.',2240,317,49),
+    P('n43','u9','2 g','Bir metinden “aslında” kelimesini silince metin genelde daha dürüst oluyor.',1562,344,38),
+    P('n44','u1','3 g','Yeni projede tek şartım var: oturulacak yer. Gerisi tartışılır.',1085,178,31),
+    P('n45','u12','3 g','Evdeki bütün prizleri etiketledim. Kimse teşekkür etmedi ama doğru olanı yaptım.',926,104,27),
+    P('n46','u8','3 g','Üç günde bitecek maket, dördüncü gününde. Her seferinde aynı.',588,52,35)
   ];
 
   var following = [
@@ -2413,7 +2451,17 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
     P('f9','u5','6 sa','Grafiğin ekseni sıfırdan başlamıyorsa, grafiğin kendisi bir iddiadır.',1204,377,41),
     P('f10','u6','8 sa','Amfide akort tutmuyor, salonun nemi %70. Fizik kazandı.',187,12,6),
     P('f11','u4','11 sa','En iyi objektif, yanında taşıdığın objektiftir.',455,73,18,{ media: 'objektif' }),
-    P('f12','u3','15 sa','Bir öğrenci “öğretmenim bu konuyu sevdim” dedi. Günün geri kalanı önemsiz.',978,145,37)
+    P('f12','u3','15 sa','Bir öğrenci “öğretmenim bu konuyu sevdim” dedi. Günün geri kalanı önemsiz.',978,145,37),
+    P('f13','u7','18 sa','İki haftadır aynı kitabın aynı sayfasındayım. Kitap suçsuz.',264,22,13),
+    P('f14','u1','20 sa','Kent mobilyası dediğimiz şeyin yarısı insanların oturmasını engellemek için tasarlanmış. Diğer yarısı da iyi değil.',1342,412,57),
+    P('f15','u12','22 sa','Havya açık kalmış. Sabah evi yerinde bulduğuma şükrettim, abartıyorum ama çok değil.',387,34,21),
+    P('f16','u2','1 g','Dokümantasyon yazmak kodu iki kez yazmak gibi. İkincisinde ne yaptığını anlıyorsun.',702,158,26),
+    P('f17','u10','1 g','Tarih dersinde en zor iş, “bunu sonradan biz adlandırdık” cümlesini öğretmek.',845,197,33),
+    P('f18','u11','1 g','Müşteri “biraz daha pop olsun” dedi. On iki yıldır bu cümleyi çözmeye çalışıyorum.',1531,389,74),
+    P('f19','u4','2 g','Işık iyi olunca fotoğrafçı da iyi oluyor. Kimse bunu yüksek sesle söylemiyor.',668,91,29,{ media: 'isik' }),
+    P('f20','u3','2 g','Veli toplantısında en çok konuşan veli, en az soru soran veli oluyor. Bunun bir adı olmalı.',1194,236,58),
+    P('f21','u9','2 g','Yazım kılavuzu tartışmak metni düzeltmekten eğlenceli. Tam da bu yüzden tehlikeli.',513,77,19),
+    P('f22','u6','3 g','Amfide prova, evde kayıt, otobüste mix. Modern müzisyenlik bu.',429,63,15)
   ];
 
   /* ---- crisis feed ----------------------------------------------------- */
@@ -3586,15 +3634,72 @@ if(root.shared)root.SEED={users:[],orgs:[],me:{id:'me',name:'',handle:'',avatar:
   var TAGLABEL = {};
   S.TAGS.forEach(function (t) { TAGLABEL[t.id] = t.label; });
 
-  var KEYWORDS = ['deprem', 'enkaz', 'yardım', 'yardim', 'kayıp', 'kayip', 'afad', 'göçük',
-    'gocuk', 'kurtarma', 'acil', 'imdat', 'yaralı', 'yarali', 'çadır', 'cadir', 'battaniye',
-    'kızılay', 'kizilay', 'artçı', 'artci', 'sarsıntı', 'sarsinti', 'hasar', 'afet',
-    'toplanma', 'barınma', 'barinma', 'kriz'];
+  /* ------------------------------------------------------- crisis keywords
+     What decides whether the composer offers to move a post to the crisis
+     tab. The text and the word list run through the same normaliser, so the
+     list is written once in ordinary Turkish: normalize() folds the Turkish
+     letters to ASCII (no more yardım / yardim pairs to maintain) and squeezes
+     repeated letters, which is what lets "DEPREEEEM!!!" and "yardiiim" land
+     on the same stem as the calm spelling.
 
-  M.isCrisisText = function (t) {
-    var s = (t || '').toLocaleLowerCase('tr-TR');
-    return KEYWORDS.some(function (k) { return s.indexOf(k) >= 0; });
-  };
+     ROOTS match from a word boundary onwards, so Turkish suffixes ride along
+     for free: "deprem" also catches depremde, depremin, depremzede. WHOLE is
+     for the short words that would otherwise fire inside an unrelated word -
+     "sel" inside "selam", "çığ" inside "ciğer" - and matches whole words. */
+  var FOLD = { 'ı': 'i', 'İ': 'i', 'ş': 's', 'ğ': 'g', 'ü': 'u', 'ö': 'o', 'ç': 'c',
+    'â': 'a', 'î': 'i', 'û': 'u' };
+
+  var ROOTS = [
+    /* olay */
+    'deprem', 'zelzele', 'artçı', 'sarsıntı', 'tsunami', 'heyelan', 'toprak kayması',
+    'yangın', 'patlama', 'infilak', 'kasırga', 'fırtına', 'afet', 'felaket', 'kriz',
+    'acil', 'olağanüstü hal', 'tahliye', 'afetzede', 'depremzede',
+    /* hasar */
+    'enkaz', 'moloz', 'göçük', 'yıkıl', 'yıkık', 'harabe', 'hasar', 'çatlak',
+    /* insan */
+    'arama kurtarma', 'kurtar', 'mahsur', 'yaral', 'cenaze', 'kayıp', 'kaybol',
+    'ulaşamıyor', 'haber alamıyor', 'sesimi duyan', 'imdat', 'yardım',
+    /* barınma ve ısınma */
+    'barınma', 'barınak', 'çadır', 'çadırkent', 'konteyner', 'battaniye', 'uyku tulumu',
+    'ısıtıcı', 'soba', 'jeneratör', 'powerbank', 'şarj', 'kıyafet', 'toplanma',
+    /* gıda ve sağlık */
+    'gıda', 'susuz', 'içme suyu', 'mama', 'ilaç', 'ilk yardım', 'sağlık', 'ambulans',
+    'hastane', 'revir', 'kan bağış',
+    /* koordinasyon */
+    'afad', 'akut', 'kızılay', 'ahbap', 'valilik', 'kaymakamlık', 'jandarma', 'itfaiye',
+    'meteoroloji', 'koordinasyon', 'gönüllü', 'bağış', 'dağıtım nokta', 'yardım nokta',
+    'güvenli bölge',
+    /* altyapı */
+    'elektrik kesint', 'su kesint', 'doğalgaz', 'gaz kaçağ', 'şebeke', 'baz istasyon',
+    'iletişim yok', 'sinyal yok'
+  ];
+
+  var WHOLE = ['sel', 'çığ', 'çöktü', 'çöken', 'çökme', 'çökmüş', 'göçtü',
+    'ölü', 'ölüm', 'ölen', 'yol kapalı', 'yol kapandı', '112'];
+
+  function normalize(text) {
+    return (text || '').toLocaleLowerCase('tr-TR')
+      .replace(/[ıİşğüöçâîû]/g, function (ch) { return FOLD[ch] || ch; })
+      .replace(/[^a-z0-9]+/g, ' ')
+      .replace(/([a-z])\1+/g, '$1')
+      .trim();
+  }
+
+  /* Normalising the list the same way collapses the doubled letters in it too
+     ("battaniye" becomes "bataniye" on both sides), so the two always agree. */
+  function alternation(words) {
+    var seen = {};
+    return words.map(normalize).filter(function (w) {
+      if (!w || seen[w]) return false;
+      seen[w] = 1;
+      return true;
+    }).join('|');
+  }
+
+  var CRISIS_RE = new RegExp(
+    '(?:^| )(?:(?:' + alternation(ROOTS) + ')|(?:' + alternation(WHOLE) + ')(?= |$))');
+
+  M.isCrisisText = function (t) { return CRISIS_RE.test(normalize(t)); };
 
   function sourceHTML(p) {
     if (!p.source) return '';

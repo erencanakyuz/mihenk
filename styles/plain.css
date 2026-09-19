@@ -65,6 +65,13 @@
 :root[data-plain="1"] :is(.crisis-filters label, .crisis-filters button) { min-height: 44px; border: 1px solid #bdbdbd; }
 :root[data-plain="1"] .crisis-filters button { width: auto; padding: 0 12px; }
 
+/* the compose box. The floating button that opens it on a phone is one of the
+   visuals this mode drops, so the box itself stays open at the top of the feed:
+   otherwise a narrow screen is left with no way to write a post at all. */
+@media (max-width: 700px) {
+  :root[data-plain="1"]:not([data-tab="crisis"]) #composer { display: flex; }
+}
+
 /* crisis head: label, title, one amber row, one ruled row */
 :root[data-plain="1"] .crisis-card { margin: 0; border: 0; background: #000; }
 :root[data-plain="1"] .crisis-intro { padding: 16px var(--pad-x) 0; }
@@ -93,6 +100,21 @@
 :root[data-plain="1"] :is(.chip[aria-pressed="true"], .chip[data-on="1"]) { background: none; color: #fff; font-weight: 700; }
 :root[data-plain="1"] :is(.chip[aria-pressed="true"], .chip[data-on="1"])::before { content: "[x] "; }
 :root[data-plain="1"] .chip__n { opacity: 1; margin-left: 4px; }
+
+/* need chips carry the same [ ] / [x] marker, and the box belongs to the rows
+   that are chosen. Left to the shared rule the pressed chip paints its border
+   in the accent fill, which is the page background here, so the box fell off
+   exactly the rows it was meant to mark. */
+:root[data-plain="1"] .big-chip {
+  min-height: 44px; margin-bottom: 4px; padding: 0; gap: 0;
+  border: 0; background: none; color: #bdbdbd;
+  font-size: 16px; font-weight: 400; white-space: pre;
+}
+:root[data-plain="1"] .big-chip::before { content: "[ ] "; }
+:root[data-plain="1"] .big-chip[aria-pressed="true"] {
+  padding: 0 12px; border: 1px solid #fff; background: none; color: #fff; font-weight: 700;
+}
+:root[data-plain="1"] .big-chip[aria-pressed="true"]::before { content: "[x] "; }
 
 /* posts: ruled rows, no cards */
 :root[data-plain="1"] :is(.post, .cpost) { display: block; margin: 0; padding: 16px var(--pad-x); background: #000; border: 0; border-bottom: 1px solid #fff; }
