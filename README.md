@@ -55,7 +55,8 @@ içinde üç sistem çalışır:
   Yapay zekâ doğrulaması bugün yalnızca arayüzdeki yer tutucudur (TODO).
 - **Düşük bant genişliği modu.** Tek tıkla siyah-beyaz, tek sütun "Terminal"
   görünümü: görseller, hareketler ve gölgeler kapanır, **hiçbir işlem
-  kaybolmaz**. Tam sürüm ~470 KB, düz mod ~11 KB.
+  kaybolmaz**. Boyut sabit yazılmaz, çalışma anında ölçülür: tarayıcının indirdiği
+  tam sürüm ~325 KB, düz belge ~11 KB; tek dosya paketi 528 KB.
 
 ## Öne çıkanlar
 
