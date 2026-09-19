@@ -101,6 +101,21 @@
 :root[data-plain="1"] :is(.chip[aria-pressed="true"], .chip[data-on="1"])::before { content: "[x] "; }
 :root[data-plain="1"] .chip__n { opacity: 1; margin-left: 4px; }
 
+/* need chips carry the same [ ] / [x] marker, and the box belongs to the rows
+   that are chosen. Left to the shared rule the pressed chip paints its border
+   in the accent fill, which is the page background here, so the box fell off
+   exactly the rows it was meant to mark. */
+:root[data-plain="1"] .big-chip {
+  min-height: 44px; margin-bottom: 4px; padding: 0; gap: 0;
+  border: 0; background: none; color: #bdbdbd;
+  font-size: 16px; font-weight: 400; white-space: pre;
+}
+:root[data-plain="1"] .big-chip::before { content: "[ ] "; }
+:root[data-plain="1"] .big-chip[aria-pressed="true"] {
+  padding: 0 12px; border: 1px solid #fff; background: none; color: #fff; font-weight: 700;
+}
+:root[data-plain="1"] .big-chip[aria-pressed="true"]::before { content: "[x] "; }
+
 /* posts: ruled rows, no cards */
 :root[data-plain="1"] :is(.post, .cpost) { display: block; margin: 0; padding: 16px var(--pad-x); background: #000; border: 0; border-bottom: 1px solid #fff; }
 :root[data-plain="1"] :is(.post__head, .cpost__head) { flex-wrap: wrap; gap: 0 6px; color: #bdbdbd; font-size: 14px; }
