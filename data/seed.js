@@ -79,7 +79,7 @@
     P('n7','u9','52 dk','Bir cümleyi kısaltmak, uzatmaktan her zaman daha çok zaman alıyor.',889,131,27),
     P('n8','u8','1 sa','Maket bıçağını üçüncü kez kaybettim. Muhtemelen maketin içinde.',432,21,44),
     P('n9','u1','1 sa','Şehirdeki her boş arsa aslında bir soru: gölge mi istiyoruz, otopark mı?',1673,388,141,{ media: 'arsa' }),
-    P('n10','u12','1 sa','Elektrik kesintisinde en çok özlediğim şey ışık değil, buzdolabının sesi.',2044,297,88),
+    P('n10','u12','1 sa','Kahve makinesinin kablosunu tamir ettim. Evdeki itibarım üç kat arttı.',2044,297,88),
     P('n11','u7','2 sa','Gece vardiyası bitti. Sabah kahvesi bugün fazlasıyla hak edilmiş durumda.',760,42,19),
     P('n12','u10','2 sa','Öğrenciler “tarih ezberdir” diyor, ben “tarih tartışmadır” diyorum. Zil çalıyor, tartışma yarıya kalıyor.',1512,246,73),
     P('n13','u2','2 sa','Kod incelemesinde en sevdiğim yorum: “bu neden çalışıyor?” Cevabı olmayan tek soru.',998,164,52),
@@ -99,7 +99,23 @@
     P('n27','u5','14 sa','Ortalama, tek başına neredeyse hiçbir şey anlatmıyor. Yine de en çok o paylaşılıyor.',2530,604,77),
     P('n28','u6','16 sa','Metronomla çalışmayı sevmiyorum ama metronom haklı.',693,71,18),
     P('n29','u4','18 sa','Aynı sokağı üç yıldır çekiyorum. Sokak değişmiyor, ben değişiyorum.',4180,893,152,{ media: 'sokak' }),
-    P('n30','u3','20 sa','Kütüphaneye yeni gelen kitapların kokusu diye bir şey var ve bilimsel olarak kanıtlanmalı.',1487,192,58)
+    P('n30','u3','20 sa','Kütüphaneye yeni gelen kitapların kokusu diye bir şey var ve bilimsel olarak kanıtlanmalı.',1487,192,58),
+    P('n31','u9','21 sa','Akşam yemeği için üç tarif açtım, sonunda makarna yaptım. Klasik.',864,77,53),
+    P('n32','u1','22 sa','Mahalledeki ıhlamurlar çiçek açmış. Bütün sokak kokuyor, kimse fotoğrafını çekmiyor.',2765,502,64,{ media: 'ihlamur' }),
+    P('n33','u8','23 sa','Arkadaşlar, İzmir’de iyi bir maket malzemecisi öneriniz var mı? Yıllardır gittiğim yer kapandı.',318,46,97),
+    P('n34','u12','1 g','Servis yirmi dakika geç kaldı, ben de yürüdüm. Aynı sürede varmışım ve bu beni rahatsız etti.',1129,131,42),
+    P('n35','u7','1 g','Nöbette kucağıma kedi yavrusu bıraktılar. Burası veteriner değil demeyi üçüncü kişide bıraktım.',4512,806,187),
+    P('n36','u5','1 g','Pazar günü kurduğum tabloyu pazartesi anlamıyorum. Geleceğe not bırakmayı öğrenmem lazım.',1893,398,61),
+    P('n37','u10','1 g','Derste bir öğrenci “yani Osmanlı da mı borçlanmış” dedi ve sınıf sustu. Güzel bir sessizlikti.',3277,691,143),
+    P('n38','u6','1 g','Albümün adını sonunda buldum. Şarkılar üç aydır hazırdı, isim yoktu.',1406,163,88),
+    P('n39','u2','1 g','Ofiste kahve makinesi bozuldu. Verimlilik üzerine doğal bir deney başlatmış olduk.',2618,489,112),
+    P('n40','u11','2 g','Bir logoyu küçülttüğünüzde hâlâ anlaşılıyorsa logodur. Anlaşılmıyorsa resimdir.',3845,921,74),
+    P('n41','u4','2 g','Bisikletle kırk kilometre. Dizlerim itiraz ediyor, geri kalan her şey memnun.',1974,212,66,{ media: 'bisiklet' }),
+    P('n42','u3','2 g','Sınıfa kitap kutusu geldi. Çocuklar kutuyu açmaya benden hevesliydi, bu iyiye işaret.',2240,317,49),
+    P('n43','u9','2 g','Bir metinden “aslında” kelimesini silince metin genelde daha dürüst oluyor.',1562,344,38),
+    P('n44','u1','3 g','Yeni projede tek şartım var: oturulacak yer. Gerisi tartışılır.',1085,178,31),
+    P('n45','u12','3 g','Evdeki bütün prizleri etiketledim. Kimse teşekkür etmedi ama doğru olanı yaptım.',926,104,27),
+    P('n46','u8','3 g','Üç günde bitecek maket, dördüncü gününde. Her seferinde aynı.',588,52,35)
   ];
 
   var following = [
@@ -114,7 +130,17 @@
     P('f9','u5','6 sa','Grafiğin ekseni sıfırdan başlamıyorsa, grafiğin kendisi bir iddiadır.',1204,377,41),
     P('f10','u6','8 sa','Amfide akort tutmuyor, salonun nemi %70. Fizik kazandı.',187,12,6),
     P('f11','u4','11 sa','En iyi objektif, yanında taşıdığın objektiftir.',455,73,18,{ media: 'objektif' }),
-    P('f12','u3','15 sa','Bir öğrenci “öğretmenim bu konuyu sevdim” dedi. Günün geri kalanı önemsiz.',978,145,37)
+    P('f12','u3','15 sa','Bir öğrenci “öğretmenim bu konuyu sevdim” dedi. Günün geri kalanı önemsiz.',978,145,37),
+    P('f13','u7','18 sa','İki haftadır aynı kitabın aynı sayfasındayım. Kitap suçsuz.',264,22,13),
+    P('f14','u1','20 sa','Kent mobilyası dediğimiz şeyin yarısı insanların oturmasını engellemek için tasarlanmış. Diğer yarısı da iyi değil.',1342,412,57),
+    P('f15','u12','22 sa','Havya açık kalmış. Sabah evi yerinde bulduğuma şükrettim, abartıyorum ama çok değil.',387,34,21),
+    P('f16','u2','1 g','Dokümantasyon yazmak kodu iki kez yazmak gibi. İkincisinde ne yaptığını anlıyorsun.',702,158,26),
+    P('f17','u10','1 g','Tarih dersinde en zor iş, “bunu sonradan biz adlandırdık” cümlesini öğretmek.',845,197,33),
+    P('f18','u11','1 g','Müşteri “biraz daha pop olsun” dedi. On iki yıldır bu cümleyi çözmeye çalışıyorum.',1531,389,74),
+    P('f19','u4','2 g','Işık iyi olunca fotoğrafçı da iyi oluyor. Kimse bunu yüksek sesle söylemiyor.',668,91,29,{ media: 'isik' }),
+    P('f20','u3','2 g','Veli toplantısında en çok konuşan veli, en az soru soran veli oluyor. Bunun bir adı olmalı.',1194,236,58),
+    P('f21','u9','2 g','Yazım kılavuzu tartışmak metni düzeltmekten eğlenceli. Tam da bu yüzden tehlikeli.',513,77,19),
+    P('f22','u6','3 g','Amfide prova, evde kayıt, otobüste mix. Modern müzisyenlik bu.',429,63,15)
   ];
 
   /* ---- crisis feed ----------------------------------------------------- */
